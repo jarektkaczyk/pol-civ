@@ -51,11 +51,15 @@ Poland had 37,242,958 residents on 30 June 2026. Pages are in English; place nam
 - [data/history.json](https://softonsofa.com/pol-civ/data/history.json): The 1914 partition borders and the borders of interwar Poland, simplified from CShapes 2.0.
 - [data/commuting.json](https://softonsofa.com/pol-civ/data/commuting.json): Commuting flows into the 12 most populous cities, from the NSP 2021 gmina matrix.
 - [data/timeline.json](https://softonsofa.com/pol-civ/data/timeline.json): Annual population density and change for Polish land hexes, 2015 to 2026.
+- [data/economy.json](https://softonsofa.com/pol-civ/data/economy.json): Made in Poland and Tech and games: product and tech sites with one fact each, and the game studios of each town.
 - [data/sources.json](https://softonsofa.com/pol-civ/data/sources.json): The bibliography: every source with publisher, licence, vintage and the exact files used.
 
 ## Sources
 
 - [Statistics Poland (GUS)](https://bdl.stat.gov.pl/bdl/dane/podgrup/temat/31/640/4318): NSP 2021 education by powiat and gmina
+- [Eurostat, GUS, the Polish Investment and Trade Agency (PAIH), company reports and press pages](https://www.paih.gov.pl/): Made in Poland: plants, yards and makers behind Polish products
+- [Statistics Poland (GUS), Dziedzinowe Bazy Wiedzy](https://dbw.stat.gov.pl/): Patents granted and R&D spending
+- [Główny Urząd Nadzoru Budowlanego (GUNB)](https://dane.gov.pl/pl/dataset/3467): Building permit register: new industrial and storage buildings
 - [ORLEN, Gaz-System (via the cited pages); positions from Wikidata and OpenStreetMap](https://www.orlen.pl/en): Oil and gas in Poland: Baltic Pipe, main fields, refineries (curated)
 - [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE](https://www.openstreetmap.org/): Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear
 - [Urząd Regulacji Energetyki (Energy Regulatory Office); powiat codes from GUS BDL](https://www.ure.gov.pl/pl/oze/potencjal-krajowy-oze/8108,Instalacje-odnawialnych-zrodel-energii-stan-na-30-wrzesnia-2026-r.html): Installed renewable capacity by powiat (URE Mapa OZE)
@@ -85,6 +89,7 @@ Poland had 37,242,958 residents on 30 June 2026. Pages are in English; place nam
 - [Główny Urząd Statystyczny (GUS); Wikidata](https://stat.gov.pl/obszary-tematyczne/srodowisko-energia/srodowisko/ochrona-srodowiska-2025,1,26.html): National parks: area and visitors
 - [Główny Urząd Statystyczny (GUS); Ministry of Science (RAD-on / POL-on); Wikidata](https://radon.nauka.gov.pl/dane): Universities: students, research categories, main campus
 - [Ministry of Finance and Statistics Poland (GUS)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia): Polish local income, housing, and tourism statistics
+- [Wikidata (game studios); company, TOP500, Polish Patent Office and press pages (landmarks)](https://www.wikidata.org/): Tech and games: game studios and tech landmarks
 - [Eurostat; OpenStreetMap contributors; Wikidata; Government of Poland](https://ec.europa.eu/eurostat/web/transport/database): Airports of Poland: traffic, positions and planned Port Polska
 - [Eurostat (data from Statistics Poland, GUS)](https://ec.europa.eu/eurostat/web/transport/database): Road freight by NUTS 3 region and rail freight between regions (Eurostat)
 - [OpenStreetMap contributors (via the Overpass API)](https://www.openstreetmap.org/): Motorways, expressways and main railway lines of Poland (OpenStreetMap)

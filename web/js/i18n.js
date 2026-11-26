@@ -56,11 +56,24 @@ function fill(text, vars) {
   });
 }
 
+// Dates and years inside a key: "GUS, 2026-10 and 2025-12" -> "GUS, {d1} and {d2}" (pipeline/core/i18n.py
+// date_pattern). A key with no exact entry is looked up by this pattern, so a monthly date change keeps one entry.
+const DATE_TOKEN = /(?<![\w/.:=-])(?:\d{4}-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12]\d|3[01]))?|(?:19|20)\d{2})(?![\w/-])/g;
+
+function lookup(k) {
+  const hit = catalogue[k];
+  if (hit != null) return hit;
+  const dates = [];
+  const pattern = k.replace(DATE_TOKEN, (m) => `{d${dates.push(m)}}`);
+  const tpl = dates.length ? catalogue[pattern] : null;
+  return typeof tpl === "string" ? tpl.replace(/\{d(\d+)\}/g, (m, i) => dates[i - 1] ?? m) : null;
+}
+
 /** The text of `key` in the page language, with {placeholders} filled and ISO dates formatted. */
 export function t(key, vars) {
   if (key == null) return "";
   const k = String(key);
-  const hit = LANG === "pl" ? catalogue[k] : null;
+  const hit = LANG === "pl" ? lookup(k) : null;
   return localizeDates(fill(typeof hit === "string" && hit ? hit : k, vars));
 }
 
@@ -86,7 +99,7 @@ t.plural = function plural(n, forms, vars) {
 };
 
 /** Whether the catalogue has `key` (always true in English). */
-t.has = (key) => LANG !== "pl" || typeof catalogue[key] === "string" || typeof catalogue[key] === "object";
+t.has = (key) => LANG !== "pl" || lookup(String(key)) != null;
 
 // ---------------------------------------------------------------- numbers
 

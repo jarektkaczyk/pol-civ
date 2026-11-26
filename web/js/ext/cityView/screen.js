@@ -12,6 +12,7 @@ import { sparkline, meter, bar } from "./charts.js";
 import { popSeries, rankCount, resourceValue, siteDetail, LAND } from "./model.js";
 import { citizensHtml, mountCitizens } from "./citizens.js";
 import { badgeHtml, cityDistricts, districtsHtml } from "./districts.js";
+import { madeHereHtml } from "../economy/cards.js";
 
 const TABS = [
   ["citizens", t("Citizens"), "pop"],
@@ -201,6 +202,7 @@ function economy(m) {
     </div>
     <h4 class="cv-h4">${esc(t("Yields"))} <span class="muted">${esc(t("rank among towns"))}</span></h4>
     <div class="cv-yields">${yields}</div>
+    <div data-made></div>
   </section>`;
 }
 
@@ -407,4 +409,9 @@ export function render(el, m, h) {
     typeSlot.innerHTML = badgeHtml(m, dd ?? null);
     h.onDistricts?.(dd ? cityDistricts(dd, mil, m.city.id) : []);
   }, () => { if (dHost.isConnected) dHost.innerHTML = districtsHtml(m, null, null); });
+  // Made here: the product and tech sites in the town (economy.json), only when there are any.
+  const madeHost = el.querySelector("[data-made]");
+  Promise.resolve(h.loadData?.("economy")).then((doc) => {
+    if (madeHost.isConnected) madeHost.innerHTML = madeHereHtml(doc, m.city.id);
+  }, () => {});
 }

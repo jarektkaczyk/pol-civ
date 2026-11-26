@@ -202,5 +202,28 @@ class BrowserI18nTest(unittest.TestCase):
         self.assertEqual(pl["href"], "/pol-civ/#lens=age")
 
 
+
+class DatePatternTest(unittest.TestCase):
+    """A source line whose dates move keeps one catalogue entry (pipeline/core/i18n.py date_pattern, lookup)."""
+
+    CAT = {"GUS, {d1}, {d2}, and {d3}": "GUS, {d1}, {d2} i {d3}", "Change 2015-2025": "Zmiana 2015-2025",
+           "Exact 2026-10": "Dokladnie 2026-10"}
+
+    def test_pattern(self):
+        self.assertEqual(i18n.date_pattern("GUS, 2026-10, 2026-05, and 2025-12"),
+                         ("GUS, {d1}, {d2}, and {d3}", ["2026-10", "2026-05", "2025-12"]))
+        self.assertEqual(i18n.date_pattern("Change 2015-2025")[1], [])  # a range stays literal
+        self.assertEqual(i18n.date_pattern("Census 2021-03-31")[0], "Census {d1}")
+
+    def test_lookup_by_pattern(self):
+        self.assertEqual(i18n.lookup("GUS, 2026-11, 2026-05, and 2025-12", self.CAT), "GUS, 2026-11, 2026-05 i 2025-12")
+        self.assertEqual(i18n.t("GUS, 2026-11, 2026-05, and 2025-12", "pl", self.CAT),
+                         "GUS, listopad 2026, maj 2026 i grudzień 2025")
+
+    def test_exact_entry_wins(self):
+        self.assertEqual(i18n.lookup("Exact 2026-10", {**self.CAT, "Exact {d1}": "Wzor {d1}"}), "Dokladnie 2026-10")
+        self.assertIsNone(i18n.lookup("Nothing 2026-10", self.CAT))
+
+
 if __name__ == "__main__":
     unittest.main()

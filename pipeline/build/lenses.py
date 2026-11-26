@@ -19,11 +19,12 @@ from .plstats import Stats, Units, cell_weights, optional, spread, unsampled_cel
 from .lenses_more_a import LENSES_A, lens_values
 from .yields import Economy
 from .lenses_more_b import REQUIRES_B, lenses_b  # identity, commuting and EU funds lenses (lenses_more_b.py)
+from .lenses_more_c import GROUPS_C, LENSES_C, REQUIRES_C  # enterprise lenses (lenses_more_c.py)
 
 REQUIRES = ["_world", "pl_geo_teryt", "pl_geo_lau", "pl_geo_fua", "pl_stats_population", "pl_stats_labour", "pl_stats_prosperity",
             "pl_gdp", "pl_foreigners", "pl_census_2021", "pl_soc_elections", "pl_soc_faith", "pl_soc_air",
             "pl_soc_health", "pl_soc_universities", "pl_soc_disasters", "pl_more_gus", "pl_more_exams",
-            "pl_more_finance"] + REQUIRES_B
+            "pl_more_finance"] + REQUIRES_B + REQUIRES_C
 PRODUCES = ["lenses.json"]
 
 GROUPS = [
@@ -37,6 +38,7 @@ GROUPS = [
     {"id": "hazards", "name": "Hazards"},
     {"id": "land", "name": "Land"},
 ]
+GROUPS[2:2] = GROUPS_C  # after Prosperity
 
 R = {  # ramps, dark to light
     "plum": ["#1b1035", "#4b2377", "#9a3b8a", "#e0645e", "#f9b24a", "#fff3a8"],
@@ -87,7 +89,7 @@ LENSES = [
     ("pm25", "pm25", "l-air", "🌫️", "smog", "linear", {}),
     ("flood", "flood_2024", "l-disasters", "🌊", None, "linear", {}),
 ]
-LENSES = [lens for lens in LENSES if lens[0] not in {more[0] for more in LENSES_A}] + LENSES_A
+LENSES = [lens for lens in LENSES if lens[0] not in {more[0] for more in LENSES_A}] + LENSES_A + LENSES_C
 NOTES = {
     "ukrainians": "Counts where the PESEL UKR number was issued, not where people live now.",
     "income": "Follows the taxable income of residents.",
@@ -241,7 +243,7 @@ def build() -> None:
     print(f"    {len(lenses)} lenses: " + ", ".join(l["id"] for l in lenses))
 
 
-REQUIRED_NOTES = {"ukrainians", "vote", "pm25", "flood", "catholic"} | {lens[0] for lens in LENSES_A}
+REQUIRED_NOTES = {"ukrainians", "vote", "pm25", "flood", "catholic"} | {lens[0] for lens in LENSES_A + LENSES_C}
 
 
 def check(web_dir) -> list[tuple[str, str]]:

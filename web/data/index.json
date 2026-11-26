@@ -565,7 +565,7 @@
   {
    "path": "data/lenses.json",
    "url": "https://softonsofa.com/pol-civ/data/lenses.json",
-   "bytes": 2104268,
+   "bytes": 2352432,
    "description": "The map lenses: one value per hex for each metric, with legend domains and notes.",
    "fields": [
     "density (Density)",
@@ -607,6 +607,12 @@
     "vote_2015 (President 2015)",
     "vote_2020 (President 2020)",
     "vote_shift_2020_2025 (Presidential vote shift, 2020-2025)",
+    "tech_firms (Tech and media firms)",
+    "new_firms (New firms)",
+    "sole_traders (Sole traders)",
+    "patents (Patents)",
+    "rd_spending (R&D spending)",
+    "new_industry (New factories and warehouses)",
     "silesian (Silesian identity)",
     "kashubian (Kashubian identity)",
     "german (German identity)",
@@ -618,10 +624,13 @@
     "farmland (Farmland)",
     "developed (Built-up)"
    ],
-   "rows": 49,
+   "rows": 55,
    "vintage": "GUS population 2026-06-30; population 2025-12-31 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 2025-12-31; territorial division 2026-01-01; PKW: presidential election runoffs of 2015-05-24 and 2020-07-12; presidential election 2025 (rounds of 18 May and 2025-06-01); Sejm 2023 (2023-10-15)",
    "sources": [
     "pl_census_2021",
+    "pl_econ_innovation",
+    "pl_econ_permits",
+    "pl_econ_regon",
     "pl_eu_funds",
     "pl_flows_commuting",
     "pl_foreigners",
@@ -641,6 +650,8 @@
    ],
    "publishers": [
     "Statistics Poland (GUS)",
+    "Statistics Poland (GUS), Dziedzinowe Bazy Wiedzy",
+    "Główny Urząd Nadzoru Budowlanego (GUNB)",
     "Ministry of Funds and Regional Policy (dane.gov.pl)",
     "Statistics Poland (GUS) and dane.gov.pl",
     "European Space Agency (ESA WorldCover consortium)",
@@ -656,6 +667,18 @@
    "licenses": [
     {
      "source": "pl_census_2021",
+     "terms": "Creative Commons Attribution 4.0"
+    },
+    {
+     "source": "pl_econ_innovation",
+     "terms": "Creative Commons Attribution 4.0"
+    },
+    {
+     "source": "pl_econ_permits",
+     "terms": "CC0 1.0"
+    },
+    {
+     "source": "pl_econ_regon",
      "terms": "Creative Commons Attribution 4.0"
     },
     {
@@ -1127,9 +1150,43 @@
    ]
   },
   {
+   "path": "data/economy.json",
+   "url": "https://softonsofa.com/pol-civ/data/economy.json",
+   "bytes": 59431,
+   "description": "Made in Poland and Tech and games: product and tech sites with one fact each, and the game studios of each town.",
+   "fields": [
+    "items (layer, kind, name, place, fact, year, ref, x, y, cell, county, state)",
+    "kinds",
+    "rules"
+   ],
+   "rows": 150,
+   "vintage": {
+    "pl_econ_champions": "Curated 2026-11; figures 2017-2026 (each item has its year)",
+    "pl_tech_sites": "Wikidata game studios; landmarks curated 2026-11"
+   },
+   "sources": [
+    "pl_econ_champions",
+    "pl_tech_sites"
+   ],
+   "publishers": [
+    "Eurostat, GUS, the Polish Investment and Trade Agency (PAIH), company reports and press pages",
+    "Wikidata (game studios); company, TOP500, Polish Patent Office and press pages (landmarks)"
+   ],
+   "licenses": [
+    {
+     "source": "pl_econ_champions",
+     "terms": "Short quotations of published figures with the page named; Eurostat and GUS: reuse with attribution"
+    },
+    {
+     "source": "pl_tech_sites",
+     "terms": "Wikidata: CC0; landmark facts: short quotations of figures with the page named"
+    }
+   ]
+  },
+  {
    "path": "data/sources.json",
    "url": "https://softonsofa.com/pol-civ/data/sources.json",
-   "bytes": 200446,
+   "bytes": 243222,
    "description": "The bibliography: every source with publisher, licence, vintage and the exact files used.",
    "fields": [
     "id",
@@ -1138,7 +1195,7 @@
     "vintage",
     "files"
    ],
-   "rows": 41,
+   "rows": 46,
    "vintage": null,
    "sources": [],
    "publishers": [],

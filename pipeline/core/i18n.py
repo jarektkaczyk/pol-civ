@@ -189,6 +189,34 @@ def _fill(text: str, lang: str, vars_: dict) -> str:
     return re.sub(r"\{(\w+)\}", rep, text)
 
 
+# Dates and years inside a key: "GUS, 2026-10 and 2025-12" -> "GUS, {d1} and {d2}". A key with no exact entry is
+# looked up by this pattern, so a source line whose dates move every month keeps one catalogue entry. Ranges such as
+# "2015-2025" stay literal (the lookarounds reject a hyphen next to the year).
+_DATE_TOKEN = re.compile(r"(?<![\w/.:=-])(?:\d{4}-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12]\d|3[01]))?|(?:19|20)\d{2})(?![\w/-])")
+
+
+def date_pattern(key: str) -> tuple[str, list[str]]:
+    """(the key with each date or year replaced by {d1}, {d2}, ..., the dates in order)."""
+    found: list[str] = []
+
+    def rep(m):
+        found.append(m.group(0))
+        return "{d%d}" % len(found)
+
+    return _DATE_TOKEN.sub(rep, key), found
+
+
+def lookup(key: str, cat: dict):
+    """The catalogue entry for `key`: the exact entry, else its date pattern's entry with the dates put back."""
+    hit = cat.get(key)
+    if hit is not None:
+        return hit
+    pattern, dates = date_pattern(key)
+    if dates and isinstance(cat.get(pattern), str):
+        return _fill(cat[pattern], "en", {f"d{i + 1}": d for i, d in enumerate(dates)})
+    return None
+
+
 def t(key: str, lang: str = "en", catalogue: dict | None = None, **vars_) -> str:
     """The text of `key` in `lang`, with {name} placeholders filled and ISO dates formatted. A key with no Polish
     entry falls back to English (pipeline check fails the build before that can ship)."""
@@ -197,7 +225,7 @@ def t(key: str, lang: str = "en", catalogue: dict | None = None, **vars_) -> str
     text = key
     if lang == "pl":
         cat = load_catalogue() if catalogue is None else catalogue
-        hit = cat.get(key)
+        hit = lookup(key, cat)
         if isinstance(hit, str):
             text = hit
     return localize_dates(_fill(text, lang, vars_), lang)
@@ -305,13 +333,14 @@ DATA_TEXT: dict[str, list[str]] = {
     "commuting.json": ["rule", "notes[]"],
     "history.json": ["layers[].label", "layers[].labels[].name", "layers[].lines[].tip", "rules[]", "licence", "notes[]"],
     "timeline.json": ["notes[]", "rule"],
+    "economy.json": ["layers[].name", "kinds[].name", "items[].fact", "items[].label", "rules.*"],
     "sources.json": ["[].title", "[].description", "[].publisher", "[].license", "[].vintage", "[].used_for[]",
                      "[].notes[]", "[].caveats[]"],
 }
 # Vintage lines are shown in the Almanac and in lens notes.
 for _name in ("lenses.json", "nation.json", "counties.json", "powiaty.json", "citizens.json", "districts.json",
               "disasters.json", "trade.json", "metros.json", "military.json", "infrastructure.json", "resources.json",
-              "wonders.json", "commuting.json", "history.json", "timeline.json"):
+              "wonders.json", "commuting.json", "history.json", "timeline.json", "economy.json"):
     DATA_TEXT[_name] += ["vintage", "vintage.*", "gdp_vintage"]
 
 
@@ -440,7 +469,7 @@ def missing(web: Path | None = None, catalogue: dict | None = None) -> dict[str,
     cat = load_catalogue() if catalogue is None else catalogue
     out = {}
     for k, info in all_keys(web).items():
-        v = cat.get(k)
+        v = cat.get(k) if info["plural"] else lookup(k, cat)
         if info["plural"]:
             ok = isinstance(v, dict) and all(isinstance(v.get(f), str) and v.get(f) for f in ("one", "few", "many"))
         else:

@@ -1707,6 +1707,9 @@ FILE_INFO = {
                        ["cities (name, commuters_in, commuters_out, arcs)", "rule"], ["pl_flows_commuting"]),
     "timeline.json": ("Annual population density and change for Polish land hexes, 2015 to 2026.",
                       ["dates", "cells", "density", "growth", "domains", "notes"], ["pl_hist_population"]),
+    "economy.json": ("Made in Poland and Tech and games: product and tech sites with one fact each, and the game studios of each town.",
+                     ["items (layer, kind, name, place, fact, year, ref, x, y, cell, county, state)", "kinds", "rules"],
+                     ["pl_econ_champions", "pl_tech_sites"]),
     "sources.json": ("The bibliography: every source with publisher, licence, vintage and the exact files used.", ["id", "publisher", "license", "vintage", "files"], []),
 }
 
@@ -1805,6 +1808,7 @@ FILE_INFO_PL = {
     "history.json": "Granice zaborów w 1914 r. i granice II Rzeczypospolitej, uproszczone na podstawie CShapes 2.0.",
     "commuting.json": "Dojazdy do pracy do 12 największych miast według macierzy gmin z NSP 2021.",
     "timeline.json": "Roczna gęstość zaludnienia i zmiana liczby ludności na polskich heksach w latach 2015-2026.",
+    "economy.json": "Z Polski na świat oraz Technologie i gry: zakłady, firmy i ośrodki z jednym faktem każdy oraz studia gier w każdym mieście.",
     "sources.json": "Bibliografia: każde źródło z wydawcą, licencją, stanem danych i dokładnie wykorzystanymi plikami.",
 }
 

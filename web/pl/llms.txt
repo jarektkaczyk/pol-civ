@@ -51,11 +51,15 @@
 - [data/history.json](https://softonsofa.com/pol-civ/data/history.json): Granice zaborów w 1914 r. i granice II Rzeczypospolitej, uproszczone na podstawie CShapes 2.0.
 - [data/commuting.json](https://softonsofa.com/pol-civ/data/commuting.json): Dojazdy do pracy do 12 największych miast według macierzy gmin z NSP 2021.
 - [data/timeline.json](https://softonsofa.com/pol-civ/data/timeline.json): Roczna gęstość zaludnienia i zmiana liczby ludności na polskich heksach w latach 2015-2026.
+- [data/economy.json](https://softonsofa.com/pol-civ/data/economy.json): Z Polski na świat oraz Technologie i gry: zakłady, firmy i ośrodki z jednym faktem każdy oraz studia gier w każdym mieście.
 - [data/sources.json](https://softonsofa.com/pol-civ/data/sources.json): Bibliografia: każde źródło z wydawcą, licencją, stanem danych i dokładnie wykorzystanymi plikami.
 
 ## Źródła
 
 - [Główny Urząd Statystyczny (GUS)](https://bdl.stat.gov.pl/bdl/dane/podgrup/temat/31/640/4318): NSP 2021: wykształcenie według powiatów i gmin
+- [Eurostat, GUS, Polska Agencja Inwestycji i Handlu (PAIH), raporty firm i artykuły prasowe](https://www.paih.gov.pl/): Z Polski na świat: fabryki, stocznie i wytwórcy polskich produktów
+- [Główny Urząd Statystyczny (GUS), Dziedzinowe Bazy Wiedzy](https://dbw.stat.gov.pl/): Udzielone patenty i nakłady na B+R
+- [Główny Urząd Nadzoru Budowlanego (GUNB)](https://dane.gov.pl/pl/dataset/3467): Rejestr pozwoleń na budowę: nowe budynki przemysłowe i magazynowe
 - [ORLEN, Gaz-System (cytowane strony); lokalizacje z Wikidata i OpenStreetMap](https://www.orlen.pl/en): Ropa i gaz w Polsce: Baltic Pipe, główne złoża, rafinerie (zestawienie własne)
 - [Współtwórcy OpenStreetMap; operatorzy (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE](https://www.openstreetmap.org/): Elektrownie w Polsce (100 MW i więcej; fotowoltaika 50 MW i więcej), morskie farmy wiatrowe i elektrownia jądrowa
 - [Urząd Regulacji Energetyki (URE); kody powiatów z BDL GUS](https://www.ure.gov.pl/pl/oze/potencjal-krajowy-oze/8108,Instalacje-odnawialnych-zrodel-energii-stan-na-30-wrzesnia-2026-r.html): Zainstalowana moc OZE według powiatów (URE Mapa OZE)
@@ -85,6 +89,7 @@
 - [Główny Urząd Statystyczny (GUS); Wikidata](https://stat.gov.pl/obszary-tematyczne/srodowisko-energia/srodowisko/ochrona-srodowiska-2025,1,26.html): Parki narodowe: powierzchnia i liczba odwiedzających
 - [Główny Urząd Statystyczny (GUS); Ministerstwo Nauki i Szkolnictwa Wyższego (RAD-on / POL-on); Wikidata](https://radon.nauka.gov.pl/dane): Uczelnie: studenci, kategorie naukowe, główny kampus
 - [Ministerstwo Finansów i Główny Urząd Statystyczny (GUS)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia): Polskie statystyki lokalne: dochody, mieszkania i turystyka
+- [Wikidane (studia gier); strony firm, TOP500, Urzędu Patentowego RP i prasy (miejsca technologii)](https://www.wikidata.org/): Technologie i gry: studia gier i miejsca polskiej technologii
 - [Eurostat; współtwórcy OpenStreetMap; Wikidata; Rząd RP](https://ec.europa.eu/eurostat/web/transport/database): Lotniska w Polsce: ruch, położenie i planowany Port Polska
 - [Eurostat (dane Głównego Urzędu Statystycznego, GUS)](https://ec.europa.eu/eurostat/web/transport/database): Przewozy drogowe według regionów NUTS 3 i przewozy kolejowe między regionami (Eurostat)
 - [Współtwórcy OpenStreetMap (przez Overpass API)](https://www.openstreetmap.org/): Autostrady, drogi ekspresowe i główne linie kolejowe Polski (OpenStreetMap)

@@ -100,6 +100,7 @@ Election lenses stay neutral. Candidate and committee names are written as on th
 - Numbers: decimal comma, a no-break space between thousands from 10 000 up (the code formats numbers; do not write them by hand in a key with `{n}`).
 - Short scales: tys., mln, mld, bln. Money: "3,92 bln zł".
 - Dates: "30 czerwca 2026" (genitive month); a month alone: "październik 2026". ISO dates in a text ("2026-06-30") are formatted by the code: keep them as ISO in the Polish text, or write the date in words when the sentence needs another case ("od maja 2026 r.").
+- Moving dates: a key with no exact entry is looked up by its date pattern, every ISO date or year replaced by `{d1}`, `{d2}`, ... in order ("GUS, {d1}, {d2}, and {d3}"). Source and lens lines whose dates change with each refresh need one pattern entry, so the monthly refresh does not stop on a new key. Write the pattern with a nominative month in mind ("stan: {d1}" reads "stan: październik 2026").
 - Plurals: `t.plural(n, {one, other})` in the code; the catalogue entry under the English "other" form holds `{"one", "few", "many"}` ("1 miasto", "2 miasta", "5 miast"), plus "other" for fractions when it differs from "few".
 - Keep every `{placeholder}` of the key. Do not add HTML.
 - Buttons and labels fit their slot: prefer the short word.

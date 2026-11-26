@@ -241,7 +241,8 @@ lens, counties.json and the Explorer show the same numbers.
   "groups": [{"id": "people", "name": "People"}, {"id": "prosperity", "name": "Prosperity"},
              {"id": "knowledge", "name": "Knowledge"}, {"id": "life", "name": "Daily life"}, {"id": "faith", "name": "Faith"},
              {"id": "vote", "name": "Vote"}, {"id": "air", "name": "Air"}, {"id": "hazards", "name": "Hazards"},
-             {"id": "land", "name": "Land"}],
+             {"id": "land", "name": "Land"}, {"id": "enterprise", "name": "Enterprise", "icon": "i-manufacturing"}],
+             // icon is optional: an icons.js id for the group heading (default "g-<id>")
   "lenses": [{
     "id": "income", "group": "prosperity", "name": "PIT revenue per person", "short_name": "PIT per person",
     "icon": "l-income", "emoji": "💰", // short_name is optional and appears only in the lens dock
@@ -273,6 +274,12 @@ lens, counties.json and the Explorer show the same numbers.
   belarusian, lemko, lithuanian, roma, other), group `identity`; commuters (wage employees commuting in per 1,000
   residents, NSP 2021, gmina), group `life`; eu_funds (EU co-financing of 2021-2027 projects per resident, project
   list of 2026-11-01, gmina), group `prosperity`.
+* Enterprise lenses (`pipeline/build/lenses_more_c.py`, group `enterprise`, after Prosperity): tech_firms (share of
+  REGON entities in PKD 2007 section J, gmina, latest month), new_firms (new REGON entities in 12 months per 1,000
+  residents, gmina), sole_traders (natural persons running a business per 1,000 residents, gmina), patents (patents
+  granted in the two latest years per 100,000 residents, powiat), rd_spending (R&D spending per resident,
+  voivodeship), new_industry (permit decisions for new category XVIII buildings in 24 months, gmina, a count). Their
+  notes name the level and a period that stays true after a refresh; the dates are in the source vintage.
 * `lenses.py` defines `check(web_dir)`: required notes, the neutral vote ramp, coverage per lens.
 
 ## resources.json
@@ -358,7 +365,7 @@ a `check(web_dir)` (see Pipeline conventions). Shared rules:
 * Rules that pick things (districts, wonders, routes) are published inside the file as text (`rule` / `rules`) so the UI
   and the Almanac can quote them.
 * **Loading** (browser): `infrastructure`, `military`, `wonders`, `trade` load eagerly right after the first frame (keep
-  each **under ~300 kB**); `citizens`, `districts`, `disasters` load on demand with `app.loadData(name)`.
+  each **under ~300 kB**); `citizens`, `districts`, `disasters`, `economy` load on demand with `app.loadData(name)`.
 
 ### citizens.json (lazy)
 
@@ -664,6 +671,42 @@ Built by `pipeline/build/timeline.py` from `pl_hist_population` (GUS bulk popula
   Change: population(date) / population(31 Dec 2015) - 1 per gmina, spread with the change lens's weights (0 on 2015).
 * Each date is on that date's gmina borders; from 31 December 2021 GUS counts are rebased on the 2021 census.
 
+### economy.json (lazy)
+
+Built by `pipeline/build/economy.py` from `pl_econ_champions` (curated product sites) and `pl_tech_sites` (curated tech
+landmarks plus the Wikidata game studios). Loaded by `ext/economy` when the "Made in Poland" or the "Tech and games"
+switch is first turned on, and by the City View for its "Made here" block.
+
+```jsonc
+{
+  "version": 1, "vintage": {"pl_econ_champions": "...", "pl_tech_sites": "..."},
+  "sources": ["pl_econ_champions", "pl_tech_sites"],
+  "rules": {"made": "...", "tech": "...", "studios": "..."},
+  "layers": [{"id": "made", "name": "Made in Poland"}, {"id": "tech", "name": "Tech and games"}],
+  "kinds": [{"id": "cars", "layer": "made", "name": "Cars and batteries", "count": 7}],   // draw order
+  "items": [
+    {"id": "mp_vw_poznan", "layer": "made", "kind": "cars", "name": "Volkswagen Poznań", "place": "Poznań",
+     "fact": "The world's only maker of the VW Caddy: ...", "year": 2025, "ref": "https://...",
+     "source": "pl_econ_champions", "x": 201.3, "y": 305.2, "cell": 3480, "county": "3064011", "state": "WP",
+     "county_by": "polygon"},
+    {"id": "studio_Q7098994", "layer": "tech", "kind": "studio", "name": "CD Projekt Red", "place": "Warszawa",
+     "game": "Cyberpunk 2077", "games": 9, "sitelinks": 40, "year": 2020, "ref": "https://www.wikidata.org/wiki/Q7098994",
+     "source": "pl_tech_sites", "x": 478.3, "y": 323.1, "cell": 3610, "county": "1465011", "state": "MZ",
+     "county_by": "polygon"}
+  ]
+}
+```
+
+* Kinds: `made` = `cars`, `transport`, `boats`, `home`, `food`, `crafts`, `cosmetics`, `energy`; `tech` = `studio`,
+  `scaleup`, `hpc`, `space`, `research`. Each kind has its own glyph (`web/js/render/art/economy.js`).
+* `fact` is one sentence or two (data text, translated through `web/i18n/pl.json`); `year` is the year the figure refers
+  to. A studio has `game` (its best-known game, the one with the most Wikipedia sitelinks released by 2026, checked by
+  hand for the largest studios) and `year` = that game's release year (null when Wikidata has none). `office: true`
+  marks a company shown at its main Polish office while its legal seat is abroad (`seat_note` says where).
+* `county` is the gmina the point lies in, by point in polygon against the LAU 2024 outlines (`county_by: "polygon"`);
+  a point on the coast outside every outline takes the gmina of its land hex (`county_by: "hex"`). `cell` is the
+  nearest Polish land hex. Studio positions are their headquarters town, so the browser shows one marker per town.
+
 ## data/index.json
 
 The public catalogue of `web/data/`, built by `pipeline/build/seo.py` (served at `/pol-civ/data/index.json`):
@@ -717,7 +760,8 @@ saved by `download_prefix()` has a `partial` note in the manifest, and its `sha2
 
 Extensions live in `web/js/ext/<name>/index.js` and export `install(app)`; `ext/index.js` loads `cityView`, `advisors`,
 `layers` (roads, rail, forts, ports, airports, wonders and trade routes), `history` (1914 and interwar borders),
-`commuting` (commuter arcs) and `timeline` (the year slider of the population lenses). The API:
+`commuting` (commuter arcs), `timeline` (the year slider of the population lenses) and `economy` (the "Made in Poland"
+and "Tech and games" sites). The API:
 
 **Data.**
 * `app.data.<name>`: the core files (`world`, `cities`, `states`, `nation`, `lenses`, `resources`, `sources`) are loaded
