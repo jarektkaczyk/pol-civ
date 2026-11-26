@@ -1,6 +1,8 @@
 // Share popover: copy a link to the current view, or download a 1600x900 PNG of it with a caption strip.
 import { drawIcon, hasIcon } from "../icons.js";
 import { icon } from "../ui/icon.js";
+import { t, LANG } from "../i18n.js";
+import { esc } from "../format.js";
 
 // The published site: the one place it is set. index.html's canonical and social-card tags repeat it as literals
 // (crawlers read no JS); keep them equal. Shared images print it without the scheme. When left empty, the page's own
@@ -9,7 +11,8 @@ export const SITE_URL = "https://softonsofa.com/pol-civ/";
 const SITE_FALLBACK = "pol-civ";
 
 export function siteLabel() {
-  if (SITE_URL) return SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  // The Polish page prints its own address (softonsofa.com/pol-civ/pl).
+  if (SITE_URL) return SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "") + (LANG === "pl" ? "/pl" : "");
   try {
     const { hostname, host, pathname } = location;
     const local = !hostname || /^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0)$/.test(hostname) || /\.(localhost|test|local)$/.test(hostname);
@@ -26,7 +29,7 @@ export const IMG_H = 900;
 export const CAPTION_H = 118;
 const SERIF = '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif';
 const SANS = '-apple-system, "Segoe UI", system-ui, sans-serif';
-const CREDIT = "Built from public data: GUS, Eurostat, GUGiK and more";
+const CREDIT = t("Built from public data: GUS, Eurostat, GUGiK and more");
 
 async function copyText(text) {
   try {
@@ -106,7 +109,7 @@ export function composeImage(info, { height = IMG_H } = {}) {
   spaced(ctx, 0);
   ctx.fillStyle = "#b9ab88";
   ctx.font = `italic 17px ${SERIF}`;
-  ctx.fillText("as a strategy game, built from real public data", 110, cy + 28);
+  ctx.fillText(t("as a strategy game, built from real public data"), 110, cy + 28);
 
   // Lens + legend ramp
   const mx = 640;
@@ -117,7 +120,7 @@ export function composeImage(info, { height = IMG_H } = {}) {
   ctx.fillStyle = "#ecd08e";
   ctx.font = `24px ${SERIF}`;
   spaced(ctx, 1.5);
-  ctx.fillText(lens ? `${lens.name} lens` : "Terrain", mx + 50, cy - 8);
+  ctx.fillText(lens ? t("{name} lens", { name: t(lens.name) }) : t("Terrain"), mx + 50, cy - 8);
   spaced(ctx, 0);
   if (lens?.ramp?.length) {
     const rx = mx + 50, ry = cy + 4, rw = 330, rh = 12;
@@ -130,14 +133,14 @@ export function composeImage(info, { height = IMG_H } = {}) {
     ctx.font = `14px ${SANS}`;
     ctx.fillStyle = "#d8cba8";
     ctx.textAlign = "left";
-    ctx.fillText(info.formatValue(lens, 0) + " or less", rx, ry + rh + 18);
+    ctx.fillText(t("{value} or less", { value: info.formatValue(lens, 0) }), rx, ry + rh + 18);
     ctx.textAlign = "right";
-    ctx.fillText(info.formatValue(lens, 1) + " or more", rx + rw, ry + rh + 18);
+    ctx.fillText(t("{value} or more", { value: info.formatValue(lens, 1) }), rx + rw, ry + rh + 18);
     ctx.textAlign = "left";
   } else {
     ctx.font = `15px ${SANS}`;
     ctx.fillStyle = "#b9ab88";
-    ctx.fillText("Land cover, relief, rivers and resources", mx + 50, cy + 16);
+    ctx.fillText(t("Land cover, relief, rivers and resources"), mx + 50, cy + 16);
   }
 
   // Selection, credits, site
@@ -147,7 +150,7 @@ export function composeImage(info, { height = IMG_H } = {}) {
   if (sel?.name) {
     ctx.font = `italic 15px ${SERIF}`;
     ctx.fillStyle = "#b9ab88";
-    ctx.fillText(sel.kind === "state" ? "Voivodeship" : "Town", rx, cy - 30);
+    ctx.fillText(sel.kind === "state" ? t("Voivodeship") : t("Town"), rx, cy - 30);
     ctx.font = `bold 24px ${SERIF}`;
     ctx.fillStyle = "#f3e6c4";
     ctx.fillText(fit(ctx, sel.name, 460), rx, cy - 6);
@@ -171,9 +174,9 @@ export function composeImage(info, { height = IMG_H } = {}) {
 
 function fit(ctx, text, maxW) {
   if (ctx.measureText(text).width <= maxW) return text;
-  let t = text;
-  while (t.length > 3 && ctx.measureText(t + "...").width > maxW) t = t.slice(0, -1);
-  return t + "...";
+  let s = text;
+  while (s.length > 3 && ctx.measureText(s + "...").width > maxW) s = s.slice(0, -1);
+  return s + "...";
 }
 
 /**
@@ -240,11 +243,11 @@ export function initShare(opts) {
   let restore = null;
 
   pop.innerHTML = `
-    <div class="sp-title">Share this view</div>
-    <button class="sp-item" data-act="copy">${icon("share", "🔗", { size: 16 })}<span>Copy link</span></button>
-    <button class="sp-item" data-act="image">${icon("terrain", "🖼️", { size: 16 })}<span>Download image</span></button>
+    <div class="sp-title">${esc(t("Share this view"))}</div>
+    <button class="sp-item" data-act="copy">${icon("share", "🔗", { size: 16 })}<span>${esc(t("Copy link"))}</span></button>
+    <button class="sp-item" data-act="image">${icon("terrain", "🖼️", { size: 16 })}<span>${esc(t("Download image"))}</span></button>
     <div class="sp-status" role="status" aria-live="polite"></div>
-    <input class="sp-url" type="text" readonly hidden aria-label="Link to this view">`;
+    <input class="sp-url" type="text" readonly hidden aria-label="${esc(t("Link to this view"))}">`;
   const status = pop.querySelector(".sp-status");
   const urlBox = pop.querySelector(".sp-url");
 
@@ -282,17 +285,17 @@ export function initShare(opts) {
       opts.beforeCopy?.();
       const link = location.href;
       if (await copyText(link)) {
-        status.textContent = "Link copied to the clipboard";
-        opts.onToast?.("Link copied");
+        status.textContent = t("Link copied to the clipboard");
+        opts.onToast?.(t("Link copied"));
       } else {
-        status.textContent = "Copy this link:";
+        status.textContent = t("Copy this link:");
         urlBox.hidden = false;
         urlBox.value = link;
         urlBox.focus();
         urlBox.select();
       }
     } else if (b.dataset.act === "image") {
-      status.textContent = "Drawing the map...";
+      status.textContent = t("Drawing the map...");
       await new Promise((r) => setTimeout(r, 30)); // let the status paint
       try {
         const cv = composeImage(opts.getInfo());
@@ -305,10 +308,10 @@ export function initShare(opts) {
         a.click();
         a.remove();
         setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-        status.textContent = `Saved ${a.download}`;
+        status.textContent = t("Saved {file}", { file: a.download });
       } catch (err) {
         console.warn(err);
-        status.textContent = "Could not create the image in this browser.";
+        status.textContent = t("Could not create the image in this browser.");
       }
     }
   });

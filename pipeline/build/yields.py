@@ -22,7 +22,7 @@ Yield rules (blueprint section 8), all GUS workers counted where the employer is
 
 from __future__ import annotations
 
-from .growth import rate
+from .growth import comparable, rate
 from .plstats import Stats, Units, num, ratio, total
 
 # PKD 2007 sections -> (jobs key, label). GUS publishes them per powiat (pl_stats_labour employment_pkd_powiat).
@@ -217,7 +217,7 @@ class Economy:
         # Whole powiaty: a gmina created since 2015 is covered by the 2015 figure of the gmina it was split from.
         past = (lambda d: total(d.get(g) for g in gminas)) if powiaty else (lambda d: full(d, gminas))
         pop_end = past(self.pop2025)
-        growth = rate(pop_end, past(self.pop2015))
+        growth = rate(pop_end, past(self.pop2015)) if comparable(gminas) else None
         pit = total((self.pit.get(g) or {}).get("pit_revenue_total") for g in gminas)
         pit_pop = total(self.pop2025.get(g) for g in gminas
                         if num((self.pit.get(g) or {}).get("pit_revenue_total")) is not None)

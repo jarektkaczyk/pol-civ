@@ -84,6 +84,22 @@ svg.icon { display: inline-block; flex: none; }
 .btn:hover { background: linear-gradient(180deg, #a02c34, #6a141a); }
 .btn[aria-expanded="true"] { background: linear-gradient(180deg, #5a4a24, #3a2f15); }
 .btn-icon { padding: 4px 7px; }
+/* Language switch: "EN | PL", the page's own language filled like a pressed button. */
+.lang-switch {
+  display: inline-flex; flex: none; border: 1px solid var(--gold); border-radius: 4px; overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,.5); font-family: var(--serif); font-size: 12px; line-height: 18px;
+}
+.lang-switch a {
+  padding: 4px 7px; color: var(--ink-dim); text-decoration: none; background: rgba(15,29,42,.6);
+}
+.lang-switch a + a { border-left: 1px solid var(--line); }
+.lang-switch a:hover { color: var(--gold-bright); background: rgba(201,164,92,.14); }
+.lang-switch a[aria-current="page"] {
+  color: var(--gold-bright); background: linear-gradient(180deg, var(--crimson-hi), var(--crimson-lo));
+  box-shadow: inset 0 1px 0 rgba(255,235,190,.15);
+}
+.lang-switch a:focus-visible { outline-offset: -2px; }
+@media (max-width: 700px) { .lang-switch a { padding: 4px 6px; } }
 
 /* search */
 .search { position: relative; display: flex; align-items: center; flex: 0 1 262px; min-width: 150px; }

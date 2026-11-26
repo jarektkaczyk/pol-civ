@@ -22,6 +22,7 @@ import { css, luminance, shade } from "../color.js";
 import { drawIcon, hasIcon } from "../icons.js";
 import { compact, popShort } from "../ext/cityView/fmt.js"; // format.js plus a 1000K -> 1.0M roll-over fix
 import { isCapital } from "../world.js";
+import { num } from "../i18n.js";
 import { cityIsDot } from "./art/city.js";
 
 const SERIF = '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif';
@@ -153,7 +154,7 @@ function measure(ctx, city, yields, nation, L) {
     return { yd, t, w: ctx.measureText(t).width };
   });
   const yieldsW = parts.reduce((a, p) => a + L.yieldIcon + 2 + p.w + L.yieldGap, 0) - L.yieldGap;
-  const growthTxt = growth == null ? "" : `${growth >= 0 ? "+" : "-"}${Math.abs(growth * 100).toFixed(1)}%`;
+  const growthTxt = growth == null ? "" : `${growth >= 0 ? "+" : "-"}${num(Math.abs(growth * 100), 1)}%`;
   const growthW = growthTxt ? ctx.measureText(growthTxt).width : 0;
   ctx.restore();
   const spec = specialty(city, nation);

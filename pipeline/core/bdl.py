@@ -25,7 +25,8 @@ _request_count = 0
 # BDL attribute ids with no qualification in the publisher's attribute table.
 # Missing, confidential, provisional, low-reliability, break, and incomplete
 # values stay null because the interim contract has no observation flags.
-UNQUALIFIED_ATTRIBUTES = {1, 7, 94, 97}
+# Attribute 0 is a published zero with no qualifier. See the BDL attributes dictionary.
+UNQUALIFIED_ATTRIBUTES = {0, 1, 7, 94, 97}
 
 _CELL_REF = re.compile(r"([A-Z]+)([0-9]+)$")
 _MAIN_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"

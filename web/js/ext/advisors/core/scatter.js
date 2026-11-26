@@ -12,6 +12,7 @@
 //   height = 300, ariaLabel
 //   onHover(point|null), onClick(point), onBrush(Set<key>|null)
 import { esc, fin, clamp, scale, ticks, logTicks, pad, extent, sizeCanvas, onWidth } from "./util.js";
+import { t } from "../../../i18n.js";
 
 const M = { l: 52, r: 12, t: 10, b: 38 };
 
@@ -55,8 +56,8 @@ export function createScatter(host, opts) {
       r: o.size ? rmin + (rmax - rmin) * Math.sqrt(clamp((fin(p.s) ? p.s : 0) / smax, 0, 1)) : o.radius || 3,
     })).sort((a, b) => b.r - a.r);
     root._count = valid.length;
-    cv.setAttribute("aria-label", o.ariaLabel || `Scatter plot of ${valid.length} points: ${o.y?.label || "y"} against ${o.x?.label || "x"}`);
-    hint.textContent = o.brush === false ? "" : `${valid.length.toLocaleString("en-US")} points \u00b7 drag to select`;
+    cv.setAttribute("aria-label", o.ariaLabel || t.plural(valid.length, { one: "Scatter plot of {n} point: {y} against {x}", other: "Scatter plot of {n} points: {y} against {x}" }, { y: o.y?.label || "y", x: o.x?.label || "x" }));
+    hint.textContent = o.brush === false ? "" : t.plural(valid.length, { one: "{n} point \u00b7 drag to select", other: "{n} points \u00b7 drag to select" });
     draw();
   }
 
@@ -95,11 +96,11 @@ export function createScatter(host, opts) {
     c.fillStyle = "rgba(236,208,142,.9)";
     c.font = "11px 'Palatino Linotype', Palatino, Georgia, serif";
     c.textAlign = "center";
-    c.fillText(`${o.x?.label || ""}${sx.log ? " (log)" : ""}`, (M.l + W - M.r) / 2, H - 9);
+    c.fillText(sx.log ? t("{label} (log)", { label: o.x?.label || "" }) : o.x?.label || "", (M.l + W - M.r) / 2, H - 9);
     c.save();
     c.translate(11, (M.t + H - M.b) / 2);
     c.rotate(-Math.PI / 2);
-    c.fillText(`${o.y?.label || ""}${sy.log ? " (log)" : ""}`, 0, 0);
+    c.fillText(sy.log ? t("{label} (log)", { label: o.y?.label || "" }) : o.y?.label || "", 0, 0);
     c.restore();
     // reference lines
     c.save();
@@ -265,7 +266,7 @@ export function createScatter(host, opts) {
       `${esc(o.x?.label || "x")}: <b>${esc((o.x?.fmt || String)(p.x))}</b>`,
       `${esc(o.y?.label || "y")}: <b>${esc((o.y?.fmt || String)(p.y))}</b>`,
     ];
-    if (o.size && fin(p.s)) rows.push(`${esc(o.size.label || "size")}: <b>${esc((o.size.fmt || String)(p.s))}</b>`);
+    if (o.size && fin(p.s)) rows.push(`${esc(o.size.label || t("size"))}: <b>${esc((o.size.fmt || String)(p.s))}</b>`);
     if (o.colorLabel && p.c != null && !o.colorIsSame) rows.push(`${esc(o.colorLabel)}: <b>${esc((o.colorFmt || String)(p.c))}</b>`);
     if (p.extra) rows.push(esc(p.extra));
     tip.innerHTML = rows.join("<br>");

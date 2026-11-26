@@ -1,6 +1,7 @@
 # Poland in numbers
 
 Source page: https://softonsofa.com/pol-civ/atlas/
+Polish version: https://softonsofa.com/pol-civ/pl/atlas/
 Last updated: 2026-11-26
 
 Poland had 37,242,958 residents on 30 June 2026. Between 2015 and 2025 the population fell by 2.9%.
@@ -309,6 +310,6 @@ Each voivodeship and each town of 20,000 or more people has its own page below, 
 - [Statistics Poland (GUS), Eurostat and European Central Bank: Polish national and regional accounts (Eurostat national 2025; voivodeship GDP 2024 (GUS, revision of 30 September 2026); NUTS3 GDP 2023; GVA 2023)](https://ec.europa.eu/eurostat/web/national-accounts/data/database)
 - [Statistics Poland (GUS): GUS labour publication tables (GUS, October 2026, May 2026, and December 2025)](https://stat.gov.pl/obszary-tematyczne/rynek-pracy/)
 - [Ministry of Finance and Statistics Poland (GUS): Polish local income, housing, and tourism statistics (Ministry of Finance 2026; GUS annual 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
-- [UNESCO World Heritage Centre (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl): UNESCO World Heritage in Poland and Pomniki Historii (UNESCO whc001 (2026-11-22); NID Pomniki Historii 2026-09-30 + Dz.U. 2026 poz. 1334)](https://data.unesco.org/explore/dataset/whc001/)
+- [UNESCO World Heritage Centre (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl): UNESCO World Heritage in Poland and Pomniki Historii (UNESCO whc001 (22 November 2026); NID Pomniki Historii 30 September 2026 + Dz.U. 2026 poz. 1334)](https://data.unesco.org/explore/dataset/whc001/)
 - [Główny Urząd Statystyczny (GUS); Wikidata: National parks: area and visitors (GUS Ochrona srodowiska 2025 (data for 2024); Tatra National Park report for 2025; Wikidata centre points)](https://stat.gov.pl/obszary-tematyczne/srodowisko-energia/srodowisko/ochrona-srodowiska-2025,1,26.html)
 - [Statistics Poland (GUS), Local Data Bank (BDL) API: Territorial units of Poland in 2026 (TERYT codes) (BDL unit register, units in force in 2026)](https://bdl.stat.gov.pl/bdl/start)

@@ -5,6 +5,7 @@ import { barList } from "../core/charts.js";
 import { createTable } from "../core/table.js";
 import { section, tiles, segmented } from "../core/view.js";
 import { frameBox, focusPoint } from "../core/frame.js";
+import { t, date } from "../../../i18n.js";
 
 export async function mount(ctx) {
   const { app, el, link } = ctx;
@@ -13,17 +14,17 @@ export async function mount(ctx) {
     app.loadData("trade").catch(() => null),
   ]);
   if (!infra) {
-    el.innerHTML = `<p class="adv-empty pad">No transport data is available.</p>`;
+    el.innerHTML = `<p class="adv-empty pad">${esc(t("No transport data is available."))}</p>`;
     return {};
   }
   const network = infra.totals?.network || {};
   const portTotal = infra.totals?.ports || {};
   const airportTotal = infra.totals?.airports || {};
   el.insertAdjacentHTML("beforeend", tiles([
-    { label: "Motorways", value: fin(network.motorway_km) ? `${int(network.motorway_km)} km` : "-", sub: "network length" },
-    { label: "Railways", value: fin(network.rail_line_km) ? `${int(network.rail_line_km)} km` : "-", sub: fin(network.rail_electrified_km) ? `${int(network.rail_electrified_km)} km electrified` : "" },
-    { label: "Seaport cargo", value: fin(portTotal.cargo_kt) ? `${count3(portTotal.cargo_kt * 1000)} t` : "-", sub: "2025" },
-    { label: "Airport passengers", value: count3(airportTotal.passengers), sub: "2025" },
+    { label: t("Motorways"), value: fin(network.motorway_km) ? `${int(network.motorway_km)} km` : "-", sub: t("network length") },
+    { label: t("Railways"), value: fin(network.rail_line_km) ? `${int(network.rail_line_km)} km` : "-", sub: fin(network.rail_electrified_km) ? t("{km} km electrified", { km: int(network.rail_electrified_km) }) : "" },
+    { label: t("Seaport cargo"), value: fin(portTotal.cargo_kt) ? `${count3(portTotal.cargo_kt * 1000)} t` : "-", sub: "2025" },
+    { label: t("Airport passengers"), value: count3(airportTotal.passengers), sub: "2025" },
   ]));
 
   let routeTable = null;
@@ -38,21 +39,21 @@ export async function mount(ctx) {
       toName: zones.get(route.b)?.name || route.b,
       value: route.value_kt ?? route.tons_k,
     }));
-    const routesBody = section(el, { title: "Largest regional freight flows" });
-    routesBody.insertAdjacentHTML("beforeend", `<p class="adv-callout">This advisor shows all 30 published rail-freight pairs whose voivodeship capital cities are at least 100 km apart.</p>`);
+    const routesBody = section(el, { title: t("Largest regional freight flows") });
+    routesBody.insertAdjacentHTML("beforeend", `<p class="adv-callout">${esc(t("This advisor shows all 30 published rail-freight pairs whose voivodeship capital cities are at least 100 km apart."))}</p>`);
     routeBars = barList(routesBody, {
-      rows: routes.slice(0, 12).map((route) => ({ key: route.key, label: `${route.fromName} - ${route.toName}`, sub: `${count3(route.value * 1000)} tonnes`, value: route.value, color: "#d2402f", route })),
-      rank: true, ariaLabel: "Largest regional rail-freight flows",
+      rows: routes.slice(0, 12).map((route) => ({ key: route.key, label: `${route.fromName} - ${route.toName}`, sub: t("{v} tonnes", { v: count3(route.value * 1000) }), value: route.value, color: "#d2402f", route })),
+      rank: true, ariaLabel: t("Largest regional rail-freight flows"),
       onHover: (row) => highlightRoute(row?.route || null, false),
       onClick: (row) => pinRoute(row.route),
     });
     routeTable = createTable(routesBody, {
-      caption: "Regional freight flows", search: "Search regions", rank: true, maxHeight: 300, rows: routes,
+      caption: t("Regional freight flows"), search: t("Search regions"), rank: true, maxHeight: 300, rows: routes,
       columns: [
-        { key: "from", label: "From", align: "l", width: "minmax(0,1.2fr)", value: (r) => r.fromName, text: (r) => r.fromName },
-        { key: "to", label: "To", align: "l", width: "minmax(0,1.2fr)", value: (r) => r.toName, text: (r) => r.toName },
-        { key: "value", label: "Freight", value: (r) => r.value, text: (r) => `${count3(r.value * 1000)} t` },
-        { key: "distance", label: "Distance", value: (r) => r.dist_km, text: (r) => fin(r.dist_km) ? `${int(r.dist_km)} km` : "-", hideBelow: 400 },
+        { key: "from", label: t("From"), align: "l", width: "minmax(0,1.2fr)", value: (r) => r.fromName, text: (r) => r.fromName },
+        { key: "to", label: t("To"), align: "l", width: "minmax(0,1.2fr)", value: (r) => r.toName, text: (r) => r.toName },
+        { key: "value", label: t("Freight"), value: (r) => r.value, text: (r) => `${count3(r.value * 1000)} t` },
+        { key: "distance", label: t("Distance"), value: (r) => r.dist_km, text: (r) => fin(r.dist_km) ? `${int(r.dist_km)} km` : "-", hideBelow: 400 },
       ],
       sort: { key: "value", dir: "desc" },
       onHover: (route) => highlightRoute(route, false),
@@ -74,12 +75,12 @@ export async function mount(ctx) {
     }
   }
 
-  const hubsBody = section(el, { title: "Ports and airports" });
+  const hubsBody = section(el, { title: t("Ports and airports") });
   let hubMode = "ports";
   const hubsHost = document.createElement("div");
   segmented(hubsBody, {
-    label: "Show", value: hubMode,
-    options: [{ value: "ports", label: "Seaports" }, { value: "airports", label: "Airports" }],
+    label: t("Show"), value: hubMode,
+    options: [{ value: "ports", label: t("Seaports") }, { value: "airports", label: t("Airports") }],
     onChange: (value) => { hubMode = value; drawHubs(); },
   });
   hubsBody.appendChild(hubsHost);
@@ -89,38 +90,38 @@ export async function mount(ctx) {
     if (hubMode === "ports") {
       const rows = [...(infra.ports || [])].filter((p) => fin(p.cargo_kt)).sort((a, b) => b.cargo_kt - a.cargo_kt);
       barList(hubsHost, {
-        rows: rows.slice(0, 10).map((p) => ({ key: p.id, label: p.name, sub: p.teu != null ? `${count3(p.teu)} TEU` : "", value: p.cargo_kt, text: `${count3(p.cargo_kt * 1000)} t`, color: "#2f7fa7", item: p })),
-        rank: true, ariaLabel: "Busiest Polish seaports",
-        onHover: (r) => link.hover(r ? { cells: new Set([r.item.cell]), dimOthers: true, label: r.item.name } : null),
+        rows: rows.slice(0, 10).map((p) => ({ key: p.id, label: t(p.name), sub: p.teu != null ? `${count3(p.teu)} TEU` : "", value: p.cargo_kt, text: `${count3(p.cargo_kt * 1000)} t`, color: "#2f7fa7", item: p })),
+        rank: true, ariaLabel: t("Busiest Polish seaports"),
+        onHover: (r) => link.hover(r ? { cells: new Set([r.item.cell]), dimOthers: true, label: t(r.item.name) } : null),
         onClick: (r) => fly(r.item),
       });
       hubTable = createTable(hubsHost, {
-        caption: "Polish seaports", rows: infra.ports || [], maxHeight: 260,
+        caption: t("Polish seaports"), rows: infra.ports || [], maxHeight: 260,
         columns: [
-          { key: "name", label: "Port", align: "l", width: "minmax(0,1.5fr)", value: (r) => r.name, text: (r) => r.name },
-          { key: "cargo", label: "Cargo", value: (r) => r.cargo_kt, text: (r) => fin(r.cargo_kt) ? `${count3(r.cargo_kt * 1000)} t` : "-" },
-          { key: "teu", label: "Containers", value: (r) => r.teu, text: (r) => fin(r.teu) ? `${count3(r.teu)} TEU` : "-", hideBelow: 400 },
+          { key: "name", label: t("Port"), align: "l", width: "minmax(0,1.5fr)", value: (r) => t(r.name), text: (r) => t(r.name) },
+          { key: "cargo", label: t("Cargo"), value: (r) => r.cargo_kt, text: (r) => fin(r.cargo_kt) ? `${count3(r.cargo_kt * 1000)} t` : "-" },
+          { key: "teu", label: t("Containers"), value: (r) => r.teu, text: (r) => fin(r.teu) ? `${count3(r.teu)} TEU` : "-", hideBelow: 400 },
         ],
         sort: { key: "cargo", dir: "desc" },
-        onHover: (r) => link.hover(r ? { cells: new Set([r.cell]), dimOthers: true, label: r.name } : null),
+        onHover: (r) => link.hover(r ? { cells: new Set([r.cell]), dimOthers: true, label: t(r.name) } : null),
         onClick: fly,
       });
     } else {
       const rows = [...(infra.airports || [])].sort((a, b) => (b.passengers || 0) - (a.passengers || 0));
       barList(hubsHost, {
         rows: rows.filter((a) => fin(a.passengers)).slice(0, 10).map((a) => ({ key: a.id, label: a.name, sub: a.iata || a.icao, value: a.passengers, text: count3(a.passengers), color: "#5f76a8", item: a })),
-        rank: true, ariaLabel: "Busiest Polish airports",
+        rank: true, ariaLabel: t("Busiest Polish airports"),
         onHover: (r) => link.hover(r ? { cells: new Set([r.item.cell]), dimOthers: true, label: r.item.name } : null),
         onClick: (r) => fly(r.item),
       });
       hubTable = createTable(hubsHost, {
-        caption: "Polish airports", rows, maxHeight: 260,
+        caption: t("Polish airports"), rows, maxHeight: 260,
         columns: [
-          { key: "name", label: "Airport", align: "l", width: "minmax(0,1.5fr)", value: (r) => r.name, text: (r) => r.name },
-          { key: "passengers", label: "Passengers", value: (r) => r.passengers, text: (r) => fin(r.passengers) ? count3(r.passengers) : "-" },
-          { key: "status", label: "Status", align: "l", value: (r) => r.status,
-            text: (r) => r.status === "planned" ? `Planned ${r.opening_planned || ""}`.trim() : "Operating" },
-          { key: "freight", label: "Freight", value: (r) => r.freight_t, text: (r) => fin(r.freight_t) ? `${count3(r.freight_t)} t` : "-", hideBelow: 600 },
+          { key: "name", label: t("Airport"), align: "l", width: "minmax(0,1.5fr)", value: (r) => r.name, text: (r) => r.name },
+          { key: "passengers", label: t("Passengers"), value: (r) => r.passengers, text: (r) => fin(r.passengers) ? count3(r.passengers) : "-" },
+          { key: "status", label: t("Status"), align: "l", value: (r) => r.status,
+            text: (r) => (r.status === "planned" ? (r.opening_planned ? t("Planned {date}", { date: date(r.opening_planned) }) : t("Planned")) : t("Operating")) },
+          { key: "freight", label: t("Freight"), value: (r) => r.freight_t, text: (r) => fin(r.freight_t) ? `${count3(r.freight_t)} t` : "-", hideBelow: 600 },
         ],
         sort: { key: "passengers", dir: "desc" },
         onHover: (r) => link.hover(r ? { cells: new Set([r.cell]), dimOthers: true, label: r.name } : null),

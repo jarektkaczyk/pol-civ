@@ -10,3 +10,4 @@ out/
 dist/
 usaciv.zip
 .worktrees/
+.playwright-mcp/

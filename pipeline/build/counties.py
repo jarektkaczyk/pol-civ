@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import math
 
+from .growth import comparable
 from ..core.geo import MapProjection
 from ..core.hexgrid import HexGrid
 from ..core.store import load_interim, write_web
@@ -55,7 +56,8 @@ METRICS = [
       "interpolation inside the group that holds the middle resident.", "people"),
     M("growth", "Change 2015-2025", "pct", "population change", "gmina", "pl_stats_population", "neutral",
       "Population on 31 December 2025 ÷ population on 31 December 2015 - 1 (GUS). Each year is on its own "
-      "borders: a gmina whose borders changed (Opole in 2017, Kamienica and Supraśl in 2025) shows that change too.",
+      "borders, so gminas whose borders changed (Opole and four neighbours in 2017; Kamienica, Szczawa, Supraśl and "
+      "Grabówka in 2025) show no change.",
       "people"),
     M("net_migration", "Net migration", "float", "per 1,000 residents", "gmina", "pl_stats_population", "neutral",
       "People who moved in minus people who moved out, within Poland and from abroad, per 1,000 residents (GUS, 2025).",
@@ -74,14 +76,14 @@ METRICS = [
       "Average gross monthly wage, by employer seat (GUS wage distribution, May 2026).", "prosperity"),
     M("unemployment", "Unemployment", "pct", "registered rate", "powiat", "pl_stats_labour", "bad",
       "Registered unemployment rate, end of October 2026 (GUS).", "prosperity"),
-    M("dwellings", "New dwellings", "float", "per 1,000 residents", "voivodeship", "pl_stats_prosperity", "neutral",
+    M("dwellings", "New dwellings", "float", "per 1,000 residents", "gmina", "pl_stats_prosperity", "neutral",
       "Dwellings completed in 2025 per 1,000 residents (GUS).", "prosperity"),
-    M("higher_ed", "Higher education", "pct", "of residents 13+", "powiat", "pl_census_2021", "good",
+    M("higher_ed", "Higher education", "pct", "of residents 13+", "gmina", "pl_census_2021", "good",
       "Residents aged 13 or more with a higher-education diploma (NSP 2021 census, 31 March 2021).", "knowledge"),
     M("students", "University students", "float", "per 1,000 residents", "gmina", "pl_stats_population", "neutral",
       "Students of the universities in the gmina, per 1,000 residents (GUS, 31 December 2025). A student on two "
       "programmes counts twice. Gminas without a university are blank.", "knowledge"),
-    M("tourism", "Tourist nights", "float", "nights per resident", "voivodeship", "pl_stats_prosperity", "neutral",
+    M("tourism", "Tourist nights", "float", "nights per resident", "powiat", "pl_stats_prosperity", "neutral",
       "Nights spent in tourist accommodation with 10 or more beds in 2025 ÷ residents (GUS).", "life"),
     M("doctors", "Doctors", "float", "per 10,000 residents", "powiat", "pl_soc_health", "good",
       "Doctors counted at their main place of work, per 10,000 residents (GUS, 2024). City powiats with big "
@@ -163,11 +165,11 @@ class Metrics:
         vital = stats.rows("pl_stats_population", "vital_migration")
         demo = stats.rows("pl_stats_population", "demographic_indicators")
         prosp = stats.rows("pl_stats_prosperity", "income_gmina")
-        house = stats.rows("pl_stats_prosperity", "housing_voivodeship")
-        tour = stats.rows("pl_stats_prosperity", "tourism_voivodeship")
+        house = stats.rows("pl_stats_prosperity", "housing_gmina")
+        tour = stats.rows("pl_stats_prosperity", "tourism_powiat")
         lab = stats.rows("pl_stats_labour", "labour_powiat")
         ukr = stats.rows("pl_foreigners", "pesel_ukr_powiat")
-        edu = stats.rows("pl_census_2021", "education_powiat")
+        edu = stats.rows("pl_census_2021", "education_gmina")
         health = stats.rows("pl_soc_health", "health_powiat")
         stud = stats.rows("pl_stats_population", "university_students_city")
         faith = stats.rows("pl_soc_faith", "religion_gmina")
@@ -177,11 +179,9 @@ class Metrics:
         r2 = stats.rows("pl_soc_elections", "president_2025_r2")
         sejm = stats.rows("pl_soc_elections", "sejm_2023")
         flood = stats.rows("pl_soc_disasters", "flood_2024_gmina")
-        voiv_pop = {}
         powiat_pop = {}
         for g in gms:
             p = econ.pop.get(g) or 0
-            voiv_pop[g[:2]] = voiv_pop.get(g[:2], 0) + (econ.pop2025.get(g) or 0)  # 2025 tourist nights
             powiat_pop[g[:4]] = powiat_pop.get(g[:4], 0) + p
 
         def col(key, f):
@@ -197,7 +197,7 @@ class Metrics:
         col("area_km2", lambda g: ratio(rec(pop, g).get("area_ha"), 100, 1, 2))
         col("density", lambda g: ratio(econ.pop.get(g), ratio(rec(pop, g).get("area_ha"), 100), 1, 1))
         col("median_age", lambda g: median_age(rec(pop, g)))
-        col("growth", lambda g: _growth(econ.pop2025.get(g), econ.pop2015.get(g)))
+        col("growth", lambda g: _growth(econ.pop2025.get(g), econ.pop2015.get(g)) if comparable([g]) else None)
         col("net_migration", lambda g: _r(rec(vital, g).get("total_migration_net_per_1000"), 2))
         col("elderly", lambda g: ratio(rec(pop, g).get("age_65_plus"), econ.pop.get(g), 1, 4))
         col("births", lambda g: _r(rec(vital, g).get("births_per_1000"), 2))
@@ -205,10 +205,10 @@ class Metrics:
         col("pit", lambda g: _r(rec(prosp, g).get("pit_revenue_per_person"), 0))
         col("wage", lambda g: _r(rec(lab, g[:4]).get("average_gross_monthly_wage"), 0))
         col("unemployment", lambda g: pct(rec(lab, g[:4]).get("registered_unemployment_rate")))
-        col("dwellings", lambda g: _r(rec(house, g[:2]).get("dwellings_completed_per_1000"), 2))
-        col("higher_ed", lambda g: pct(rec(edu, g[:4]).get("higher_share")))
+        col("dwellings", lambda g: _r(rec(house, g).get("dwellings_completed_per_1000"), 2))
+        col("higher_ed", lambda g: pct(rec(edu, g).get("higher_share")))
         col("students", lambda g: ratio(rec(stud, g).get("students"), econ.pop2025.get(g), 1000, 1))
-        col("tourism", lambda g: ratio(rec(tour, g[:2]).get("overnight_stays"), voiv_pop.get(g[:2]), 1, 2))
+        col("tourism", lambda g: _r(rec(tour, g[:4]).get("overnight_stays_per_person"), 2))
         col("doctors", lambda g: _r(rec(health, g[:4]).get("doctors_per_10k"), 1))
         col("life_f", lambda g: _r(rec(demo, g[:2]).get("life_expectancy_female"), 1))
         col("life_m", lambda g: _r(rec(demo, g[:2]).get("life_expectancy_male"), 1))
@@ -408,7 +408,8 @@ def build() -> None:
             if k == "density":
                 vals[k] = round(pop / area, 1) if pop and area else None
             elif k == "growth":
-                vals[k] = _growth(total(econ.pop2025.get(g) for g in gms), total(econ.pop2015.get(g) for g in gms))
+                vals[k] = (_growth(total(econ.pop2025.get(g) for g in gms), total(econ.pop2015.get(g) for g in gms))
+                           if comparable(gms) else None)
             elif METRIC[k]["level"] in ("powiat", "voivodeship"):
                 vals[k] = m.values[k][ii[0]] if ii else None
             else:

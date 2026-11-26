@@ -10,6 +10,7 @@
 // Shared keys across levels: population, growth, gdp, gdp_pc, wage, unemployment, pit, workers, y_<yield>.
 import { fin, ratio } from "./util.js";
 import { frameBox } from "./frame.js";
+import { t, date, num } from "../../../i18n.js";
 
 // counties.json / powiaty.json metric key -> lenses.json lens id.
 const COUNTY_LENS = {
@@ -29,21 +30,31 @@ const BY_AREA = new Set(["forest", "farmland", "developed"]);
 // residents rather than voters, a diocese figure).
 const APPROX = new Set(["median_age", "pm25", "mass", "president_2025", "turnout_2025"]);
 const GROUP_NAME = {
-  people: "People", prosperity: "Prosperity", knowledge: "Knowledge", life: "Daily life", faith: "Faith", vote: "Vote",
-  air: "Air", hazards: "Hazards", land: "Land",
+  people: t("People"), prosperity: t("Prosperity"), knowledge: t("Knowledge"), life: t("Daily life"), faith: t("Faith"), vote: t("Vote"),
+  air: t("Air"), hazards: t("Hazards"), land: t("Land"),
 };
 const ALMOST = "\u2248"; // the approximately-equal sign, shown after a rolled-up label
 
 const LAND_KEYS = ["forest", "crop", "pasture", "grass", "shrub", "wetland", "developed"];
 export const LAND_LABEL = {
-  forest: "Forest", crop: "Cropland", pasture: "Meadow & pasture", grass: "Mountain meadow", shrub: "Scrub", wetland: "Wetland", developed: "Built-up",
+  forest: t("Forest"), crop: t("Cropland"), pasture: t("Meadow & pasture"), grass: t("Mountain meadow"), shrub: t("Scrub"), wetland: t("Wetland"), developed: t("Built-up"),
+};
+// One sentence per cover type (the Polish names take different cases).
+const LAND_DESC = {
+  forest: t("Share of the land in forest (ESA WorldCover, mean over the voivodeship's hexes)."),
+  crop: t("Share of the land in cropland (ESA WorldCover, mean over the voivodeship's hexes)."),
+  pasture: t("Share of the land in meadow & pasture (ESA WorldCover, mean over the voivodeship's hexes)."),
+  grass: t("Share of the land in mountain meadow (ESA WorldCover, mean over the voivodeship's hexes)."),
+  shrub: t("Share of the land in scrub (ESA WorldCover, mean over the voivodeship's hexes)."),
+  wetland: t("Share of the land in wetland (ESA WorldCover, mean over the voivodeship's hexes)."),
+  developed: t("Share of the land in built-up (ESA WorldCover, mean over the voivodeship's hexes)."),
 };
 export const LAND_COLOR = {
   forest: "#3f7a3a", crop: "#d2c457", pasture: "#93b852", grass: "#b9b06a", shrub: "#c9a874", wetland: "#4f9a86", developed: "#9a8f9e",
 };
 export { LAND_KEYS };
 
-const F = (key, label, format, o = {}) => ({ key, label, format, unit: o.unit || null, higher_is: o.higher_is || "neutral", source: o.source || "", description: o.description || "", lens: o.lens || null, group: o.group || "Economy", derived: !!o.derived });
+const F = (key, label, format, o = {}) => ({ key, label, format, unit: o.unit || null, higher_is: o.higher_is || "neutral", source: o.source || "", description: o.description || "", lens: o.lens || null, group: o.group || t("Economy"), derived: !!o.derived });
 
 /** Column-oriented file ({columns, rows}) -> [{r, i, get(key)}]. */
 function columnRows(file) {
@@ -103,22 +114,34 @@ export function buildData(app) {
 
   // --- economic fields (voivodeships, metros, towns) ------------------------------------------------------------
   const yieldsWorkers = (nation.yields || []).filter((y) => y.unit !== "pln" && y.unit !== "usd");
+  // Years go into t() as strings: a number var is grouped (2,024).
+  const Y = (v, d) => String(v || d);
   const gdpDesc = {
-    states: `Gross domestic product in current złoty, published per voivodeship (GUS regional accounts, ${yrs.gdp_voiv || 2024}).`,
-    metros: `Gross domestic product in current złoty: the member gminas' shares of their powiaty's GDP (Eurostat NUTS 3 ${yrs.gdp_nuts3 || 2023}, shared by wage bill and workers). An estimate.`,
-    towns: `Gross domestic product in current złoty: the town's gmina share of its powiat's GDP (Eurostat NUTS 3 ${yrs.gdp_nuts3 || 2023}). An estimate.`,
+    states: t("Gross domestic product in current złoty, published per voivodeship (GUS regional accounts, {year}).", { year: Y(yrs.gdp_voiv, 2024) }),
+    metros: t("Gross domestic product in current złoty: the member gminas' shares of their powiaty's GDP (Eurostat NUTS 3 {year}, shared by wage bill and workers). An estimate.", { year: Y(yrs.gdp_nuts3, 2023) }),
+    towns: t("Gross domestic product in current złoty: the town's gmina share of its powiat's GDP (Eurostat NUTS 3 {year}). An estimate.", { year: Y(yrs.gdp_nuts3, 2023) }),
   };
-  const area = { states: "voivodeship", metros: "metro area", towns: "town" };
+  const wageYear = { year: Y(yrs.wage, 2026) }, unempYear = { year: Y(yrs.unemployment, 2026) };
+  const wageDesc = {
+    states: t("Average gross monthly wage by employer seat (GUS, {year}). Published per powiat; the voivodeship shows the mean of its powiaty weighted by workers.", wageYear),
+    metros: t("Average gross monthly wage by employer seat (GUS, {year}). Published per powiat; the metro area shows the mean of its powiaty weighted by workers.", wageYear),
+    towns: t("Average gross monthly wage by employer seat (GUS, {year}). Published per powiat; a town shows its powiat.", wageYear),
+  };
+  const unempDesc = {
+    states: t("Registered unemployment rate (GUS, {year}). Published per powiat; the voivodeship shows the mean of its powiaty weighted by population.", unempYear),
+    metros: t("Registered unemployment rate (GUS, {year}). Published per powiat; the metro area shows the mean of its powiaty weighted by population.", unempYear),
+    towns: t("Registered unemployment rate (GUS, {year}). Published per powiat; a town shows its powiat.", unempYear),
+  };
   const econFields = (lv) => [
-    F("population", "Population", "int", { unit: "people", source: "pl_stats_population", group: "People", lens: "density", description: `Residents on ${nation.population_date || `31 December ${yrs.population || 2025}`} (GUS).` }),
-    F("growth", `Change ${growthYears}`, "signed", { unit: "population change", source: "pl_stats_population", group: "People", lens: "growth", description: `Population change ${growthYears} on today's borders (GUS).` }),
-    F("gdp", "GDP", "money", { unit: "zł per year", source: "pl_gdp", description: gdpDesc[lv] }),
-    F("gdp_pc", "GDP per person", "pln", { unit: "zł per resident", higher_is: "good", source: "pl_gdp", description: `GDP divided by residents (GDP ${lv === "states" ? yrs.gdp_voiv || 2024 : yrs.gdp_nuts3 || 2023}, population ${yrs.population || 2025}).`, derived: true }),
-    F("wage", "Average wage", "pln", { unit: "zł gross per month", higher_is: "good", source: "pl_stats_labour", group: "Prosperity", lens: "wage", description: `Average gross monthly wage by employer seat (GUS, ${yrs.wage || 2026}). Published per powiat; ${lv === "towns" ? "a town shows its powiat" : `the ${area[lv]} shows the mean of its powiaty weighted by workers`}.` }),
-    F("unemployment", "Unemployment", "pct", { unit: "registered rate", higher_is: "bad", source: "pl_stats_labour", group: "Prosperity", lens: "unemployment", description: `Registered unemployment rate (GUS, ${yrs.unemployment || 2026}). Published per powiat; ${lv === "towns" ? "a town shows its powiat" : `the ${area[lv]} shows the mean of its powiaty weighted by population`}.` }),
-    F("pit", "PIT per person", "pln", { unit: "zł per resident", higher_is: "good", source: "pl_stats_prosperity", group: "Prosperity", lens: "income", description: `Personal income tax revenue planned for ${yrs.pit || 2026} by the gminas, divided by their residents (Ministry of Finance).` }),
-    F("workers", "Workers", "int", { unit: "people, by employer seat", source: "pl_stats_labour", description: `People working, counted where their employer is (GUS, 31 December ${yrs.workers || 2025}).` }),
-    ...yieldsWorkers.map((y) => F(`y_${y.key}`, `${y.label} workers`, "int", { unit: "workers", source: "pl_stats_labour", group: "Yields", description: y.description })),
+    F("population", t("Population"), "int", { unit: t("people"), source: "pl_stats_population", group: t("People"), lens: "density", description: t("Residents on {date} (GUS).", { date: date(nation.population_date || `${Y(yrs.population, 2025)}-12-31`) }) }),
+    F("growth", t("Change {years}", { years: growthYears }), "signed", { unit: t("population change"), source: "pl_stats_population", group: t("People"), lens: "growth", description: t("Population change {years} on today's borders (GUS).", { years: growthYears }) }),
+    F("gdp", t("GDP"), "money", { unit: t("zł per year"), source: "pl_gdp", description: gdpDesc[lv] }),
+    F("gdp_pc", t("GDP per person"), "pln", { unit: t("zł per resident"), higher_is: "good", source: "pl_gdp", description: t("GDP divided by residents (GDP {gdpYear}, population {popYear}).", { gdpYear: lv === "states" ? Y(yrs.gdp_voiv, 2024) : Y(yrs.gdp_nuts3, 2023), popYear: Y(yrs.population, 2025) }), derived: true }),
+    F("wage", t("Average wage"), "pln", { unit: t("zł gross per month"), higher_is: "good", source: "pl_stats_labour", group: t("Prosperity"), lens: "wage", description: wageDesc[lv] }),
+    F("unemployment", t("Unemployment"), "pct", { unit: t("registered rate"), higher_is: "bad", source: "pl_stats_labour", group: t("Prosperity"), lens: "unemployment", description: unempDesc[lv] }),
+    F("pit", t("PIT per person"), "pln", { unit: t("zł per resident"), higher_is: "good", source: "pl_stats_prosperity", group: t("Prosperity"), lens: "income", description: t("Personal income tax revenue planned for {year} by the gminas, divided by their residents (Ministry of Finance).", { year: Y(yrs.pit, 2026) }) }),
+    F("workers", t("Workers"), "int", { unit: t("people, by employer seat"), source: "pl_stats_labour", description: t("People working, counted where their employer is (GUS, {date}).", { date: date(`${Y(yrs.workers, 2025)}-12-31`) }) }),
+    ...yieldsWorkers.map((y) => F(`y_${y.key}`, t("{label} workers", { label: t(y.label) }), "int", { unit: t("workers"), source: "pl_stats_labour", group: t("Yields"), description: t(y.description) })),
   ];
   const econValues = (o) => ({
     population: o.population ?? null,
@@ -168,19 +191,20 @@ export function buildData(app) {
     return out;
   };
   const rollupFields = (lv) => (counties ? [
-    F("density", "Density", "float", { unit: "people / km\u00b2", source: "pl_stats_population", group: "People", lens: "density", description: `Residents divided by the area of the member gminas (${countyVintage}).`, derived: true }),
-    F("area_km2", "Area", "km2", { unit: "km\u00b2", source: "pl_stats_population", group: "Land", description: "The summed area of the member gminas (GUS).", derived: true }),
+    F("density", t("Density"), "float", { unit: t("people / km\u00b2"), source: "pl_stats_population", group: t("People"), lens: "density", description: t("Residents divided by the area of the member gminas ({vintage}).", { vintage: t(countyVintage) }), derived: true }),
+    F("area_km2", t("Area"), "km2", { unit: "km\u00b2", source: "pl_stats_population", group: t("Land"), description: t("The summed area of the member gminas (GUS)."), derived: true }),
     ...ROLL.map((k) => {
       const f = cFields.find((x) => x.key === k);
       // A voivodeship figure repeated in every gmina rolls up exactly to its voivodeship.
       const exact = lv === "states" && f.level === "voivodeship";
       const approx = !exact && APPROX.has(k);
-      const how = exact ? "" : ZERO_NULL.has(k) ? " Rolled up from gminas (a gmina without a university counts as zero)."
-        : BY_AREA.has(k) ? " Rolled up from gminas as an area-weighted mean."
-        : ` Rolled up from gminas as a population-weighted mean${approx ? " (an approximation: not the area's own figure)" : ""}.`;
-      return F(k, f.label + (approx ? ` ${ALMOST}` : ""), f.format, {
-        unit: f.unit, higher_is: f.higher_is, source: f.source, group: groupOf(f), lens: COUNTY_LENS[k],
-        description: `${f.description || ""}${how}`, derived: !exact,
+      const how = exact ? "" : ZERO_NULL.has(k) ? t("Rolled up from gminas (a gmina without a university counts as zero).")
+        : BY_AREA.has(k) ? t("Rolled up from gminas as an area-weighted mean.")
+        : approx ? t("Rolled up from gminas as a population-weighted mean (an approximation: not the area's own figure).")
+        : t("Rolled up from gminas as a population-weighted mean.");
+      return F(k, t(f.label) + (approx ? ` ${ALMOST}` : ""), f.format, {
+        unit: f.unit ? t(f.unit) : null, higher_is: f.higher_is, source: f.source, group: groupOf(f), lens: COUNTY_LENS[k],
+        description: [t(f.description || ""), how].filter(Boolean).join(" "), derived: !exact,
       });
     }),
   ] : []);
@@ -195,7 +219,7 @@ export function buildData(app) {
     mwByMetro.set(m, (mwByMetro.get(m) || 0) + it.value);
   });
   const hasEnergy = (Array.isArray(states) ? states : []).some((s) => s.energy);
-  const energyField = F("energy_mw", "Mapped power", "mw", { unit: "MW of mapped sites", source: "pl_energy_plants", group: "Energy", description: "Capacity of the power sites mapped as resources (each type above its size threshold): not the total generating capacity." });
+  const energyField = F("energy_mw", t("Mapped power"), "mw", { unit: t("MW of mapped sites"), source: "pl_energy_plants", group: t("Energy"), description: t("Capacity of the power sites mapped as resources (each type above its size threshold): not the total generating capacity.") });
 
   const boxOf = (cells, k = 6) => {
     if (!cells || !cells.length) return null;
@@ -222,11 +246,11 @@ export function buildData(app) {
       energy_mw: s.energy ? s.energy.total : null,
     },
   }));
-  const landFields = LAND_KEYS.map((k) => F(`land_${k}`, LAND_LABEL[k], "pct", { unit: "share of land", source: "pl_geo_worldcover", group: "Land", description: `Share of the land in ${LAND_LABEL[k].toLowerCase()} (ESA WorldCover, mean over the voivodeship's hexes).`, lens: k === "forest" ? "forest" : k === "developed" ? "developed" : null }));
+  const landFields = LAND_KEYS.map((k) => F(`land_${k}`, LAND_LABEL[k], "pct", { unit: t("share of land"), source: "pl_geo_worldcover", group: t("Land"), description: LAND_DESC[k], lens: k === "forest" ? "forest" : k === "developed" ? "developed" : null }));
   const states_ = makeLevel({
-    id: "states", label: "Voivodeships", noun: "voivodeship",
+    id: "states", label: t("Voivodeships"), noun: t("voivodeship"),
     rows: stateRows,
-    fields: [F("name", "Voivodeship", "text", { group: "Name" }), ...econFields("states"), ...rollupFields("states"), ...landFields, ...(hasEnergy ? [energyField] : [])],
+    fields: [F("name", t("Voivodeship"), "text", { group: t("Name") }), ...econFields("states"), ...rollupFields("states"), ...landFields, ...(hasEnergy ? [energyField] : [])],
     highlight: (rows) => ({ states: new Set(rows.map((r) => r.ref)) }),
     rowAtCell: (cell) => (owner[cell] >= 0 ? stateRows[owner[cell]] || null : null),
     focus: (row) => app.selectState(row.ref, { fly: true }),
@@ -245,13 +269,13 @@ export function buildData(app) {
   const metroByRef = new Map(metroRows.map((r) => [r.ref, r]));
   const metroCells = (r) => r.ref.footprint || (r.ref.cell != null ? [r.ref.cell] : []);
   const metros = makeLevel({
-    id: "metros", label: "Metros", noun: "metro area",
+    id: "metros", label: t("Metros"), noun: t("metro area"),
     rows: metroRows,
     fields: [
-      F("name", "Metro", "text", { group: "Name" }), F("states", "Voivodeships", "text", { group: "Name" }),
-      F("core", "Core town", "text", { group: "Name", description: "The largest town of the metro area." }),
-      F("n_towns", "Towns", "int", { unit: "towns", source: "pl_geo_fua", group: "Name", description: "Towns with town rights inside the metro area." }),
-      F("n_gminas", "Gminas", "int", { unit: "gminas", source: "pl_geo_fua", group: "Name", description: "Member gminas: the city and the gminas from which at least 15% of employed residents commute to it (Eurostat functional urban area)." }),
+      F("name", t("Metro"), "text", { group: t("Name") }), F("states", t("Voivodeships"), "text", { group: t("Name") }),
+      F("core", t("Core town"), "text", { group: t("Name"), description: t("The largest town of the metro area.") }),
+      F("n_towns", t("Towns"), "int", { unit: t("towns"), source: "pl_geo_fua", group: t("Name"), description: t("Towns with town rights inside the metro area.") }),
+      F("n_gminas", t("Gminas"), "int", { unit: t("gminas"), source: "pl_geo_fua", group: t("Name"), description: t("Member gminas: the city and the gminas from which at least 15% of employed residents commute to it (Eurostat functional urban area).") }),
       ...econFields("metros"), ...rollupFields("metros"), ...(mwByMetro.size ? [energyField] : []),
     ],
     highlight: (rows, o = {}) => {
@@ -286,17 +310,17 @@ export function buildData(app) {
     const fields = [];
     for (const f of pFields) {
       if (["code", "cell", "y_gold"].includes(f.key)) continue;
-      fields.push(F(f.key, f.key === "name" ? "Powiat" : f.label, f.key === "growth" ? "signed" : f.format, {
-        unit: f.unit, higher_is: f.higher_is, source: f.source, description: f.description, lens: COUNTY_LENS[f.key], group: groupOf(f),
+      fields.push(F(f.key, f.key === "name" ? t("Powiat") : t(f.label), f.key === "growth" ? "signed" : f.format, {
+        unit: f.unit ? t(f.unit) : null, higher_is: f.higher_is, source: f.source, description: t(f.description || ""), lens: COUNTY_LENS[f.key], group: groupOf(f),
       }));
     }
     fields.push(
-      F("gdp", "GDP", "money", { unit: "zł per year", source: "pl_gdp", description: `The powiat's share of its NUTS 3 subregion's GDP ${yrs.gdp_nuts3 || 2023} (Eurostat), shared by wage bill. An estimate.` }),
-      F("gdp_pc", "GDP per person", "pln", { unit: "zł per resident", higher_is: "good", source: "pl_gdp", description: "GDP divided by residents.", derived: true }),
+      F("gdp", t("GDP"), "money", { unit: t("zł per year"), source: "pl_gdp", description: t("The powiat's share of its NUTS 3 subregion's GDP {year} (Eurostat), shared by wage bill. An estimate.", { year: Y(yrs.gdp_nuts3, 2023) }) }),
+      F("gdp_pc", t("GDP per person"), "pln", { unit: t("zł per resident"), higher_is: "good", source: "pl_gdp", description: t("GDP divided by residents."), derived: true }),
     );
     const byPowiat = new Map(rows.map((r) => [r.key, r]));
     powiaty_ = makeLevel({
-      id: "powiaty", label: "Powiaty", noun: "powiat",
+      id: "powiaty", label: t("Powiaty"), noun: t("powiat"),
       rows, fields,
       highlight: (list) => {
         const cells = new Set();
@@ -321,6 +345,7 @@ export function buildData(app) {
     const metroName = new Map(metroList.map((m) => [m.id, m.name]));
     const catName = (lensId) => new Map((app.lensById?.get(lensId)?.categories || []).map((c) => [c.id, c.name]));
     const sejmName = catName("sejm"), floodName = catName("flood");
+    // Category names come from lenses.json (translated there); the values are shown as text.
     // A rural gmina often shares its name with the town next door (Boleslawiec and gmina Boleslawiec).
     const twins = new Set();
     const seen = new Map();
@@ -334,10 +359,10 @@ export function buildData(app) {
       cols.forEach((k, j) => (v[k] = r[j]));
       v.metro = v.cbsa ? metroName.get(v.cbsa) || null : null;
       v.gdp_pc = ratio(v.gdp, v.population);
-      if (v.sejm_2023 != null) v.sejm_2023 = sejmName.get(v.sejm_2023) || v.sejm_2023;
-      if (v.flood_2024 != null) v.flood_2024 = floodName.get(v.flood_2024) || v.flood_2024;
+      if (v.sejm_2023 != null) v.sejm_2023 = t(sejmName.get(v.sejm_2023) || v.sejm_2023);
+      if (v.flood_2024 != null) v.flood_2024 = t(floodName.get(v.flood_2024) || v.flood_2024);
       const twin = twins.has(`${v.powiat}|${v.name}`) && v.type === "rural";
-      const name = twin ? `${v.name} (rural)` : v.name;
+      const name = twin ? t("{name} (rural)", { name: v.name }) : v.name;
       return { key: v.geoid, name, full: `${name}, ${v.powiat}, ${stateName.get(v.state) || v.state}`, sub: v.state, level: "counties", ref: i, v };
     });
     // counties.json rows follow world.json counties; map by geoid anyway in case they ever diverge.
@@ -347,15 +372,15 @@ export function buildData(app) {
     // Gminas smaller than a hex own no cell: counties.json `cell` (the hex nearest the gmina's centre) stands in.
     const cellsOfRow = (r) => countyCells.get(r.ref) || (Number.isInteger(r.v.cell) ? [r.v.cell] : []);
     const fields = cFields.filter((f) => !["cbsa", "geoid", "cell"].includes(f.key)).map((f) =>
-      F(f.key, f.key === "name" ? "Gmina" : f.key === "gdp" ? "GDP" : f.label, f.key === "growth" ? "signed" : f.key === "gdp" ? "money" : f.format, {
-        unit: f.unit, higher_is: f.higher_is, source: f.source, description: f.description, lens: COUNTY_LENS[f.key], group: groupOf(f),
+      F(f.key, f.key === "name" ? t("Gmina") : f.key === "gdp" ? t("GDP") : t(f.label), f.key === "growth" ? "signed" : f.key === "gdp" ? "money" : f.format, {
+        unit: f.unit ? t(f.unit) : null, higher_is: f.higher_is, source: f.source, description: t(f.description || ""), lens: COUNTY_LENS[f.key], group: groupOf(f),
       }));
     const at = fields.findIndex((f) => f.key === "state");
-    fields.splice(at + 1, 0, F("metro", "Metro", "text", { group: "Name", source: "pl_geo_fua", description: "The metro area (Eurostat functional urban area) the gmina belongs to, if any." }));
+    fields.splice(at + 1, 0, F("metro", t("Metro"), "text", { group: t("Name"), source: "pl_geo_fua", description: t("The metro area (Eurostat functional urban area) the gmina belongs to, if any.") }));
     const gi = fields.findIndex((f) => f.key === "gdp");
-    fields.splice(gi + 1, 0, F("gdp_pc", "GDP per person", "pln", { unit: "zł per resident", higher_is: "good", source: "pl_gdp", description: "The gmina's GDP share divided by its residents. An estimate.", derived: true }));
+    fields.splice(gi + 1, 0, F("gdp_pc", t("GDP per person"), "pln", { unit: t("zł per resident"), higher_is: "good", source: "pl_gdp", description: t("The gmina's GDP share divided by its residents. An estimate."), derived: true }));
     counties_ = makeLevel({
-      id: "counties", label: "Gminas", noun: "gmina",
+      id: "counties", label: t("Gminas"), noun: t("gmina"),
       rows: countyRows, fields,
       highlight: (rows) => {
         const cells = new Set();
@@ -377,7 +402,7 @@ export function buildData(app) {
   const townRows = cities.map((c) => ({
     key: c.id, name: c.name, full: c.full || c.name, sub: (c.states || []).join("-"), level: "towns", ref: c,
     v: {
-      name: c.name, state: (c.states || []).join("-"), kind: c.kind === "city" ? "City with powiat rights" : "Town",
+      name: c.name, state: (c.states || []).join("-"), kind: c.kind === "city" ? t("City with powiat rights") : t("Town"),
       metro: c.fua ? metroList.find((m) => m.id === c.fua)?.name ?? null : null,
       ...econValues(c),
     },
@@ -385,12 +410,12 @@ export function buildData(app) {
   const townByRef = new Map(townRows.map((r) => [r.ref, r]));
   const townCells = (r) => r.ref.footprint || (r.ref.cell != null ? [r.ref.cell] : []);
   const towns = makeLevel({
-    id: "towns", label: "Towns", noun: "town",
+    id: "towns", label: t("Towns"), noun: t("town"),
     rows: townRows,
     fields: [
-      F("name", "Town", "text", { group: "Name" }), F("state", "Voivodeship", "text", { group: "Name" }),
-      F("kind", "Type", "text", { group: "Name", source: "pl_geo_teryt", description: "A city with powiat rights, or another town with town rights." }),
-      F("metro", "Metro", "text", { group: "Name", source: "pl_geo_fua", description: "The metro area the town's gmina belongs to, if any." }),
+      F("name", t("Town"), "text", { group: t("Name") }), F("state", t("Voivodeship"), "text", { group: t("Name") }),
+      F("kind", t("Type"), "text", { group: t("Name"), source: "pl_geo_teryt", description: t("A city with powiat rights, or another town with town rights.") }),
+      F("metro", t("Metro"), "text", { group: t("Name"), source: "pl_geo_fua", description: t("The metro area the town's gmina belongs to, if any.") }),
       ...econFields("towns"),
     ],
     highlight: (rows, o = {}) => {
@@ -425,12 +450,12 @@ export function shortCounty(name) {
 function groupOf(f) {
   if (f.group && GROUP_NAME[f.group]) return GROUP_NAME[f.group];
   const k = f.key;
-  if (["name", "type", "powiat", "state", "metro", "code"].includes(k)) return "Name";
-  if (["population", "density", "growth"].includes(k)) return "People";
-  if (["area_km2"].includes(k)) return "Land";
-  if (k.startsWith("y_")) return "Yields";
-  if (["air_station"].includes(k)) return "Air";
-  return "Economy";
+  if (["name", "type", "powiat", "state", "metro", "code"].includes(k)) return t("Name");
+  if (["population", "density", "growth"].includes(k)) return t("People");
+  if (["area_km2"].includes(k)) return t("Land");
+  if (k.startsWith("y_")) return t("Yields");
+  if (["air_station"].includes(k)) return t("Air");
+  return t("Economy");
 }
 
 function makeLevel(def) {
@@ -456,7 +481,7 @@ function makeLevel(def) {
 // --- fields from files that load on demand ------------------------------------------------------------------------
 // extendData(data, names) loads the named files (military, districts, citizens) through app.loadData and adds their
 // columns to the levels once per data model. Missing files (null) add nothing. Returns the loaded files by name.
-const F4 = (key, label, format, o = {}) => F(key, label, format, { group: "Other", ...o });
+const F4 = (key, label, format, o = {}) => F(key, label, format, { group: t("Other"), ...o });
 
 export async function extendData(data, names) {
   const app = data.app;
@@ -483,11 +508,11 @@ function extendMilitary(data, mil) {
   const byTown = mil && typeof mil.cities === "object" && !Array.isArray(mil.cities) ? mil.cities : null;
   if (!towns || !byTown) return;
   towns.addFields([
-    F4("encampment", "Garrison", "text", { source: (mil.sources || [])[0] || "pl_soc_military", group: "Military", description: `Garrison or fortress when the town passes the Encampment rule; blank otherwise. ${typeof mil.rule === "string" ? mil.rule : ""}` }),
+    F4("encampment", t("Garrison"), "text", { source: (mil.sources || [])[0] || "pl_soc_military", group: t("Military"), description: [t("Garrison or fortress when the town passes the Encampment rule; blank otherwise."), typeof mil.rule === "string" ? t(mil.rule) : ""].filter(Boolean).join(" ") }),
   ]);
   for (const r of towns.rows) {
     const c = byTown[r.key];
-    r.v.encampment = c && c.tier ? (c.tier === "fortress" ? "Fortress" : "Garrison") : null;
+    r.v.encampment = c && c.tier ? (c.tier === "fortress" ? t("Fortress") : t("Garrison")) : null;
   }
 }
 
@@ -498,25 +523,26 @@ function extendDistricts(data, d) {
   const cat = new Map((d.catalog || []).map((c) => [c.id, c]));
   const vint = d.vintage || "GUS";
   const ind = d.industries || {};
+  const topTitle = (top) => (ind[top.pkd]?.title ? t(ind[top.pkd].title) : top.pkd);
   towns.addFields([
-    F4("city_type", "City type", "text", { source: "pl_stats_labour", group: "Districts", description: "The town's badge: named after its strongest trait (a port, a mine, a university, a speciality at least 3 times the national share of workers). Blank: a diversified economy." }),
-    F4("districts", "Districts", "text", { source: "pl_stats_labour", group: "Districts", description: `Industry districts the town qualifies for, strongest first. ${d.rule?.text || ""}` }),
-    F4("n_districts", "Number of districts", "int", { source: "pl_stats_labour", group: "Districts", description: "How many districts pass the rule (up to 5)." }),
-    F4("dist_workers", "Workers (district basis)", "int", { unit: "people, by employer seat", source: "pl_stats_labour", group: "Districts", description: `Workers by PKD section of the town's powiat, or of the city itself for a city with powiat rights (${vint}).` }),
-    F4("dist_scope", "Counted over", "text", { source: "pl_stats_labour", group: "Districts", description: d.rule?.scope_note || "The unit the district figures describe: the city itself, or the town's powiat." }),
-    F4("top_industry", "Most specialised industry", "text", { source: "pl_stats_labour", group: "Districts", description: "The PKD section with the highest location quotient and at least 1,000 workers." }),
-    F4("top_lq", "Its location quotient", "lq", { unit: "times the national share of workers", source: "pl_stats_labour", group: "Districts", description: "The section's share of the area's workers divided by its share of Poland's workers." }),
+    F4("city_type", t("City type"), "text", { source: "pl_stats_labour", group: t("Districts"), description: t("The town's badge: named after its strongest trait (a port, a mine, a university, a speciality at least 3 times the national share of workers). Blank: a diversified economy.") }),
+    F4("districts", t("Districts"), "text", { source: "pl_stats_labour", group: t("Districts"), description: [t("Industry districts the town qualifies for, strongest first."), d.rule?.text ? t(d.rule.text) : ""].filter(Boolean).join(" ") }),
+    F4("n_districts", t("Number of districts"), "int", { source: "pl_stats_labour", group: t("Districts"), description: t("How many districts pass the rule (up to 5).") }),
+    F4("dist_workers", t("Workers (district basis)"), "int", { unit: t("people, by employer seat"), source: "pl_stats_labour", group: t("Districts"), description: t("Workers by PKD section of the town's powiat, or of the city itself for a city with powiat rights ({vintage}).", { vintage: t(vint) }) }),
+    F4("dist_scope", t("Counted over"), "text", { source: "pl_stats_labour", group: t("Districts"), description: d.rule?.scope_note ? t(d.rule.scope_note) : t("The unit the district figures describe: the city itself, or the town's powiat.") }),
+    F4("top_industry", t("Most specialised industry"), "text", { source: "pl_stats_labour", group: t("Districts"), description: t("The PKD section with the highest location quotient and at least 1,000 workers.") }),
+    F4("top_lq", t("Its location quotient"), "lq", { unit: t("times the national share of workers"), source: "pl_stats_labour", group: t("Districts"), description: t("The section's share of the area's workers divided by its share of Poland's workers.") }),
   ]);
   for (const r of towns.rows) {
     const c = d.cities[r.key];
     const top = c?.top?.[0];
     Object.assign(r.v, {
-      city_type: c?.badge?.label ?? null,
-      districts: c ? (c.districts || []).map((x) => cat.get(x.id)?.name || x.id).join(", ") || null : null,
+      city_type: c?.badge?.label ? t(c.badge.label) : null,
+      districts: c ? (c.districts || []).map((x) => (cat.get(x.id)?.name ? t(cat.get(x.id).name) : x.id)).join(", ") || null : null,
       n_districts: c ? (c.districts || []).length : null,
       dist_workers: c?.emp ?? null,
       dist_scope: c?.scope ?? null,
-      top_industry: top ? `${ind[top.pkd]?.title || top.pkd}${top.lower_bound ? " (at least)" : ""}` : null,
+      top_industry: top ? (top.lower_bound ? t("{industry} (at least)", { industry: topTitle(top) }) : topTitle(top)) : null,
       top_lq: top?.lq ?? null,
     });
   }
@@ -534,18 +560,23 @@ function extendCitizens(data, cz) {
   const towns = data.levels.towns;
   if (!towns || !cz?.cities) return;
   const vint = cz.vintage || "GUS";
-  const label = new Map(Object.entries(cz.groups || {}).flatMap(([row, list]) => (list || []).map((g) => [`${row}.${g.key}`, g.label])));
-  const rowDesc = cz.rows || {};
-  const grp = { workforce: "Citizens: work", age: "Citizens: age", sex: "Citizens: age", education: "Citizens: education", nativity: "Citizens: origin" };
-  const unitOf = (row) => (row === "workforce" || row === "education" || row === "nativity" ? "the powiat (the city itself for a city with powiat rights)" : "the gmina");
+  const label = new Map(Object.entries(cz.groups || {}).flatMap(([row, list]) => (list || []).map((g) => [`${row}.${g.key}`, t(g.label)])));
+  const grp = { workforce: t("Citizens: work"), age: t("Citizens: age"), sex: t("Citizens: age"), education: t("Citizens: education"), nativity: t("Citizens: origin") };
+  // The unit and the area each figure is counted over, per citizens.json row.
+  const unitOf = {
+    workforce: t("share of workers by sector"), age: t("share of residents by age"), sex: t("share of residents by sex"), nativity: t("share of residents by origin"),
+  };
+  const descOf = (row, lab) => (row === "workforce" || row === "education" || row === "nativity"
+    ? t("{label}: {unit}, counted over the powiat (the city itself for a city with powiat rights) ({vintage}).", { label: lab, unit: unitOf[row], vintage: t(vint) })
+    : t("{label}: {unit}, counted over the gmina ({vintage}).", { label: lab, unit: unitOf[row], vintage: t(vint) }));
   towns.addFields([
     ...CZ.map(([row, key]) => F4(`cz_${key}`, label.get(`${row}.${key}`) || key, "pct", {
-      unit: `share of ${(rowDesc[row] || row).toLowerCase()}`, source: row === "nativity" ? "pl_foreigners" : row === "workforce" ? "pl_stats_labour" : "pl_stats_population", group: grp[row],
-      description: `${label.get(`${row}.${key}`) || key}: share of ${(rowDesc[row] || row).toLowerCase()}, counted over ${unitOf(row)} (${vint}).`,
+      unit: unitOf[row], source: row === "nativity" ? "pl_foreigners" : row === "workforce" ? "pl_stats_labour" : "pl_stats_population", group: grp[row],
+      description: descOf(row, label.get(`${row}.${key}`) || key),
     })),
-    F4("cz_median_age", "Median age", "years", { unit: "years", source: "pl_stats_population", group: grp.age, description: `Median age of the residents of the town's gmina (${vint}).` }),
-    F4("cz_degree", "Higher education", "pct", { unit: "of residents 13+", source: "pl_census_2021", group: grp.education, description: "Residents aged 13 or more with a higher-education diploma, in the town's powiat (NSP 2021 census)." }),
-    F4("cz_specialist", "Most over-represented citizen", "text", { source: "pl_stats_labour", group: "Citizens", description: `The citizen group most over-represented against Poland as a whole (at least 1.5 times). ${cz.rule?.text || ""}` }),
+    F4("cz_median_age", t("Median age"), "years", { unit: t("years"), source: "pl_stats_population", group: grp.age, description: t("Median age of the residents of the town's gmina ({vintage}).", { vintage: t(vint) }) }),
+    F4("cz_degree", t("Higher education"), "pct", { unit: t("of residents 13+"), source: "pl_census_2021", group: grp.education, description: t("Residents aged 13 or more with a higher-education diploma, in the town's powiat (NSP 2021 census).") }),
+    F4("cz_specialist", t("Most over-represented citizen"), "text", { source: "pl_stats_labour", group: t("Citizens"), description: [t("The citizen group most over-represented against Poland as a whole (at least 1.5 times)."), cz.rule?.text ? t(cz.rule.text) : ""].filter(Boolean).join(" ") }),
   ]);
   for (const r of towns.rows) {
     const c = cz.cities[r.key];
@@ -553,7 +584,8 @@ function extendCitizens(data, cz) {
     r.v.cz_median_age = c?.age?.median ?? null;
     r.v.cz_degree = c?.education?.bachelors_plus ?? null;
     const sp = (c?.specialists || []).find((s) => s.ratio >= 1);
-    r.v.cz_specialist = sp ? `${label.get(`${sp.row}.${sp.key}`) || sp.key} x${sp.ratio.toFixed(1)}${c.reliable === false ? " (rough)" : ""}` : null;
+    const spText = sp ? `${label.get(`${sp.row}.${sp.key}`) || sp.key} x${num(sp.ratio, 1)}` : null;
+    r.v.cz_specialist = sp ? (c.reliable === false ? t("{text} (rough)", { text: spText }) : spText) : null;
   }
 }
 

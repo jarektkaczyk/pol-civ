@@ -1,57 +1,29 @@
 import unittest
 
-from pipeline.sources.pl_census_2021 import (
-    _category_columns,
-    parse_education_map,
-    parse_education_rows,
-    parse_final_education_rows,
-)
+from pipeline.sources.pl_census_2021 import education_rows, parse_final_education_rows
 
 
-class CensusWorkbookTest(unittest.TestCase):
-    def test_maps_full_header(self):
-        header = [
-            "Wyszczegolnienie", "Ogolem", "Wyzsze doktor", "Wyzsze magister",
-            "Dyplom ukonczenia kolegium", "Policealne", "Srednie ogolnoksztalcace",
-            "Srednie zawodowe", "Zasadnicze zawodowe", "Gimnazjalne",
-            "Podstawowe ukonczone", "Podstawowe nieukonczone", "Nieustalony",
-        ]
-        columns = _category_columns(header)
-        self.assertEqual(columns["higher"], [2, 3, 4])
-        self.assertTrue(all(columns.values()))
-
-    def test_parses_land_and_city_powiat_rows_and_sums_higher(self):
-        rows = [
-            ["Tablica. Ludnosc w wieku 13 lat i wiecej wedlug poziomu wyksztalcenia i powiatow"],
-            ["Wyszczegolnienie", "Ogolem", "Wyzsze doktor", "Wyzsze magister", "Dyplom ukonczenia kolegium", "Policealne", "Srednie ogolnoksztalcace", "Srednie zawodowe", "Zasadnicze zawodowe", "Gimnazjalne", "Podstawowe ukonczone", "Podstawowe nieukonczone", "Nieustalony"],
-            ["Powiaty:"],
-            ["bytowski", 100, 1, 10, 2, 3, 20, 21, 15, 4, 12, 5, 7],
-            ["m. Gdansk", 200, 2, 20, 4, 6, 40, 42, 30, 8, 24, 10, 14],
-            ["Mezczyzni"],
-            ["bytowski", 50, 1, 5, 1, 2, 10, 10, 8, 2, 6, 2, 3],
-        ]
-        parsed = parse_education_rows(
-            rows,
-            "22",
-            {("22", "bytowski"): "2201", ("22", "gdansk"): "2261"},
+class CensusEducationTest(unittest.TestCase):
+    def test_shares_use_the_matching_census_population(self):
+        rows = education_rows(
+            {"0201", "0202", "0203", "0204"},
+            {"0201": 3000, "0202": 500, "0204": 0},
+            {"0201": 1000, "0202": 0, "0204": 100},
         )
-        self.assertEqual(parsed["2201"]["higher"], 13)
-        self.assertEqual(parsed["2201"]["population_13_plus"], 100)
-        self.assertEqual(parsed["2261"]["higher"], 26)
-        self.assertEqual(parsed["2261"]["population_13_plus"], 200)
-        self.assertEqual(len(parsed), 2)
+        self.assertEqual(
+            rows["0201"],
+            {"population_13_plus": 3000, "higher": 1000, "higher_share": 33.3333},
+        )
+        self.assertEqual(rows["0202"]["higher_share"], 0)
+        self.assertIsNone(rows["0203"]["higher_share"])
+        self.assertIsNone(rows["0204"]["higher_share"])
 
-    def test_parses_preliminary_map_for_land_and_city_powiat(self):
-        rows = [
-            ["Share with higher education"],
-            ["TERYT", "Powiat", "Udzial osob z wyksztalceniem wyzszym"],
-            ["2201", "bytowski", 14.2],
-            ["2261", "m. Gdansk", 36.5],
-        ]
-        lookup = {("22", "bytowski"): "2201", ("22", "gdansk"): "2261"}
-        parsed = parse_education_map(rows, "22", lookup)
-        self.assertEqual(parsed["2201"]["higher_share"], 14.2)
-        self.assertEqual(parsed["2261"]["higher_share"], 36.5)
+    def test_matches_type_changes_and_keeps_new_gminas_null(self):
+        rows = education_rows(
+            {"0604123", "0604152"}, {"0604122": 200}, {"0604122": 75}, map_gminas=True,
+        )
+        self.assertEqual(rows["0604123"]["higher_share"], 37.5)
+        self.assertIsNone(rows["0604152"]["higher_share"])
 
     def test_parses_final_name_rows_with_combined_categories(self):
         rows = [

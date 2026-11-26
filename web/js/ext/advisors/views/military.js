@@ -6,15 +6,19 @@ import { createTable } from "../core/table.js";
 import { section, tiles, chips } from "../core/view.js";
 import { frameBox, focusPoint } from "../core/frame.js";
 import { FORT_KINDS, fortKind } from "../../../render/art/sites.js";
+import { t, num, zloty, LANG } from "../../../i18n.js";
 
-const STATUS = { act: "Active", active: "Active", forming: "Forming" };
-const TIER = { major: "Major garrison", base: "Garrison", site: "Military site" };
+const TIER = { major: t("Major garrison"), base: t("Garrison"), site: t("Military site") };
+// Money in the style of the shared money() helper (124.8B zl / 124,8 mld zl), with one decimal for billions.
 const pln = (value) => {
   if (!fin(value)) return "-";
-  if (value >= 1e9) return `PLN ${(value / 1e9).toFixed(value % 1e9 ? 1 : 0)} bn`;
-  if (value >= 1e6) return `PLN ${(value / 1e6).toFixed(0)} mn`;
-  return `PLN ${int(value)}`;
+  if (value >= 1e9) return `${num(value / 1e9, 1, { trim: true })}${LANG === "pl" ? " mld" : "B"} z\u0142`;
+  if (value >= 1e6) return `${num(value / 1e6, 0)}${LANG === "pl" ? " mln" : "M"} z\u0142`;
+  return zloty(value);
 };
+const compName = (c) => (c?.name ? t(c.name) : "");
+// Escape a translated template and fill its {placeholders} with HTML.
+const tHtml = (text, vars) => esc(text).replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
 
 export function groupGarrisons(installations, compById, activeComponents, voivodeship = null) {
   const order = new Map([...compById.keys()].map((id, index) => [id, index]));
@@ -36,7 +40,7 @@ export function groupGarrisons(installations, compById, activeComponents, voivod
   for (const row of grouped.values()) {
     row.branches = [...row.branchCounts]
       .sort((a, b) => b[1] - a[1] || (order.get(a[0]) || 0) - (order.get(b[0]) || 0));
-    row.branchText = row.branches.map(([id]) => compById.get(id)?.name || id).join(", ");
+    row.branchText = row.branches.map(([id]) => compName(compById.get(id)) || id).join(", ");
   }
   return [...grouped.values()];
 }
@@ -45,7 +49,7 @@ export async function mount(ctx) {
   const { app, data, el, link } = ctx;
   const mil = await app.loadData("military");
   if (!mil) {
-    el.innerHTML = `<p class="adv-empty pad">No military data is available.</p>`;
+    el.innerHTML = `<p class="adv-empty pad">${esc(t("No military data is available."))}</p>`;
     return {};
   }
   const components = mil.components || [];
@@ -61,22 +65,22 @@ export async function mount(ctx) {
   const filter = { components: new Set(components.map((c) => c.id)), voivodeship: null };
 
   el.insertAdjacentHTML("beforeend", tiles([
-    { label: "Armed Forces", value: int(personnel.total_mid_2026), sub: "at the end of June 2026" },
-    { label: "Professional soldiers", value: int(personnel.professional), sub: "June 2026" },
-    { label: "Territorial Defence", value: int(personnel.territorial_defence), sub: "soldiers" },
+    { label: t("Armed Forces"), value: int(personnel.total_mid_2026), sub: t("at the end of June 2026") },
+    { label: t("Professional soldiers"), value: int(personnel.professional), sub: t("June 2026") },
+    { label: t("Territorial Defence"), value: int(personnel.territorial_defence), sub: t("soldiers") },
   ]));
 
-  const budgetBody = section(el, { title: "Defence spending in 2026" });
+  const budgetBody = section(el, { title: t("Defence spending in 2026") });
   const budgetRows = [spending.budget_act, spending.with_support_fund].filter(Boolean);
   budgetBody.insertAdjacentHTML("beforeend", budgetRows.length ? budgetRows.map((row) => `
-    <p class="adv-note"><b>${esc(row.name)}</b><br>
-      ${esc(pln(row.total_pln))}${fin(row.pct_gdp) ? `, ${row.pct_gdp.toFixed(row.pct_gdp % 1 ? 2 : 1)}% of GDP` : ""}
-    </p>`).join("") : `<p class="adv-empty">No 2026 budget figures are available.</p>`);
+    <p class="adv-note"><b>${esc(t(row.name))}</b><br>
+      ${esc(pln(row.total_pln))}${fin(row.pct_gdp) ? `, ${esc(t("{v}% of GDP", { v: num(row.pct_gdp, row.pct_gdp % 1 ? 2 : 1) }))}` : ""}
+    </p>`).join("") : `<p class="adv-empty">${esc(t("No 2026 budget figures are available."))}</p>`);
 
-  const componentBody = section(el, { title: "Show garrisons" });
+  const componentBody = section(el, { title: t("Show garrisons") });
   const componentChips = chips(componentBody, {
-    label: "Branches",
-    items: components.map((c) => ({ key: c.id, label: c.name, color: FORT_KINDS[fortKind(c.id)]?.accent })),
+    label: t("Branches"),
+    items: components.map((c) => ({ key: c.id, label: compName(c), color: FORT_KINDS[fortKind(c.id)]?.accent })),
     onChange: (on) => { filter.components = on; apply(); },
   });
   const activePlace = document.createElement("div");
@@ -84,15 +88,15 @@ export async function mount(ctx) {
   componentBody.appendChild(activePlace);
   activePlace.addEventListener("click", (event) => { if (event.target.closest("[data-clear-place]")) setVoivodeship(null); });
 
-  const siteBody = section(el, { title: "Garrisons and allied sites" });
+  const siteBody = section(el, { title: t("Garrisons and allied sites") });
   const siteTable = createTable(siteBody, {
-    caption: "Garrison towns", search: "Search garrisons and branches", rank: true, maxHeight: 348, rowH: 58, rows: [],
+    caption: t("Garrison towns"), search: t("Search garrisons and branches"), rank: true, maxHeight: 348, rowH: 58, rows: [],
     searchText: (r) => `${r.name} ${r.branchText} ${(r.units || []).join(" ")}`,
     columns: [
-      { key: "name", label: "Garrison", align: "l", width: "minmax(0,.9fr)", value: (r) => r.name, text: (r) => r.name },
-      { key: "branch", label: "Branches", align: "l", width: "minmax(0,2fr)", value: (r) => r.branchText, text: (r) => r.branchText },
-      { key: "units", label: "Entries", width: "48px", value: (r) => r.count, text: (r) => int(r.count) },
-      { key: "tier", label: "Scale", align: "l", value: (r) => r.tier, text: (r) => TIER[r.tier] || r.tier, hideBelow: 600 },
+      { key: "name", label: t("Garrison"), align: "l", width: "minmax(0,.9fr)", value: (r) => r.name, text: (r) => r.name },
+      { key: "branch", label: t("Branches"), align: "l", width: "minmax(0,2fr)", value: (r) => r.branchText, text: (r) => r.branchText },
+      { key: "units", label: t("Entries"), width: "48px", value: (r) => r.count, text: (r) => int(r.count) },
+      { key: "tier", label: t("Scale"), align: "l", value: (r) => r.tier, text: (r) => TIER[r.tier] || r.tier, hideBelow: 600 },
     ],
     sort: { key: "units", dir: "desc" },
     onHover: (r) => link.hover(r ? { cells: new Set([r.cell]), dimOthers: true, label: r.name } : null),
@@ -100,25 +104,25 @@ export async function mount(ctx) {
   });
   siteTable.el.classList.add("mil-garrisons");
 
-  const rangeBody = section(el, { title: "Main training areas" });
+  const rangeBody = section(el, { title: t("Main training areas") });
   createTable(rangeBody, {
-    caption: "Training areas", rows: ranges, maxHeight: 220,
+    caption: t("Training areas"), rows: ranges, maxHeight: 220,
     columns: [
-      { key: "name", label: "Training area", align: "l", width: "minmax(0,1.7fr)", value: (r) => r.name, text: (r) => r.name },
-      { key: "garrison", label: "Near", align: "l", value: (r) => r.garrison, text: (r) => r.garrison || "-" },
-      { key: "area", label: "Area", value: (r) => r.area_km2, text: (r) => fin(r.area_km2) ? `${int(r.area_km2)} km2` : "-" },
+      { key: "name", label: t("Training area"), align: "l", width: "minmax(0,1.7fr)", value: (r) => r.name, text: (r) => r.name },
+      { key: "garrison", label: t("Near"), align: "l", value: (r) => r.garrison, text: (r) => r.garrison || "-" },
+      { key: "area", label: t("Area"), short: "km&sup2;", width: "54px", value: (r) => r.area_km2, text: (r) => fin(r.area_km2) ? `${int(r.area_km2)} km\u00b2` : "-" },
     ],
     sort: { key: "area", dir: "desc" },
     onHover: (r) => link.hover(r ? { cells: new Set(r.cells || [r.cell]), dimOthers: true, label: r.name } : null),
     onClick: (r) => focusPoint(app, r.x, r.y, Math.min(app.cam.maxScale, Math.max(app.cam.scale, (app.cam.fitScale || 1) * 3.2))),
   });
 
-  const placeBody = section(el, { title: "Garrisons by voivodeship" });
+  const placeBody = section(el, { title: t("Garrisons by voivodeship") });
   const placeRows = Object.entries(mil.states || {}).map(([abbr, row]) => ({
-    key: abbr, label: voivodeshipName(abbr), value: row.garrison_towns, sub: `${int(row.units)} formations, ${int(row.bases)} bases`, row,
+    key: abbr, label: voivodeshipName(abbr), value: row.garrison_towns, sub: `${t.plural(row.units, { one: "{n} formation", other: "{n} formations" })}, ${t.plural(row.bases, { one: "{n} base", other: "{n} bases" })}`, row,
   })).filter((r) => fin(r.value)).sort((a, b) => b.value - a.value);
   const placeBars = barList(placeBody, {
-    rows: placeRows, rank: true, ariaLabel: "Garrison towns by voivodeship",
+    rows: placeRows, rank: true, ariaLabel: t("Garrison towns by voivodeship"),
     onHover: (r) => {
       const idx = r ? voivodeshipIndex(r.key) : null;
       link.hover(idx != null ? { states: new Set([idx]), dimOthers: true, label: r.label } : null);
@@ -126,13 +130,13 @@ export async function mount(ctx) {
     onClick: (r) => setVoivodeship(filter.voivodeship === r.key ? null : r.key, true),
   });
 
-  const forceBody = section(el, { title: "Personnel" });
+  const forceBody = section(el, { title: t("Personnel") });
   const forceRows = [
-    { key: "professional", label: "Professional soldiers", value: personnel.professional },
-    { key: "territorial", label: "Territorial Defence", value: personnel.territorial_defence },
-    { key: "voluntary", label: "Voluntary basic service", value: personnel.voluntary_service },
+    { key: "professional", label: t("Professional soldiers"), value: personnel.professional },
+    { key: "territorial", label: t("Territorial Defence"), value: personnel.territorial_defence },
+    { key: "voluntary", label: t("Voluntary basic service"), value: personnel.voluntary_service },
   ].filter((r) => fin(r.value));
-  barList(forceBody, { rows: forceRows, ariaLabel: "Polish Armed Forces personnel", rank: false, max: Math.max(1, ...forceRows.map((r) => r.value)) });
+  barList(forceBody, { rows: forceRows, ariaLabel: t("Polish Armed Forces personnel"), rank: false, max: Math.max(1, ...forceRows.map((r) => r.value)) });
 
   function shown() {
     return groupGarrisons(installations, compById, filter.components, filter.voivodeship);
@@ -154,7 +158,7 @@ export async function mount(ctx) {
     siteTable.setRows(rows);
     const idx = filter.voivodeship ? voivodeshipIndex(filter.voivodeship) : null;
     link.base(idx != null ? { states: new Set([idx]), dimOthers: true } : null);
-    activePlace.innerHTML = idx != null ? `<span class="adv-fchip">Voivodeship: <b>${esc(voivodeshipName(filter.voivodeship))}</b> &middot; ${int(rows.length)} towns<button type="button" data-clear-place aria-label="Clear the voivodeship filter">x</button></span>` : "";
+    activePlace.innerHTML = idx != null ? `<span class="adv-fchip">${tHtml(t("Voivodeship: {name}"), { name: `<b>${esc(voivodeshipName(filter.voivodeship))}</b>` })} &middot; ${esc(t.plural(rows.length, { one: "{n} town", other: "{n} towns" }))}<button type="button" data-clear-place aria-label="${esc(t("Clear the voivodeship filter"))}">x</button></span>` : "";
   }
   apply();
 

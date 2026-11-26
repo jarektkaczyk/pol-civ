@@ -2,6 +2,7 @@
 // Each is an ordinary lens object ({id, name, ramp, domain, scale, format, values: per cell}) that app.setLens()
 // accepts; they are built once per data model and cached, so the lens dock's histogram cache stays valid.
 import { fin, quantile } from "./util.js";
+import { t } from "../../../i18n.js";
 
 // Diverging: shrinking (brick), no change (parchment), growing (teal). Dark ends so the extremes read on the map.
 const GROWTH_RAMP = ["#7a1f2b", "#c2463d", "#e8a07a", "#efe6d2", "#8fcbb8", "#2e9c8a", "#0f5e57"];
@@ -44,12 +45,12 @@ export function growthLens(data, by = "metros") {
       vals = data.levels.metros.rows.map((r) => r.v.growth);
     }
     return {
-      id: `adv-growth-${by}`, group: "people", name: by === "states" ? "Growth by voivodeship" : "Growth by metro",
-      icon: "l-people", emoji: "\u{1f4c8}", unit: "population change", format: "pct", scale: "linear",
+      id: `adv-growth-${by}`, group: "people", name: by === "states" ? t("Growth by voivodeship") : t("Growth by metro"),
+      icon: "l-people", emoji: "\u{1f4c8}", unit: t("population change"), format: "pct", scale: "linear",
       domain: symDomain(vals), ramp: GROWTH_RAMP, higher_is: "neutral", source: "pl_stats_population",
       description: by === "states"
-        ? `Population change ${yrs} by voivodeship (GUS, on today's borders).`
-        : `Population change ${yrs} by metro area (GUS, on today's borders). Grey hexes lie outside the metro areas.`,
+        ? t("Population change {years} by voivodeship (GUS, on today's borders).", { years: yrs })
+        : t("Population change {years} by metro area (GUS, on today's borders). Grey hexes lie outside the metro areas.", { years: yrs }),
       values,
     };
   });
@@ -65,10 +66,10 @@ export function scienceLens(data) {
     for (const [cell, city] of cellMetro) if (owner[cell] >= 0) values[cell] = share(city);
     const sci = app.data.nation?.yields?.find((y) => y.key === "science");
     return {
-      id: "adv-science-share", group: "knowledge", name: "Science jobs",
-      icon: "l-degrees", emoji: "\u{1F52C}", unit: "of workers", format: "pct", scale: "linear",
+      id: "adv-science-share", group: "knowledge", name: t("Science jobs"),
+      icon: "l-degrees", emoji: "\u{1F52C}", unit: t("of workers"), format: "pct", scale: "linear",
       domain: robust(data.levels.metros.rows.map((r) => share(r.ref))), ramp: SCIENCE_RAMP, higher_is: "neutral", source: "pl_stats_labour",
-      description: `${sci?.label || "Science"} workers as a share of all workers, by metro area (counted where the employer is). Grey hexes lie outside the metro areas.`,
+      description: t("{label} workers as a share of all workers, by metro area (counted where the employer is). Grey hexes lie outside the metro areas.", { label: t(sci?.label || "Science") }),
       values,
     };
   });

@@ -10,6 +10,7 @@
 import { drawRoads, drawRail, drawPort, drawAirport, drawTradeRoutes, hitRoute, ROAD_MIN_RPX, OVERVIEW_ROUTES } from "../../render/art/improvements.js";
 import { drawFort, drawRestricted, drawProtected, drawWonder, drawPlaque } from "../../render/art/sites.js";
 import { visibleSites, siteSize, hitSites } from "./model.js";
+import { t } from "../../i18n.js";
 
 const inVp = (it, vp, padKm) => it.x > vp.x0 - padKm && it.x < vp.x1 + padKm && it.y > vp.y0 - padKm && it.y < vp.y1 + padKm;
 
@@ -193,9 +194,9 @@ export function makeLayers(model, on, { tips = {}, app = null } = {}) {
     // In the City View, the open metro's hexes carry district plaques, yield chips and site labels (drawn over the
     // map each frame), so no fort or wonder plate may stand on them: the dock lists those sites instead.
     const mm = app?.cityView?.city ? app.cityView.model : null;
-    for (const t of mm?.tiles || []) {
-      if (t?.x == null || t?.y == null) continue;
-      const [hx, hy] = o.toScreen(t.x, t.y);
+    for (const tile of mm?.tiles || []) {
+      if (tile?.x == null || tile?.y == null) continue;
+      const [hx, hy] = o.toScreen(tile.x, tile.y);
       placed.push([hx - o.Rpx * 0.95, hy - o.Rpx, hx + o.Rpx * 0.95, hy + o.Rpx * 1.05]);
     }
     const scale = Math.min(1.2, 0.85 + o.Rpx / 200);
@@ -205,7 +206,9 @@ export function makeLayers(model, on, { tips = {}, app = null } = {}) {
       if (busy.size && (busy.has(it.drawCell) || busy.has(g.cellAt(it.x, it.y)))) continue;
       const [sx, sy] = o.toScreen(it.x, it.y);
       const size = siteSize(it, o.Rpx);
-      const text = it.data.short || it.data.name || "";
+      // wonders.json names are translated data; a fort plate is its garrison town's name.
+      const raw = it.data.short || it.data.name || "";
+      const text = raw && it.kind !== "fort" ? t(raw) : raw;
       if (!text) continue;
       const kind = it.kind === "fort" ? "fort" : it.wkind;
       const y = sy + size * 0.42;

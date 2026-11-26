@@ -38,6 +38,19 @@ Per-cell arrays have length `grid.cols * grid.rows`, with index `row * cols + co
   the NUTS 3 code (`PL213`) or by `PL` for the country. Each field is `{label, unit, year, note}`; `note` starts with
   the reference date when the figure is a stock (`"30 June 2026, ..."`), and `year` is that date's year. Money fields
   are in złoty (`unit: "PLN"`) unless the key ends in `_eur` or `_usd`.
+* **Dates are ISO.** Every date in `web/data` is ISO text: a day `"2026-06-30"`, a month `"2026-10"`, a year `"2025"`
+  (or the integer year). This holds for date fields and for dates inside free text (`"GUS, 2025-12-31"`). `write_web()`
+  turns any English date a source still writes (`"30 June 2026"`, `"31 Dec 2025"`, `"October 2026"`) into ISO; the
+  browser (`web/js/i18n.js` `date()`, `localizeDates()`) and the atlas (`pipeline/core/i18n.py`) format them per language.
+  Never write a pre-formatted date in a builder. Write a span of years in full (`2017-2021`, `2025/26`), never
+  `2010-11`: that reads as the month 2010-11.
+* **Languages.** The page ships in English and Polish (`/pol-civ/pl/`). Data text stays English; the browser translates
+  it through `web/i18n/pl.json` (key = the exact English text). The prose fields that are translated are listed in
+  `pipeline/core/i18n.py` `DATA_TEXT`: add a field there when the page shows a new prose field. A sentence a builder
+  makes from numbers is written as a template plus values (`"tpl": "{students} university students, {share}% of
+  residents", "vars": {...}`) beside the English `text`, so the catalogue holds one key, not one key per town.
+  `pipeline check` (builder check `i18n`) fails while any English string of the page or of a `DATA_TEXT` field has no
+  Polish entry; `scripts/i18n-extract.py` lists the missing keys.
 
 ## world.json
 
@@ -206,7 +219,7 @@ Also, per voivodeship:
 ```jsonc
 {
   "vintage": "GUS population 30 June 2026; ...", "year": 2026,
-  "population_date": "30 June 2026",   // reference date of every `population` figure
+  "population_date": "2026-06-30",     // reference date of every `population` figure (ISO)
   "gdp_vintage": "Eurostat national 2025; voivodeship GDP 2024 (GUS, revision of 30 September 2026); ...",
   "years": {"population": 2026, "population_2025": 2025, "workers": 2025, "gdp_nuts3": 2023, "gdp_voiv": 2024,
             "gdp_nation": 2025, "wage": 2026, "unemployment": 2026, "pit": 2026},   // the year of each figure
@@ -230,7 +243,8 @@ lens, counties.json and the Explorer show the same numbers.
              {"id": "vote", "name": "Vote"}, {"id": "air", "name": "Air"}, {"id": "hazards", "name": "Hazards"},
              {"id": "land", "name": "Land"}],
   "lenses": [{
-    "id": "income", "group": "prosperity", "name": "PIT revenue per person", "icon": "l-income", "emoji": "💰",
+    "id": "income", "group": "prosperity", "name": "PIT revenue per person", "short_name": "PIT per person",
+    "icon": "l-income", "emoji": "💰", // short_name is optional and appears only in the lens dock
     "unit": "zł per resident", "format": "int|pln|pct|float|years|category",   // pct values are 0..1 fractions
     "scale": "log|linear", "domain": [1900, 5500], "ramp": ["#..."], "higher_is": "good|bad|neutral",
     "source": "pl_stats_prosperity", "description": "...",
@@ -253,6 +267,12 @@ lens, counties.json and the Explorer show the same numbers.
   (Nawrocki share, 2025 second round), turnout (gmina); sejm (largest committee 2023, category); pm25 (nearest GIOŚ
   station within 25 km of the gmina centre, else null); flood (2024 flood disaster area, category); forest,
   farmland, developed (hex). Missing source tables leave a lens out; it returns on the next build.
+* More lenses (`pipeline/build/lenses_more_b.py`, called from `lenses.py`): silesian, kashubian, german, belarusian
+  (share declaring the identity, first or second answer, NSP 2021, gmina; null where fewer than 10 people declared
+  it), minority (the largest identity other than Polish, category: silesian, kashubian, german, ukrainian,
+  belarusian, lemko, lithuanian, roma, other), group `identity`; commuters (wage employees commuting in per 1,000
+  residents, NSP 2021, gmina), group `life`; eu_funds (EU co-financing of 2021-2027 projects per resident, project
+  list of 2026-11-01, gmina), group `prosperity`.
 * `lenses.py` defines `check(web_dir)`: required notes, the neutral vote ramp, coverage per lens.
 
 ## resources.json
@@ -267,6 +287,7 @@ lens, counties.json and the Explorer show the same numbers.
              "unit": "MW", "description": "...", "source": "pl_energy_plants"}],
   "items": [{"id": "plant:way/1583424363", "type": "nuclear", "name": "Lubiatowo-Kopalino nuclear power plant",
              "value": 3750, "status": "planned", "operator": "Polskie Elektrownie Jądrowe", "detail": "...", "year": null,
+             "status_label": "Planned", "status_note": null,   // detail = status_label - operator - status_note (English)
              "ref": "https://...", "x": 265.4, "y": 38.3, "cell": 441,
              "gmina": "2215042", "powiat": "2215", "state": "PM", "cbsa": null}],
   "summary": {
@@ -398,7 +419,10 @@ its whole powiat (`scope`).
     "districts": [{"id": "campus", "lq": 2.06, "emp": 193309, "share": 0.361, "sub": "J", "sub_lq": 3.84,
                    "sub_emp": 74424, "via": "broad|specialty", "strength": 99359, "suppressed": 0, "lower_bound": false}],
     "badge": {"id": "scientific", "rule": "tech", "label": "Tech city", "district": "campus", "basis": "rule",
-              "text": "IT and telecoms: 3.8 times the national share of workers"} | null
+              "text": "IT and telecoms: 3.8 times the national share of workers",
+              "tpl": "IT and telecoms: {lq} times the national share of workers", "vars": {"lq": 3.8}} | null
+    // tpl (and vars when the line has numbers) let the browser write the line per language (t(tpl, vars)); a badge
+    // named after a place (a mine, a garrison) has tpl equal to text.
   } | null}
 }
 ```
@@ -574,6 +598,72 @@ Built from `pl_soc_disasters`. It maps the administrative area declared after th
 `gminas.rows` follows `world.json` gmina order. `declared` is 1 for the 198 named gminas and 0 elsewhere. `partial` is 1
 only for Małomice. `cells` is `null` outside Polish land, 1 in declared gminas and 0 in other Polish gminas.
 
+### history.json (lazy)
+
+Built by `pipeline/build/history.py` from `pl_hist_borders` (CShapes 2.0, CC BY-NC-SA 4.0). Loaded by `ext/history`
+when one of its switches ("Borders of 1914", "Interwar border") is first turned on.
+
+```jsonc
+{
+  "version": 1, "vintage": "CShapes 2.0 (2022); borders on 1914-07-01 and 1930-01-01", "sources": ["pl_hist_borders"],
+  "layers": [{
+    "id": "borders_1914",              // or "borders_1930" (the border of Poland 1921-1939)
+    "date": "1914-07-01", "label": "Borders of 1914",
+    "lines": [{"between": ["the German Empire", "the Russian Empire"], "tip": "Border of ... on 1 July 1914",
+               "pts": [x0, y0, x1, y1, ...]}],   // map km
+    "labels": [{"name": "German Empire", "x": 129.7, "y": 241.6}]   // 1914 only; [] for the interwar layer
+  }],
+  "rules": ["..."], "licence": "CShapes 2.0, ETH Zurich (Schvitz et al. 2022), CC BY-NC-SA 4.0"
+}
+```
+
+* A line is the stretch of one state's outline within 2.5 km of its neighbour's outline (coasts are left out), clipped
+  to lon 12-27, lat 47.5-56.5 and simplified to 0.4 km. Label points are picked by hand inside each 1914 zone (clear
+  of voivodeship names); the builder checks each lies inside its zone. Labels carry no data.
+
+### commuting.json (lazy)
+
+Built by `pipeline/build/commuting.py` from `pl_flows_commuting` (GUS NSP 2021 commuting matrix). Loaded by
+`ext/commuting` when the "Commuters" switch is first turned on.
+
+```jsonc
+{
+  "version": 1, "vintage": "NSP 2021 (31 March 2021), matrix published 31 January 2024",
+  "sources": ["pl_flows_commuting"],
+  "rule": "The 12 most populous cities (30 June 2026). Into each: the flows ... of 250 people or more, the largest 40.",
+  "cities": [{"id": "1465011", "name": "Warszawa", "x": 478.3, "y": 323.1,   // the cities.json banner point
+              "commuters_in": 390395, "commuters_out": 56045,             // all flows, incl. those under 3 people
+              "arcs": [{"from": "1418043", "name": "Piaseczno", "value": 15550, "x": 481.0, "y": 340.2}]}]
+}
+```
+
+* `value` = wage employees living in gmina `from` and working in the city (whole counts). Arc start = the mean of the
+  home gmina's hexes. Urban-rural gminas are whole gminas (GUS publishes town and rural parts; the source adds them).
+
+### timeline.json (lazy)
+
+Built by `pipeline/build/timeline.py` from `pl_hist_population` (GUS bulk population tables). Loaded by
+`ext/timeline` when the density or the change lens is first shown; it drives the year slider in their legend
+(`#year=2019` in the URL; the key is left out at the lens's own date).
+
+```jsonc
+{
+  "version": 1, "vintage": "GUS population 31 December 2015 to 2025 and 30 June 2026", "sources": ["pl_hist_population"],
+  "dates": ["2015-12-31", ..., "2025-12-31", "2026-06-30"], "labels": ["2015", ..., "2025", "June 2026"],
+  "lens_dates": {"density": "2026-06-30", "growth": "2025-12-31"},   // the date each lens shows by default
+  "scale": {"density": 10, "growth": 1000},       // stored integers = value x scale
+  "domains": {"density": [13, 850], "growth": [-0.15, 0.28]},       // copied from lenses.json, fixed for all years
+  "cells": [int],                                 // Polish land cells (world.json owner >= 0)
+  "density": [[int|null]], "growth": [[int|null]],  // one array per date, one value per entry of `cells`
+  "notes": ["..."]
+}
+```
+
+* Density: residents per km² of the hex's land on each date. A hex's people on a date are its gmina parts in the
+  density lens times population(date) / population(30 June 2026) of each gmina, so the last date equals the lens.
+  Change: population(date) / population(31 Dec 2015) - 1 per gmina, spread with the change lens's weights (0 on 2015).
+* Each date is on that date's gmina borders; from 31 December 2021 GUS counts are rebased on the 2021 census.
+
 ## data/index.json
 
 The public catalogue of `web/data/`, built by `pipeline/build/seo.py` (served at `/pol-civ/data/index.json`):
@@ -592,7 +682,9 @@ The public catalogue of `web/data/`, built by `pipeline/build/seo.py` (served at
     "description": "...",               // one sentence: what one row is
     "fields": ["id", "name", "..."],    // the main keys, or "key (label)" for a file with a fields list
     "rows": 1026,                       // rows, items or cells in the file's main list; null when it has none
-    "vintage": "..." | {"<source id>": "..."}
+    "vintage": "..." | {"<source id>": "..."},
+    "sources": ["<source id>"], "publishers": ["..."],
+    "licenses": [{"source": "<source id>", "terms": "..."}]
   }]
 }
 ```
@@ -623,8 +715,9 @@ saved by `download_prefix()` has a `partial` note in the manifest, and its `sha2
 
 ## Browser extension API (window.__app; main.js "extension API", app/api.js)
 
-Extensions live in `web/js/ext/<name>/index.js` and export `install(app)`; `ext/index.js` loads `cityView`, `advisors` and
-`layers` (roads, rail, forts, ports, airports, wonders and trade routes). The API:
+Extensions live in `web/js/ext/<name>/index.js` and export `install(app)`; `ext/index.js` loads `cityView`, `advisors`,
+`layers` (roads, rail, forts, ports, airports, wonders and trade routes), `history` (1914 and interwar borders),
+`commuting` (commuter arcs) and `timeline` (the year slider of the population lenses). The API:
 
 **Data.**
 * `app.data.<name>`: the core files (`world`, `cities`, `states`, `nation`, `lenses`, `resources`, `sources`) are loaded

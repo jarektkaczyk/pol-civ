@@ -1,28 +1,30 @@
 // Keyboard and mouse cheat sheet.
 import { icon } from "../ui/icon.js";
+import { t } from "../i18n.js";
+import { esc } from "../format.js";
 
 const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || "");
 const MOD = isMac ? "Cmd" : "Ctrl";
 
 const ROWS = [
-  ["Move", [
-    [["Drag", "Arrow keys", "WASD"], "Pan the map"],
-    [["Scroll", "+", "-"], "Zoom in and out"],
-    [["Double-click"], "Zoom in on a spot"],
-    [["Two fingers"], "Pinch to zoom, drag to pan (touch)"],
-    [["Minimap"], "Click or drag to jump"],
+  [t("Move"), [
+    [[t("Drag"), t("Arrow keys"), "WASD"], t("Pan the map")],
+    [[t("Scroll"), "+", "-"], t("Zoom in and out")],
+    [[t("Double-click")], t("Zoom in on a spot")],
+    [[t("Two fingers")], t("Pinch to zoom, drag to pan (touch)")],
+    [[t("Minimap")], t("Click or drag to jump")],
   ]],
-  ["Explore", [
-    [["Click town"], "Open the town screen"],
-    [["Click land"], "Open that voivodeship"],
-    [["/", `${MOD} K`], "Search towns and voivodeships"],
-    [["L", "Shift L"], "Next or previous lens"],
-    [["Legend"], "Hover or drag the scale to show only that range"],
-    [["R"], "Show or hide resources"],
+  [t("Explore"), [
+    [[t("Click town")], t("Open the town screen")],
+    [[t("Click land")], t("Open that voivodeship")],
+    [["/", `${MOD} K`], t("Search towns and voivodeships")],
+    [["L", "Shift L"], t("Next or previous lens")],
+    [[t("Legend")], t("Hover or drag the scale to show only that range")],
+    [["R"], t("Show or hide resources")],
   ]],
-  ["Panels", [
-    [["?"], "This help"],
-    [["Esc"], "Close help, search, Almanac, then the panel"],
+  [t("Panels"), [
+    [["?"], t("This help")],
+    [["Esc"], t("Close help, search, Almanac, then the panel")],
   ]],
 ];
 
@@ -32,15 +34,15 @@ export function initHelp() {
   const card = modal.querySelector(".help-card");
   let restore = null;
   card.innerHTML = `
-    <button class="icon-btn help-close" data-close aria-label="Close help">${icon("close", "\u2715", { size: 13 })}</button>
-    <h2 id="help-title">${icon("help", "?", { size: 22 })}<span>Controls</span></h2>
+    <button class="icon-btn help-close" data-close aria-label="${esc(t("Close help"))}">${icon("close", "\u2715", { size: 13 })}</button>
+    <h2 id="help-title">${icon("help", "?", { size: 22 })}<span>${esc(t("Controls"))}</span></h2>
     <div class="help-cols">${ROWS.map(([title, rows]) => `
-      <section><h3>${title}</h3>${rows.map(([keys, what]) => `
-        <div class="help-row"><span class="keys">${keys.map((k) => `<kbd>${k}</kbd>`).join("")}</span><span>${what}</span></div>`).join("")}
+      <section><h3>${esc(title)}</h3>${rows.map(([keys, what]) => `
+        <div class="help-row"><span class="keys">${keys.map((k) => `<kbd>${esc(k)}</kbd>`).join("")}</span><span>${esc(what)}</span></div>`).join("")}
       </section>`).join("")}</div>
-    <p class="help-foot">The link in the address bar always reopens this exact view.
-      Open the <b>Almanac</b> for what every number means.
-      Source code: <a href="https://github.com/jarektkaczyk/pol-civ" target="_blank" rel="noopener">github.com/jarektkaczyk/pol-civ</a> (MIT).</p>`;
+    <p class="help-foot">${esc(t("The link in the address bar always reopens this exact view."))}
+      ${esc(t("Open the {almanac} for what every number means.")).replace("{almanac}", `<b>${esc(t("Almanac"))}</b>`)}
+      ${esc(t("Source code:"))} <a href="https://github.com/jarektkaczyk/pol-civ" target="_blank" rel="noopener">github.com/jarektkaczyk/pol-civ</a> (MIT).</p>`;
 
   const close = () => {
     if (modal.hidden) return;

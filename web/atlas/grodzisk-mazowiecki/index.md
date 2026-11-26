@@ -1,6 +1,7 @@
 # Grodzisk Mazowiecki
 
 Source page: https://softonsofa.com/pol-civ/atlas/grodzisk-mazowiecki/
+Polish version: https://softonsofa.com/pol-civ/pl/atlas/grodzisk-mazowiecki/
 Last updated: 2026-11-26
 
 The gmina of Grodzisk Mazowiecki has the 6th youngest population of the 203 Polish towns with 20,000 or more people: a median age of 41.2 years.
@@ -62,10 +63,10 @@ Grodzisk Mazowiecki belongs to the Warszawa metro area, 3,539,344 residents in 9
 - [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 30 June 2026 and position (GUS population 30 June 2026; towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
 - [Statistics Poland (GUS): GUS labour publication tables (GUS, October 2026, May 2026, and December 2025)](https://stat.gov.pl/obszary-tematyczne/rynek-pracy/)
 - [Ministry of Finance and Statistics Poland (GUS): Polish local income, housing, and tourism statistics (Ministry of Finance 2026; GUS annual 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
-- [Państwowa Komisja Wyborcza (PKW): Election results by gmina (presidential 2025, Sejm 2023) (PKW: presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 Oct 2023))](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach)
+- [Państwowa Komisja Wyborcza (PKW): Election results by gmina (presidential 2015, 2020 and 2025, Sejm 2023) (PKW: presidential election runoffs of 24 May 2015 and 12 July 2020; presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 October 2023))](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach)
 - [Główny Inspektorat Ochrony Środowiska (GIOŚ): Air quality: annual means of PM2.5, PM10 and benzo(a)pyrene by station (GIOS annual statistics 2025)](https://powietrze.gios.gov.pl/pjp/archives)
-- [Eurostat; OpenStreetMap contributors; Wikidata; Government of Poland: Airports of Poland: traffic, positions and planned Port Polska (Eurostat airport traffic 2025; Port Polska plan status 2026-06-30)](https://ec.europa.eu/eurostat/web/transport/database)
+- [Eurostat; OpenStreetMap contributors; Wikidata; Government of Poland: Airports of Poland: traffic, positions and planned Port Polska (Eurostat airport traffic 2025; Port Polska plan status 30 June 2026)](https://ec.europa.eu/eurostat/web/transport/database)
 - [Główny Urząd Statystyczny (GUS); Wikidata: National parks: area and visitors (GUS Ochrona srodowiska 2025 (data for 2024); Tatra National Park report for 2025; Wikidata centre points)](https://stat.gov.pl/obszary-tematyczne/srodowisko-energia/srodowisko/ochrona-srodowiska-2025,1,26.html)
-- [Główny Urząd Statystyczny (GUS); Ministry of Science (RAD-on / POL-on); Wikidata: Universities: students, research categories, main campus (GUS academic year 2025/26 (31 Dec 2025); RAD-on evaluations 2017-2021 and 2022-2025; Wikidata positions)](https://radon.nauka.gov.pl/dane)
+- [Główny Urząd Statystyczny (GUS); Ministry of Science (RAD-on / POL-on); Wikidata: Universities: students, research categories, main campus (GUS academic year 2025/26 (31 December 2025); RAD-on evaluations 2017-2021 and 2022-2025; Wikidata positions)](https://radon.nauka.gov.pl/dane)
 - [Eurostat: Functional urban areas: LAU 2025 to city and FUA correspondence (LAU 2025 (NUTS 2024) correspondence)](https://ec.europa.eu/eurostat/web/nuts/local-administrative-units)
 - [Varso Tower: varso.com](https://varso.com/en/varso-tower/)

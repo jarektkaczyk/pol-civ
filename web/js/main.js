@@ -2,7 +2,7 @@ import { Camera } from "./camera.js";
 import { prepareWorld, applyLens, stateIndex } from "./world.js";
 import * as mapRender from "./render/map.js";
 import { drawBanners } from "./render/banners.js";
-import { renderTopbar } from "./ui/topbar.js";
+import { renderTopbar, initLangSwitch } from "./ui/topbar.js";
 import { showCellTooltip, showCityTooltip, showHtmlTooltip, hideTooltip } from "./ui/tooltip.js";
 import { initLensDock, formatLensValue, lensValueAt } from "./ui/lenses.js";
 import { openCityPanel, closeCityPanel } from "./ui/cityPanel.js";
@@ -19,14 +19,27 @@ import { resourceFilterSig, layerActive, layerError, Z as LAYER_Z } from "./rend
 import { installExtensions } from "./ext/index.js";
 import { initShare } from "./app/share.js";
 import { initHelp } from "./app/help.js";
+import { t, ROOT } from "./i18n.js";
 
 const { drawStatic, drawOverlay, OCEAN_BG } = mapRender;
 
+// Proper names that carry English words ("Port of Gdańsk", "Kraków metro area") are shown in the page language
+// everywhere (map, tooltips, advisors, search) by translating them once, as they load.
+const LOCALIZE = {
+  infrastructure: (d) => { for (const p of d.ports || []) if (p.name) p.name = t(p.name); },
+  resources: (d) => { for (const it of d.items || []) if (it.name) it.name = t(it.name); },
+  metros: (d) => {
+    for (const m of d.metros || []) if (m.full === `${m.name} metro area`) m.full = t("{name} metro area", { name: m.name });
+  },
+};
+
 async function loadJSON(name, optional = false) {
   try {
-    const r = await fetch(`data/${name}.json`);
+    const r = await fetch(`${ROOT}data/${name}.json`);
     if (!r.ok) throw new Error(`data/${name}.json: HTTP ${r.status}`);
-    return await r.json();
+    const doc = await r.json();
+    if (doc && LOCALIZE[name]) LOCALIZE[name](doc);
+    return doc;
   } catch (err) {
     if (optional) return null;
     throw err;
@@ -50,6 +63,7 @@ const SELECT_ANIM_MS = 33; // ~30 fps while a state's border highlight animates
 const isMobile = () => matchMedia("(max-width: 700px)").matches;
 
 async function main() {
+  initLangSwitch(); // before the data loads, so the EN | PL links keep the view from the first click
   const [world, cities, nation, lenses, sources, resources, statesData, metros, powiaty] = await Promise.all([
     loadJSON("world"), loadJSON("cities"), loadJSON("nation"),
     loadJSON("lenses", true), loadJSON("sources", true), loadJSON("resources", true), loadJSON("states", true),
@@ -532,12 +546,12 @@ async function main() {
     announceEl.textContent = "";
     setTimeout(() => (announceEl.textContent = text), 30);
   };
-  const stateName = (idx) => states?.[idx]?.name || w.raw.states[idx]?.name || "State";
+  const stateName = (idx) => states?.[idx]?.name || w.raw.states[idx]?.name || t("Voivodeship");
 
   function describeCanvas() {
-    const parts = ["Hex map of Poland", state.lens ? `coloured by the ${state.lens.name} lens` : "showing terrain"];
-    if (state.selectedCity) parts.push(`${state.selectedCity.name} selected`);
-    else if (state.selectedState != null) parts.push(`${stateName(state.selectedState)} selected`);
+    const parts = [t("Hex map of Poland"), state.lens ? t("coloured by the {lens} lens", { lens: t(state.lens.name) }) : t("showing terrain")];
+    if (state.selectedCity) parts.push(t("{name} selected", { name: state.selectedCity.name }));
+    else if (state.selectedState != null) parts.push(t("{name} selected", { name: stateName(state.selectedState) }));
     canvas.setAttribute("aria-label", parts.join(", "));
   }
 
@@ -555,7 +569,7 @@ async function main() {
     state.selectedState = null;
     app.panels.city(city, panelCtx());
     if (fly && city.cell != null) focusCity(city);
-    announce(`${city.name} selected. ${city.full || ""}`);
+    announce(`${t("{name} selected.", { name: city.name })} ${city.full || ""}`);
     afterSelect();
   }
 
@@ -565,7 +579,7 @@ async function main() {
     state.selectedState = idx;
     app.panels.state(idx, panelCtx());
     if (fly) focusState(idx);
-    announce(`${stateName(idx)} selected.`);
+    announce(t("{name} selected.", { name: stateName(idx) }));
     afterSelect();
   }
 
@@ -574,7 +588,7 @@ async function main() {
     state.selectedCity = null;
     state.selectedState = null;
     app.panels.close();
-    if (had) announce("Selection closed.");
+    if (had) announce(t("Selection closed."));
     afterSelect();
   }
 
@@ -662,12 +676,12 @@ async function main() {
     if (b) b.innerHTML = html;
     return b;
   };
-  setBtn("btn-share", `${icon("share", "🔗", { size: 15 })}<span class="lbl">Share</span>`);
+  setBtn("btn-share", `${icon("share", "🔗", { size: 15 })}<span class="lbl">${t("Share")}</span>`);
   setBtn("btn-help", icon("help", "?", { size: 15 }));
-  setBtn("btn-pedia", `${icon("pedia", "📖", { size: 16 })}<span class="lbl">Almanac</span>`);
+  setBtn("btn-pedia", `${icon("pedia", "📖", { size: 16 })}<span class="lbl">${t("Almanac")}</span>`);
   const searchIc = document.querySelector(".search-ic");
   if (searchIc) searchIc.innerHTML = icon("search", "🔍", { size: 14 });
-  document.querySelector(".search-kbd")?.setAttribute("title", "Press / or Ctrl K to search");
+  document.querySelector(".search-kbd")?.setAttribute("title", t("Press / or Ctrl K to search"));
 
   const search = initSearch({
     cities,
@@ -823,7 +837,7 @@ async function main() {
   const resBtn = document.getElementById("btn-res");
   if (resBtn) {
     resBtn.hidden = !w.resources;
-    resBtn.innerHTML = `${icon("resources", "⛏️", { size: 15 })}<span>Resources</span>`;
+    resBtn.innerHTML = `${icon("resources", "⛏️", { size: 15 })}<span>${t("Resources")}</span>`;
     const sync = () => {
       resBtn.classList.toggle("active", state.showResources);
       resBtn.setAttribute("aria-pressed", String(state.showResources));
@@ -842,7 +856,7 @@ async function main() {
       const on = !document.body.classList.contains("minimap-on");
       document.body.classList.toggle("minimap-on", on);
       mmBtn.setAttribute("aria-pressed", String(on));
-      mmBtn.setAttribute("aria-label", on ? "Hide the minimap" : "Show the minimap");
+      mmBtn.setAttribute("aria-label", on ? t("Hide the minimap") : t("Show the minimap"));
       minimap.draw();
     };
   }
@@ -1279,5 +1293,5 @@ main().catch((err) => {
   const el = document.getElementById("loading");
   if (!el) return;
   el.classList.add("error");
-  el.textContent = `Could not load the map data (${err.message}). Run "uv run python -m pipeline all" and serve web/ over HTTP.`;
+  el.textContent = t("Could not load the map data ({error}). Run \"uv run python -m pipeline all\" and serve web/ over HTTP.", { error: err.message });
 });

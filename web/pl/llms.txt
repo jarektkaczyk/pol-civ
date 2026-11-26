@@ -1,0 +1,303 @@
+# Polska na mapie strategicznej opartej na danych publicznych
+
+> Na mapie strategicznej Polski można porównać miasta i ich zasoby, obejrzeć rzeźbę terenu i sprawdzić rozmieszczenie surowców. Atlas zawiera dane dla Polski, 16 województw i 203 miast liczących co najmniej 20 tys. mieszkańców. Przy danych podano datę i źródło, m.in. GUS, Eurostat, PKW, GIOŚ i UNESCO.
+
+30 czerwca 2026 r. Polska liczyła 37 242 958 mieszkańców. Wersja angielska: https://softonsofa.com/pol-civ/llms.txt
+
+## Aplikacja
+
+- [Polska, mapa](https://softonsofa.com/pol-civ/pl/): interaktywna mapa heksagonalna z warstwami, widokami miast i doradcami (wymaga JavaScriptu)
+
+## Atlas
+
+- [Polska w liczbach](https://softonsofa.com/pol-civ/pl/atlas/): dane krajowe, 16 województw i linki do wszystkich stron
+- [Pełny tekst](https://softonsofa.com/pol-civ/pl/llms-full.txt): wszystkie strony atlasu w jednym pliku Markdown
+- [Dolnośląskie](https://softonsofa.com/pol-civ/pl/atlas/dolnoslaskie/index.md): W maju 2026 r. przeciętne miesięczne wynagrodzenie brutto w województwie dolnośląskim wyniosło 9208 zł. To drugie miejsce wśród województw.
+- [Kujawsko-Pomorskie](https://softonsofa.com/pol-civ/pl/atlas/kujawsko-pomorskie/index.md): Drzewa pokrywają 31% powierzchni województwa kujawsko-pomorskiego. To najniższy wynik wśród województw.
+- [Lubelskie](https://softonsofa.com/pol-civ/pl/atlas/lubelskie/index.md): W maju 2026 r. przeciętne miesięczne wynagrodzenie brutto w województwie lubelskim wyniosło 7982 zł. To najniższy wynik wśród województw.
+- [Lubuskie](https://softonsofa.com/pol-civ/pl/atlas/lubuskie/index.md): Drzewa pokrywają 60% powierzchni województwa lubuskiego. To najwyższy wynik wśród województw.
+- [Łódzkie](https://softonsofa.com/pol-civ/pl/atlas/lodzkie/index.md): W 2025 r. w województwie łódzkim przeciętne dalsze trwanie życia nowo narodzonych dziewczynek wynosiło 81,4 roku. To najniższy wynik wśród województw.
+- [Małopolskie](https://softonsofa.com/pol-civ/pl/atlas/malopolskie/index.md): W 2025 r. w województwie małopolskim na mieszkańca przypadało średnio 8,8 noclegu udzielonego turystom. To najwyższy wynik wśród województw.
+- [Mazowieckie](https://softonsofa.com/pol-civ/pl/atlas/mazowieckie/index.md): 30 czerwca 2026 r. województwo mazowieckie liczyło 5 502 043 mieszkańców. To najwyższy wynik wśród województw.
+- [Opolskie](https://softonsofa.com/pol-civ/pl/atlas/opolskie/index.md): 30 czerwca 2026 r. województwo opolskie liczyło 919 766 mieszkańców. To najniższy wynik wśród województw.
+- [Podkarpackie](https://softonsofa.com/pol-civ/pl/atlas/podkarpackie/index.md): Planowane na 2026 r. dochody gmin z PIT w województwie podkarpackim wynoszą 3368 zł na mieszkańca. To najniższy wynik wśród województw.
+- [Podlaskie](https://softonsofa.com/pol-civ/pl/atlas/podlaskie/index.md): W 2025 r. w województwie podlaskim przeciętne dalsze trwanie życia nowo narodzonych dziewczynek wynosiło 83,7 roku. To drugie miejsce wśród województw.
+- [Pomorskie](https://softonsofa.com/pol-civ/pl/atlas/pomorskie/index.md): W latach 2015-2025 liczba ludności województwa pomorskiego wzrosła o 2,2%. To drugie miejsce w rankingu zmiany liczby ludności województw.
+- [Śląskie](https://softonsofa.com/pol-civ/pl/atlas/slaskie/index.md): 30 czerwca 2026 r. województwo śląskie liczyło 4 246 702 mieszkańców. To drugie miejsce wśród województw.
+- [Świętokrzyskie](https://softonsofa.com/pol-civ/pl/atlas/swietokrzyskie/index.md): W latach 2015-2025 liczba ludności województwa świętokrzyskiego spadła o 8,7%. To najniższy wynik w rankingu zmiany liczby ludności województw.
+- [Warmińsko-Mazurskie](https://softonsofa.com/pol-civ/pl/atlas/warminsko-mazurskie/index.md): W październiku 2026 r. stopa bezrobocia rejestrowanego w województwie warmińsko-mazurskim wyniosła 9,3%. To najwyższy wynik wśród województw.
+- [Wielkopolskie](https://softonsofa.com/pol-civ/pl/atlas/wielkopolskie/index.md): W październiku 2026 r. stopa bezrobocia rejestrowanego w województwie wielkopolskim wyniosła 3,8%. To najniższy wynik wśród województw.
+- [Zachodniopomorskie](https://softonsofa.com/pol-civ/pl/atlas/zachodniopomorskie/index.md): W 2025 r. w województwie zachodniopomorskim przeciętne dalsze trwanie życia nowo narodzonych dziewczynek wynosiło 82,0 roku. To czwarte miejsce od końca wśród województw.
+
+## Dane
+
+- [Katalog danych](https://softonsofa.com/pol-civ/data/index.json): pola, liczba wierszy, okres i wydawcy danych dla każdego pliku (po angielsku)
+- [data/world.json](https://softonsofa.com/pol-civ/data/world.json): Siatka heksagonalna Polski: województwo i gmina każdego heksu, wysokość, wody, rzeźba terenu, pokrycie terenu, rzeki, jeziora.
+- [data/cities.json](https://softonsofa.com/pol-civ/data/cities.json): Wszystkie miasta (stan na 1 stycznia 2026 r.): ludność, zmiana liczby ludności, wynagrodzenie, bezrobocie, udział w PKB, zasoby i pozycje w rankingach.
+- [data/metros.json](https://softonsofa.com/pol-civ/data/metros.json): Miejskie obszary funkcjonalne Polski według Eurostatu: gminy wchodzące w ich skład i dane gospodarcze.
+- [data/states.json](https://softonsofa.com/pol-civ/data/states.json): 16 województw: ludność, zmiana liczby ludności, PKB, wynagrodzenie, bezrobocie, pracujący według sekcji PKD, stolice, pokrycie terenu.
+- [data/nation.json](https://softonsofa.com/pol-civ/data/nation.json): Dane krajowe Polski i definicje zasobów miast.
+- [data/counties.json](https://softonsofa.com/pol-civ/data/counties.json): Każda gmina (TERYT7) z około 30 wskaźnikami: gęstość zaludnienia, wiek, migracje, PIT, wynagrodzenie, bezrobocie, wykształcenie, wyznanie, wybory, powietrze, powódź, pokrycie terenu.
+- [data/powiaty.json](https://softonsofa.com/pol-civ/data/powiaty.json): Każdy powiat (TERYT4) z tymi samymi wskaźnikami, zsumowanymi lub ważonymi z danych gmin.
+- [data/lenses.json](https://softonsofa.com/pol-civ/data/lenses.json): Warstwy mapy: jedna wartość na heks dla każdego wskaźnika, z zakresami legendy i uwagami.
+- [data/resources.json](https://softonsofa.com/pol-civ/data/resources.json): Elektrownie, kopalnie, złoża ropy i gazu, morskie farmy wiatrowe oraz odnawialne źródła energii według powiatów.
+- [data/infrastructure.json](https://softonsofa.com/pol-civ/data/infrastructure.json): Autostrady, drogi ekspresowe i główne linie kolejowe na połączeniach heksów oraz porty morskie i lotniska.
+- [data/military.json](https://softonsofa.com/pol-civ/data/military.json): Garnizony, bazy, obiekty sojusznicze i poligony, z liczebnością i budżetem.
+- [data/wonders.json](https://softonsofa.com/pol-civ/data/wonders.json): Obiekty dziedzictwa i obiekty wyjątkowe wybrane według opublikowanych reguł: obiekty UNESCO, parki narodowe, uczelnie badawcze, obiekty rekordowe.
+- [data/trade.json](https://softonsofa.com/pol-civ/data/trade.json): Drogowe i kolejowe przewozy ładunków między regionami.
+- [data/citizens.json](https://softonsofa.com/pol-civ/data/citizens.json): Struktura mieszkańców każdego miasta liczącego co najmniej 20 tys. mieszkańców: pracujący według sektorów, wiek, płeć, wykształcenie, pochodzenie.
+- [data/districts.json](https://softonsofa.com/pol-civ/data/districts.json): Dzielnice i typy miast liczących co najmniej 20 tys. mieszkańców, wyznaczone ze wskaźników lokalizacji pracujących według sekcji PKD.
+- [data/disasters.json](https://softonsofa.com/pol-civ/data/disasters.json): Gminy objęte stanem klęski żywiołowej po powodzi we wrześniu 2024 r.
+- [data/history.json](https://softonsofa.com/pol-civ/data/history.json): Granice zaborów w 1914 r. i granice II Rzeczypospolitej, uproszczone na podstawie CShapes 2.0.
+- [data/commuting.json](https://softonsofa.com/pol-civ/data/commuting.json): Dojazdy do pracy do 12 największych miast według macierzy gmin z NSP 2021.
+- [data/timeline.json](https://softonsofa.com/pol-civ/data/timeline.json): Roczna gęstość zaludnienia i zmiana liczby ludności na polskich heksach w latach 2015-2026.
+- [data/sources.json](https://softonsofa.com/pol-civ/data/sources.json): Bibliografia: każde źródło z wydawcą, licencją, stanem danych i dokładnie wykorzystanymi plikami.
+
+## Źródła
+
+- [Główny Urząd Statystyczny (GUS)](https://bdl.stat.gov.pl/bdl/dane/podgrup/temat/31/640/4318): NSP 2021: wykształcenie według powiatów i gmin
+- [ORLEN, Gaz-System (cytowane strony); lokalizacje z Wikidata i OpenStreetMap](https://www.orlen.pl/en): Ropa i gaz w Polsce: Baltic Pipe, główne złoża, rafinerie (zestawienie własne)
+- [Współtwórcy OpenStreetMap; operatorzy (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE](https://www.openstreetmap.org/): Elektrownie w Polsce (100 MW i więcej; fotowoltaika 50 MW i więcej), morskie farmy wiatrowe i elektrownia jądrowa
+- [Urząd Regulacji Energetyki (URE); kody powiatów z BDL GUS](https://www.ure.gov.pl/pl/oze/potencjal-krajowy-oze/8108,Instalacje-odnawialnych-zrodel-energii-stan-na-30-wrzesnia-2026-r.html): Zainstalowana moc OZE według powiatów (URE Mapa OZE)
+- [Ministerstwo Funduszy i Polityki Regionalnej (dane.gov.pl)](https://dane.gov.pl/pl/dataset/13939): Projekty z funduszy UE 2021-2027
+- [Główny Urząd Statystyczny (GUS) i dane.gov.pl](https://stat.gov.pl/obszary-tematyczne/ludnosc/migracje-zagraniczne-ludnosci/): Ochrona czasowa i status PESEL UKR
+- [Główny Urząd Statystyczny (GUS), Eurostat i Europejski Bank Centralny](https://ec.europa.eu/eurostat/web/national-accounts/data/database): Polskie rachunki narodowe i regionalne
+- [NOAA National Centers for Environmental Information (udostępniane przez NOAA PIFSC ERDDAP)](https://www.ncei.noaa.gov/products/etopo-global-relief-model): ETOPO 2022, globalny model rzeźby terenu (15 sekund kątowych)
+- [Copernicus Global Land Service (VITO), udostępniane w Zenodo](https://zenodo.org/records/3939050): Copernicus Global Land Cover 100 m, warstwa typu lasu (rok 2019)
+- [Eurostat](https://ec.europa.eu/eurostat/web/nuts/local-administrative-units): Miejskie obszary funkcjonalne: przyporządkowanie LAU 2025 do miast i FUA
+- [WWF HydroSHEDS (Lehner i Grill 2013)](https://www.hydrosheds.org/products/hydrorivers): HydroRIVERS v1.0, Europa
+- [Eurostat GISCO](https://ec.europa.eu/eurostat/web/gisco/geodata/statistical-units/local-administrative-units): Lokalne jednostki administracyjne (LAU) z 2024 r., skala 1:1 mln
+- [Natural Earth](https://www.naturalearthdata.com/): Natural Earth, skala 1:10 mln (państwa, jeziora, rzeki i dane uzupełniające dla Europy)
+- [Główny Urząd Statystyczny (GUS); współtwórcy OpenStreetMap](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html): Miasta Polski: ludność na 30 czerwca 2026 i położenie
+- [Główny Urząd Statystyczny (GUS), API Banku Danych Lokalnych (BDL)](https://bdl.stat.gov.pl/bdl/start): Jednostki terytorialne Polski w 2026 r. (kody TERYT)
+- [Europejska Agencja Kosmiczna (konsorcjum ESA WorldCover)](https://esa-worldcover.org/): ESA WorldCover 2021 (v200), pokrycie terenu 10 m
+- [ETH Zurych, International Conflict Research (Schvitz i in. 2022)](https://icr.ethz.ch/data/cshapes/): CShapes 2.0: historyczne granice państw
+- [Ministerstwo Przemysłu (sprawozdanie o górnictwie węgla kamiennego za 2025 r.), Wyższy Urząd Górniczy (WUG), KGHM, Sejm; lokalizacje z Wikidata i OpenStreetMap](https://www.gov.pl/web/wug/kwk): Kopalnie w Polsce: węgiel kamienny, węgiel brunatny, miedź i srebro, sól, siarka (zestawienie własne)
+- [Centralna Komisja Egzaminacyjna (CKE) i Centrum Informatyczne Edukacji (CIE)](https://mapa.wyniki.edu.pl/MapaEgzaminow/): Wyniki egzaminu ósmoklasisty i matury
+- [Ministerstwo Finansów (MF); Główny Urząd Statystyczny (GUS); metodologia RIO w Krakowie](https://www.gov.pl/web/finanse/bazy-danych8): Budżety i zadłużenie gmin w 2025 r.
+- [Główny Inspektorat Ochrony Środowiska (GIOŚ)](https://powietrze.gios.gov.pl/pjp/archives): Jakość powietrza: średnie roczne stężenia pyłów PM2,5 i PM10 oraz benzo(a)pirenu na stacjach pomiarowych
+- [Rada Ministrów (Dziennik Ustaw, przez API ELI Sejmu); PKW i GUS dla kodów jednostek](https://api.sejm.gov.pl/eli/acts/DU/2024/1395): Obszar objęty stanem klęski żywiołowej po powodzi w 2024 r.
+- [Państwowa Komisja Wyborcza (PKW)](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach): Wyniki wyborów prezydenckich w latach 2015, 2020 i 2025 oraz wyborów do Sejmu w 2023 r. według gmin
+- [Główny Urząd Statystyczny (GUS); Instytut Statystyki Kościoła Katolickiego (ISKK); OpenStreetMap; Wikidata](https://stat.gov.pl/spisy-powszechne/nsp-2021/nsp-2021-wyniki-ostateczne/): Wyznanie (NSP 2021), uczestnictwo w niedzielnej mszy według diecezji (ISKK) i diecezje
+- [Główny Urząd Statystyczny (GUS), Bank Danych Lokalnych](https://bdl.stat.gov.pl/bdl/start): Lekarze i łóżka szpitalne według powiatów
+- [Centrum Światowego Dziedzictwa UNESCO (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl)](https://data.unesco.org/explore/dataset/whc001/): Światowe dziedzictwo UNESCO w Polsce i Pomniki Historii
+- [Ministerstwo Obrony Narodowej (MON), NATO, US Army; cytowane strony jednostek w Wikipedii](https://www.gov.pl/web/obrona-narodowa): Garnizony, bazy, obiekty sojusznicze, liczebność i budżet wojska
+- [Główny Urząd Statystyczny (GUS); Wikidata](https://stat.gov.pl/obszary-tematyczne/srodowisko-energia/srodowisko/ochrona-srodowiska-2025,1,26.html): Parki narodowe: powierzchnia i liczba odwiedzających
+- [Główny Urząd Statystyczny (GUS); Ministerstwo Nauki i Szkolnictwa Wyższego (RAD-on / POL-on); Wikidata](https://radon.nauka.gov.pl/dane): Uczelnie: studenci, kategorie naukowe, główny kampus
+- [Ministerstwo Finansów i Główny Urząd Statystyczny (GUS)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia): Polskie statystyki lokalne: dochody, mieszkania i turystyka
+- [Eurostat; współtwórcy OpenStreetMap; Wikidata; Rząd RP](https://ec.europa.eu/eurostat/web/transport/database): Lotniska w Polsce: ruch, położenie i planowany Port Polska
+- [Eurostat (dane Głównego Urzędu Statystycznego, GUS)](https://ec.europa.eu/eurostat/web/transport/database): Przewozy drogowe według regionów NUTS 3 i przewozy kolejowe między regionami (Eurostat)
+- [Współtwórcy OpenStreetMap (przez Overpass API)](https://www.openstreetmap.org/): Autostrady, drogi ekspresowe i główne linie kolejowe Polski (OpenStreetMap)
+- [Główny Urząd Statystyczny (GUS); Eurostat; zarządy portów i Gaz-System (pozycje z zestawienia własnego)](https://stat.gov.pl/obszary-tematyczne/transport-i-lacznosc/transport/gospodarka-morska-w-polsce-w-2025-r-,7,23.html): Porty morskie Polski: przeładunki i kontenery, terminale LNG
+
+## Jak cytować
+
+- [Cytowanie serwisu](https://softonsofa.com/pol-civ/pl/atlas/): "Polska na mapie strategicznej opartej na danych publicznych", Jarek Tkaczyk, https://softonsofa.com/pol-civ/pl/, z adresem strony i datą odczytu
+- [Cytowanie danych](https://softonsofa.com/pol-civ/data/sources.json): podaj wydawcę i rok danych. Spis źródeł znajduje się na końcu każdej strony atlasu.
+- [Kod źródłowy](https://github.com/jarektkaczyk/pol-civ): kod jest dostępny na licencji MIT. Warunki wykorzystania danych określają ich wydawcy.
+
+## Miasta (opcjonalnie)
+
+- [Warszawa](https://softonsofa.com/pol-civ/pl/atlas/warszawa/index.md): Warszawa, Mazowieckie
+- [Kraków](https://softonsofa.com/pol-civ/pl/atlas/krakow/index.md): Kraków, Małopolskie
+- [Wrocław](https://softonsofa.com/pol-civ/pl/atlas/wroclaw/index.md): Wrocław, Dolnośląskie
+- [Łódź](https://softonsofa.com/pol-civ/pl/atlas/lodz/index.md): Łódź, Łódzkie
+- [Poznań](https://softonsofa.com/pol-civ/pl/atlas/poznan/index.md): Poznań, Wielkopolskie
+- [Gdańsk](https://softonsofa.com/pol-civ/pl/atlas/gdansk/index.md): Gdańsk, Pomorskie
+- [Szczecin](https://softonsofa.com/pol-civ/pl/atlas/szczecin/index.md): Szczecin, Zachodniopomorskie
+- [Lublin](https://softonsofa.com/pol-civ/pl/atlas/lublin/index.md): Lublin, Lubelskie
+- [Bydgoszcz](https://softonsofa.com/pol-civ/pl/atlas/bydgoszcz/index.md): Bydgoszcz, Kujawsko-Pomorskie
+- [Białystok](https://softonsofa.com/pol-civ/pl/atlas/bialystok/index.md): Białystok, Podlaskie
+- [Katowice](https://softonsofa.com/pol-civ/pl/atlas/katowice/index.md): Katowice, Śląskie
+- [Gdynia](https://softonsofa.com/pol-civ/pl/atlas/gdynia/index.md): Gdynia, Pomorskie
+- [Częstochowa](https://softonsofa.com/pol-civ/pl/atlas/czestochowa/index.md): Częstochowa, Śląskie
+- [Rzeszów](https://softonsofa.com/pol-civ/pl/atlas/rzeszow/index.md): Rzeszów, Podkarpackie
+- [Toruń](https://softonsofa.com/pol-civ/pl/atlas/torun/index.md): Toruń, Kujawsko-Pomorskie
+- [Radom](https://softonsofa.com/pol-civ/pl/atlas/radom/index.md): Radom, Mazowieckie
+- [Sosnowiec](https://softonsofa.com/pol-civ/pl/atlas/sosnowiec/index.md): Sosnowiec, Śląskie
+- [Kielce](https://softonsofa.com/pol-civ/pl/atlas/kielce/index.md): Kielce, Świętokrzyskie
+- [Gliwice](https://softonsofa.com/pol-civ/pl/atlas/gliwice/index.md): Gliwice, Śląskie
+- [Olsztyn](https://softonsofa.com/pol-civ/pl/atlas/olsztyn/index.md): Olsztyn, Warmińsko-Mazurskie
+- [Bielsko-Biała](https://softonsofa.com/pol-civ/pl/atlas/bielsko-biala/index.md): Bielsko-Biała, Śląskie
+- [Zabrze](https://softonsofa.com/pol-civ/pl/atlas/zabrze/index.md): Zabrze, Śląskie
+- [Bytom](https://softonsofa.com/pol-civ/pl/atlas/bytom/index.md): Bytom, Śląskie
+- [Zielona Góra](https://softonsofa.com/pol-civ/pl/atlas/zielona-gora/index.md): Zielona Góra, Lubuskie
+- [Rybnik](https://softonsofa.com/pol-civ/pl/atlas/rybnik/index.md): Rybnik, Śląskie
+- [Ruda Śląska](https://softonsofa.com/pol-civ/pl/atlas/ruda-slaska/index.md): Ruda Śląska, Śląskie
+- [Opole](https://softonsofa.com/pol-civ/pl/atlas/opole/index.md): Opole, Opolskie
+- [Tychy](https://softonsofa.com/pol-civ/pl/atlas/tychy/index.md): Tychy, Śląskie
+- [Gorzów Wielkopolski](https://softonsofa.com/pol-civ/pl/atlas/gorzow-wielkopolski/index.md): Gorzów Wielkopolski, Lubuskie
+- [Dąbrowa Górnicza](https://softonsofa.com/pol-civ/pl/atlas/dabrowa-gornicza/index.md): Dąbrowa Górnicza, Śląskie
+- [Elbląg](https://softonsofa.com/pol-civ/pl/atlas/elblag/index.md): Elbląg, Warmińsko-Mazurskie
+- [Płock](https://softonsofa.com/pol-civ/pl/atlas/plock/index.md): Płock, Mazowieckie
+- [Koszalin](https://softonsofa.com/pol-civ/pl/atlas/koszalin/index.md): Koszalin, Zachodniopomorskie
+- [Tarnów](https://softonsofa.com/pol-civ/pl/atlas/tarnow/index.md): Tarnów, Małopolskie
+- [Chorzów](https://softonsofa.com/pol-civ/pl/atlas/chorzow/index.md): Chorzów, Śląskie
+- [Włocławek](https://softonsofa.com/pol-civ/pl/atlas/wloclawek/index.md): Włocławek, Kujawsko-Pomorskie
+- [Wałbrzych](https://softonsofa.com/pol-civ/pl/atlas/walbrzych/index.md): Wałbrzych, Dolnośląskie
+- [Kalisz](https://softonsofa.com/pol-civ/pl/atlas/kalisz/index.md): Kalisz, Wielkopolskie
+- [Legnica](https://softonsofa.com/pol-civ/pl/atlas/legnica/index.md): Legnica, Dolnośląskie
+- [Grudziądz](https://softonsofa.com/pol-civ/pl/atlas/grudziadz/index.md): Grudziądz, Kujawsko-Pomorskie
+- [Słupsk](https://softonsofa.com/pol-civ/pl/atlas/slupsk/index.md): Słupsk, Pomorskie
+- [Jaworzno](https://softonsofa.com/pol-civ/pl/atlas/jaworzno/index.md): Jaworzno, Śląskie
+- [Jastrzębie-Zdrój](https://softonsofa.com/pol-civ/pl/atlas/jastrzebie-zdroj/index.md): Jastrzębie-Zdrój, Śląskie
+- [Nowy Sącz](https://softonsofa.com/pol-civ/pl/atlas/nowy-sacz/index.md): Nowy Sącz, Małopolskie
+- [Siedlce](https://softonsofa.com/pol-civ/pl/atlas/siedlce/index.md): Siedlce, Mazowieckie
+- [Jelenia Góra](https://softonsofa.com/pol-civ/pl/atlas/jelenia-gora/index.md): Jelenia Góra, Dolnośląskie
+- [Mysłowice](https://softonsofa.com/pol-civ/pl/atlas/myslowice/index.md): Mysłowice, Śląskie
+- [Piła](https://softonsofa.com/pol-civ/pl/atlas/pila/index.md): Piła, powiat pilski, Wielkopolskie
+- [Ostrów Wielkopolski](https://softonsofa.com/pol-civ/pl/atlas/ostrow-wielkopolski/index.md): Ostrów Wielkopolski, powiat ostrowski, Wielkopolskie
+- [Suwałki](https://softonsofa.com/pol-civ/pl/atlas/suwalki/index.md): Suwałki, Podlaskie
+- [Pruszków](https://softonsofa.com/pol-civ/pl/atlas/pruszkow/index.md): Pruszków, powiat pruszkowski, Mazowieckie
+- [Stargard](https://softonsofa.com/pol-civ/pl/atlas/stargard/index.md): Stargard, powiat stargardzki, Zachodniopomorskie
+- [Lubin](https://softonsofa.com/pol-civ/pl/atlas/lubin/index.md): Lubin, powiat lubiński, Dolnośląskie
+- [Inowrocław](https://softonsofa.com/pol-civ/pl/atlas/inowroclaw/index.md): Inowrocław, powiat inowrocławski, Kujawsko-Pomorskie
+- [Piotrków Trybunalski](https://softonsofa.com/pol-civ/pl/atlas/piotrkow-trybunalski/index.md): Piotrków Trybunalski, Łódzkie
+- [Konin](https://softonsofa.com/pol-civ/pl/atlas/konin/index.md): Konin, Wielkopolskie
+- [Siemianowice Śląskie](https://softonsofa.com/pol-civ/pl/atlas/siemianowice-slaskie/index.md): Siemianowice Śląskie, Śląskie
+- [Żory](https://softonsofa.com/pol-civ/pl/atlas/zory/index.md): Żory, Śląskie
+- [Gniezno](https://softonsofa.com/pol-civ/pl/atlas/gniezno/index.md): Gniezno, powiat gnieźnieński, Wielkopolskie
+- [Tarnowskie Góry](https://softonsofa.com/pol-civ/pl/atlas/tarnowskie-gory/index.md): Tarnowskie Góry, powiat tarnogórski, Śląskie
+- [Głogów](https://softonsofa.com/pol-civ/pl/atlas/glogow/index.md): Głogów, powiat głogowski, Dolnośląskie
+- [Ostrowiec Świętokrzyski](https://softonsofa.com/pol-civ/pl/atlas/ostrowiec-swietokrzyski/index.md): Ostrowiec Świętokrzyski, powiat ostrowiecki, Świętokrzyskie
+- [Pabianice](https://softonsofa.com/pol-civ/pl/atlas/pabianice/index.md): Pabianice, powiat pabianicki, Łódzkie
+- [Ełk](https://softonsofa.com/pol-civ/pl/atlas/elk/index.md): Ełk, powiat ełcki, Warmińsko-Mazurskie
+- [Łomża](https://softonsofa.com/pol-civ/pl/atlas/lomza/index.md): Łomża, Podlaskie
+- [Leszno](https://softonsofa.com/pol-civ/pl/atlas/leszno/index.md): Leszno, Wielkopolskie
+- [Zamość](https://softonsofa.com/pol-civ/pl/atlas/zamosc/index.md): Zamość, Lubelskie
+- [Mielec](https://softonsofa.com/pol-civ/pl/atlas/mielec/index.md): Mielec, powiat mielecki, Podkarpackie
+- [Tomaszów Mazowiecki](https://softonsofa.com/pol-civ/pl/atlas/tomaszow-mazowiecki/index.md): Tomaszów Mazowiecki, powiat tomaszowski, Łódzkie
+- [Tczew](https://softonsofa.com/pol-civ/pl/atlas/tczew/index.md): Tczew, powiat tczewski, Pomorskie
+- [Chełm](https://softonsofa.com/pol-civ/pl/atlas/chelm/index.md): Chełm, Lubelskie
+- [Rumia](https://softonsofa.com/pol-civ/pl/atlas/rumia/index.md): Rumia, powiat wejherowski, Pomorskie
+- [Przemyśl](https://softonsofa.com/pol-civ/pl/atlas/przemysl/index.md): Przemyśl, Podkarpackie
+- [Biała Podlaska](https://softonsofa.com/pol-civ/pl/atlas/biala-podlaska/index.md): Biała Podlaska, Lubelskie
+- [Stalowa Wola](https://softonsofa.com/pol-civ/pl/atlas/stalowa-wola/index.md): Stalowa Wola, powiat stalowowolski, Podkarpackie
+- [Kędzierzyn-Koźle](https://softonsofa.com/pol-civ/pl/atlas/kedzierzyn-kozle/index.md): Kędzierzyn-Koźle, powiat kędzierzyńsko-kozielski, Opolskie
+- [Będzin](https://softonsofa.com/pol-civ/pl/atlas/bedzin/index.md): Będzin, powiat będziński, Śląskie
+- [Zgierz](https://softonsofa.com/pol-civ/pl/atlas/zgierz/index.md): Zgierz, powiat zgierski, Łódzkie
+- [Legionowo](https://softonsofa.com/pol-civ/pl/atlas/legionowo/index.md): Legionowo, powiat legionowski, Mazowieckie
+- [Piaseczno](https://softonsofa.com/pol-civ/pl/atlas/piaseczno/index.md): Piaseczno, powiat piaseczyński, Mazowieckie
+- [Świdnica](https://softonsofa.com/pol-civ/pl/atlas/swidnica/index.md): Świdnica, powiat świdnicki, Dolnośląskie
+- [Piekary Śląskie](https://softonsofa.com/pol-civ/pl/atlas/piekary-slaskie/index.md): Piekary Śląskie, Śląskie
+- [Bełchatów](https://softonsofa.com/pol-civ/pl/atlas/belchatow/index.md): Bełchatów, powiat bełchatowski, Łódzkie
+- [Racibórz](https://softonsofa.com/pol-civ/pl/atlas/raciborz/index.md): Racibórz, powiat raciborski, Śląskie
+- [Marki](https://softonsofa.com/pol-civ/pl/atlas/marki/index.md): Marki, powiat wołomiński, Mazowieckie
+- [Ostrołęka](https://softonsofa.com/pol-civ/pl/atlas/ostroleka/index.md): Ostrołęka, Mazowieckie
+- [Ząbki](https://softonsofa.com/pol-civ/pl/atlas/zabki/index.md): Ząbki, powiat wołomiński, Mazowieckie
+- [Wejherowo](https://softonsofa.com/pol-civ/pl/atlas/wejherowo/index.md): Wejherowo, powiat wejherowski, Pomorskie
+- [Skierniewice](https://softonsofa.com/pol-civ/pl/atlas/skierniewice/index.md): Skierniewice, Łódzkie
+- [Zawiercie](https://softonsofa.com/pol-civ/pl/atlas/zawiercie/index.md): Zawiercie, powiat zawierciański, Śląskie
+- [Starogard Gdański](https://softonsofa.com/pol-civ/pl/atlas/starogard-gdanski/index.md): Starogard Gdański, powiat starogardzki, Pomorskie
+- [Świętochłowice](https://softonsofa.com/pol-civ/pl/atlas/swietochlowice/index.md): Świętochłowice, Śląskie
+- [Wodzisław Śląski](https://softonsofa.com/pol-civ/pl/atlas/wodzislaw-slaski/index.md): Wodzisław Śląski, powiat wodzisławski, Śląskie
+- [Kołobrzeg](https://softonsofa.com/pol-civ/pl/atlas/kolobrzeg/index.md): Kołobrzeg, powiat kołobrzeski, Zachodniopomorskie
+- [Krosno](https://softonsofa.com/pol-civ/pl/atlas/krosno/index.md): Krosno, Podkarpackie
+- [Starachowice](https://softonsofa.com/pol-civ/pl/atlas/starachowice/index.md): Starachowice, powiat starachowicki, Świętokrzyskie
+- [Otwock](https://softonsofa.com/pol-civ/pl/atlas/otwock/index.md): Otwock, powiat otwocki, Mazowieckie
+- [Puławy](https://softonsofa.com/pol-civ/pl/atlas/pulawy/index.md): Puławy, powiat puławski, Lubelskie
+- [Tarnobrzeg](https://softonsofa.com/pol-civ/pl/atlas/tarnobrzeg/index.md): Tarnobrzeg, Podkarpackie
+- [Dębica](https://softonsofa.com/pol-civ/pl/atlas/debica/index.md): Dębica, powiat dębicki, Podkarpackie
+- [Radomsko](https://softonsofa.com/pol-civ/pl/atlas/radomsko/index.md): Radomsko, powiat radomszczański, Łódzkie
+- [Mikołów](https://softonsofa.com/pol-civ/pl/atlas/mikolow/index.md): Mikołów, powiat mikołowski, Śląskie
+- [Ciechanów](https://softonsofa.com/pol-civ/pl/atlas/ciechanow/index.md): Ciechanów, powiat ciechanowski, Mazowieckie
+- [Kutno](https://softonsofa.com/pol-civ/pl/atlas/kutno/index.md): Kutno, powiat kutnowski, Łódzkie
+- [Skarżysko-Kamienna](https://softonsofa.com/pol-civ/pl/atlas/skarzysko-kamienna/index.md): Skarżysko-Kamienna, powiat skarżyski, Świętokrzyskie
+- [Nysa](https://softonsofa.com/pol-civ/pl/atlas/nysa/index.md): Nysa, powiat nyski, Opolskie
+- [Mińsk Mazowiecki](https://softonsofa.com/pol-civ/pl/atlas/minsk-mazowiecki/index.md): Mińsk Mazowiecki, powiat miński, Mazowieckie
+- [Żyrardów](https://softonsofa.com/pol-civ/pl/atlas/zyrardow/index.md): Żyrardów, powiat żyrardowski, Mazowieckie
+- [Świnoujście](https://softonsofa.com/pol-civ/pl/atlas/swinoujscie/index.md): Świnoujście, Zachodniopomorskie
+- [Chojnice](https://softonsofa.com/pol-civ/pl/atlas/chojnice/index.md): Chojnice, powiat chojnicki, Pomorskie
+- [Sieradz](https://softonsofa.com/pol-civ/pl/atlas/sieradz/index.md): Sieradz, powiat sieradzki, Łódzkie
+- [Zduńska Wola](https://softonsofa.com/pol-civ/pl/atlas/zdunska-wola/index.md): Zduńska Wola, powiat zduńskowolski, Łódzkie
+- [Szczecinek](https://softonsofa.com/pol-civ/pl/atlas/szczecinek/index.md): Szczecinek, powiat szczecinecki, Zachodniopomorskie
+- [Bolesławiec](https://softonsofa.com/pol-civ/pl/atlas/boleslawiec/index.md): Bolesławiec, powiat bolesławiecki, Dolnośląskie
+- [Świdnik](https://softonsofa.com/pol-civ/pl/atlas/swidnik/index.md): Świdnik, powiat świdnicki, Lubelskie
+- [Kwidzyn](https://softonsofa.com/pol-civ/pl/atlas/kwidzyn/index.md): Kwidzyn, powiat kwidzyński, Pomorskie
+- [Malbork](https://softonsofa.com/pol-civ/pl/atlas/malbork/index.md): Malbork, powiat malborski, Pomorskie
+- [Grodzisk Mazowiecki](https://softonsofa.com/pol-civ/pl/atlas/grodzisk-mazowiecki/index.md): Grodzisk Mazowiecki, powiat grodziski, Mazowieckie
+- [Nowa Sól](https://softonsofa.com/pol-civ/pl/atlas/nowa-sol/index.md): Nowa Sól, powiat nowosolski, Lubuskie
+- [Wołomin](https://softonsofa.com/pol-civ/pl/atlas/wolomin/index.md): Wołomin, powiat wołomiński, Mazowieckie
+- [Oświęcim](https://softonsofa.com/pol-civ/pl/atlas/oswiecim/index.md): Oświęcim, powiat oświęcimski, Małopolskie
+- [Knurów](https://softonsofa.com/pol-civ/pl/atlas/knurow/index.md): Knurów, powiat gliwicki, Śląskie
+- [Czechowice-Dziedzice](https://softonsofa.com/pol-civ/pl/atlas/czechowice-dziedzice/index.md): Czechowice-Dziedzice, powiat bielski, Śląskie
+- [Oleśnica](https://softonsofa.com/pol-civ/pl/atlas/olesnica/index.md): Oleśnica, powiat oleśnicki, Dolnośląskie
+- [Jarosław](https://softonsofa.com/pol-civ/pl/atlas/jaroslaw/index.md): Jarosław, powiat jarosławski, Podkarpackie
+- [Żary](https://softonsofa.com/pol-civ/pl/atlas/zary/index.md): Żary, powiat żarski, Lubuskie
+- [Lębork](https://softonsofa.com/pol-civ/pl/atlas/lebork/index.md): Lębork, powiat lęborski, Pomorskie
+- [Sanok](https://softonsofa.com/pol-civ/pl/atlas/sanok/index.md): Sanok, powiat sanocki, Podkarpackie
+- [Chrzanów](https://softonsofa.com/pol-civ/pl/atlas/chrzanow/index.md): Chrzanów, powiat chrzanowski, Małopolskie
+- [Nowy Targ](https://softonsofa.com/pol-civ/pl/atlas/nowy-targ/index.md): Nowy Targ, powiat nowotarski, Małopolskie
+- [Oława](https://softonsofa.com/pol-civ/pl/atlas/olawa/index.md): Oława, powiat oławski, Dolnośląskie
+- [Luboń](https://softonsofa.com/pol-civ/pl/atlas/lubon/index.md): Luboń, powiat poznański, Wielkopolskie
+- [Sochaczew](https://softonsofa.com/pol-civ/pl/atlas/sochaczew/index.md): Sochaczew, powiat sochaczewski, Mazowieckie
+- [Brzeg](https://softonsofa.com/pol-civ/pl/atlas/brzeg/index.md): Brzeg, powiat brzeski, Opolskie
+- [Pruszcz Gdański](https://softonsofa.com/pol-civ/pl/atlas/pruszcz-gdanski/index.md): Pruszcz Gdański, powiat gdański, Pomorskie
+- [Cieszyn](https://softonsofa.com/pol-civ/pl/atlas/cieszyn/index.md): Cieszyn, powiat cieszyński, Śląskie
+- [Jasło](https://softonsofa.com/pol-civ/pl/atlas/jaslo/index.md): Jasło, powiat jasielski, Podkarpackie
+- [Iława](https://softonsofa.com/pol-civ/pl/atlas/ilawa/index.md): Iława, powiat iławski, Warmińsko-Mazurskie
+- [Września](https://softonsofa.com/pol-civ/pl/atlas/wrzesnia/index.md): Września, powiat wrzesiński, Wielkopolskie
+- [Olkusz](https://softonsofa.com/pol-civ/pl/atlas/olkusz/index.md): Olkusz, powiat olkuski, Małopolskie
+- [Sopot](https://softonsofa.com/pol-civ/pl/atlas/sopot/index.md): Sopot, Pomorskie
+- [Ostróda](https://softonsofa.com/pol-civ/pl/atlas/ostroda/index.md): Ostróda, powiat ostródzki, Warmińsko-Mazurskie
+- [Mława](https://softonsofa.com/pol-civ/pl/atlas/mlawa/index.md): Mława, powiat mławski, Mazowieckie
+- [Kraśnik](https://softonsofa.com/pol-civ/pl/atlas/krasnik/index.md): Kraśnik, powiat kraśnicki, Lubelskie
+- [Dzierżoniów](https://softonsofa.com/pol-civ/pl/atlas/dzierzoniow/index.md): Dzierżoniów, powiat dzierżoniowski, Dolnośląskie
+- [Czeladź](https://softonsofa.com/pol-civ/pl/atlas/czeladz/index.md): Czeladź, powiat będziński, Śląskie
+- [Reda](https://softonsofa.com/pol-civ/pl/atlas/reda/index.md): Reda, powiat wejherowski, Pomorskie
+- [Żywiec](https://softonsofa.com/pol-civ/pl/atlas/zywiec/index.md): Żywiec, powiat żywiecki, Śląskie
+- [Kobyłka](https://softonsofa.com/pol-civ/pl/atlas/kobylka/index.md): Kobyłka, powiat wołomiński, Mazowieckie
+- [Police](https://softonsofa.com/pol-civ/pl/atlas/police/index.md): Police, powiat policki, Zachodniopomorskie
+- [Wieliczka](https://softonsofa.com/pol-civ/pl/atlas/wieliczka/index.md): Wieliczka, powiat wielicki, Małopolskie
+- [Myszków](https://softonsofa.com/pol-civ/pl/atlas/myszkow/index.md): Myszków, powiat myszkowski, Śląskie
+- [Augustów](https://softonsofa.com/pol-civ/pl/atlas/augustow/index.md): Augustów, powiat augustowski, Podlaskie
+- [Nowy Dwór Mazowiecki](https://softonsofa.com/pol-civ/pl/atlas/nowy-dwor-mazowiecki/index.md): Nowy Dwór Mazowiecki, powiat nowodworski, Mazowieckie
+- [Bochnia](https://softonsofa.com/pol-civ/pl/atlas/bochnia/index.md): Bochnia, powiat bocheński, Małopolskie
+- [Zgorzelec](https://softonsofa.com/pol-civ/pl/atlas/zgorzelec/index.md): Zgorzelec, powiat zgorzelecki, Dolnośląskie
+- [Krotoszyn](https://softonsofa.com/pol-civ/pl/atlas/krotoszyn/index.md): Krotoszyn, powiat krotoszyński, Wielkopolskie
+- [Brodnica](https://softonsofa.com/pol-civ/pl/atlas/brodnica/index.md): Brodnica, powiat brodnicki, Kujawsko-Pomorskie
+- [Swarzędz](https://softonsofa.com/pol-civ/pl/atlas/swarzedz/index.md): Swarzędz, powiat poznański, Wielkopolskie
+- [Bielawa](https://softonsofa.com/pol-civ/pl/atlas/bielawa/index.md): Bielawa, powiat dzierżoniowski, Dolnośląskie
+- [Śrem](https://softonsofa.com/pol-civ/pl/atlas/srem/index.md): Śrem, powiat śremski, Wielkopolskie
+- [Łuków](https://softonsofa.com/pol-civ/pl/atlas/lukow/index.md): Łuków, powiat łukowski, Lubelskie
+- [Giżycko](https://softonsofa.com/pol-civ/pl/atlas/gizycko/index.md): Giżycko, powiat giżycki, Warmińsko-Mazurskie
+- [Jarocin](https://softonsofa.com/pol-civ/pl/atlas/jarocin/index.md): Jarocin, powiat jarociński, Wielkopolskie
+- [Czerwionka-Leszczyny](https://softonsofa.com/pol-civ/pl/atlas/czerwionka-leszczyny/index.md): Czerwionka-Leszczyny, powiat rybnicki, Śląskie
+- [Wyszków](https://softonsofa.com/pol-civ/pl/atlas/wyszkow/index.md): Wyszków, powiat wyszkowski, Mazowieckie
+- [Łowicz](https://softonsofa.com/pol-civ/pl/atlas/lowicz/index.md): Łowicz, powiat łowicki, Łódzkie
+- [Wągrowiec](https://softonsofa.com/pol-civ/pl/atlas/wagrowiec/index.md): Wągrowiec, powiat wągrowiecki, Wielkopolskie
+- [Zakopane](https://softonsofa.com/pol-civ/pl/atlas/zakopane/index.md): Zakopane, powiat tatrzański, Małopolskie
+- [Gorlice](https://softonsofa.com/pol-civ/pl/atlas/gorlice/index.md): Gorlice, powiat gorlicki, Małopolskie
+- [Pszczyna](https://softonsofa.com/pol-civ/pl/atlas/pszczyna/index.md): Pszczyna, powiat pszczyński, Śląskie
+- [Świecie](https://softonsofa.com/pol-civ/pl/atlas/swiecie/index.md): Świecie, powiat świecki, Kujawsko-Pomorskie
+- [Środa Wielkopolska](https://softonsofa.com/pol-civ/pl/atlas/sroda-wielkopolska/index.md): Środa Wielkopolska, powiat średzki, Wielkopolskie
+- [Kętrzyn](https://softonsofa.com/pol-civ/pl/atlas/ketrzyn/index.md): Kętrzyn, powiat kętrzyński, Warmińsko-Mazurskie
+- [Biłgoraj](https://softonsofa.com/pol-civ/pl/atlas/bilgoraj/index.md): Biłgoraj, powiat biłgorajski, Lubelskie
+- [Kłodzko](https://softonsofa.com/pol-civ/pl/atlas/klodzko/index.md): Kłodzko, powiat kłodzki, Dolnośląskie
+- [Skawina](https://softonsofa.com/pol-civ/pl/atlas/skawina/index.md): Skawina, powiat krakowski, Małopolskie
+- [Turek](https://softonsofa.com/pol-civ/pl/atlas/turek/index.md): Turek, powiat turecki, Wielkopolskie
+- [Kościerzyna](https://softonsofa.com/pol-civ/pl/atlas/koscierzyna/index.md): Kościerzyna, powiat kościerski, Pomorskie
+- [Bielsk Podlaski](https://softonsofa.com/pol-civ/pl/atlas/bielsk-podlaski/index.md): Bielsk Podlaski, powiat bielski, Podlaskie
+- [Kościan](https://softonsofa.com/pol-civ/pl/atlas/koscian/index.md): Kościan, powiat kościański, Wielkopolskie
+- [Wałcz](https://softonsofa.com/pol-civ/pl/atlas/walcz/index.md): Wałcz, powiat wałecki, Zachodniopomorskie
+- [Lubliniec](https://softonsofa.com/pol-civ/pl/atlas/lubliniec/index.md): Lubliniec, powiat lubliniecki, Śląskie
+- [Żagań](https://softonsofa.com/pol-civ/pl/atlas/zagan/index.md): Żagań, powiat żagański, Lubuskie
+- [Piastów](https://softonsofa.com/pol-civ/pl/atlas/piastow/index.md): Piastów, powiat pruszkowski, Mazowieckie
+- [Orzesze](https://softonsofa.com/pol-civ/pl/atlas/orzesze/index.md): Orzesze, powiat mikołowski, Śląskie
+- [Aleksandrów Łódzki](https://softonsofa.com/pol-civ/pl/atlas/aleksandrow-lodzki/index.md): Aleksandrów Łódzki, powiat zgierski, Łódzkie
+- [Białogard](https://softonsofa.com/pol-civ/pl/atlas/bialogard/index.md): Białogard, powiat białogardzki, Zachodniopomorskie
+- [Sulejówek](https://softonsofa.com/pol-civ/pl/atlas/sulejowek/index.md): Sulejówek, powiat miński, Mazowieckie
+- [Świebodzice](https://softonsofa.com/pol-civ/pl/atlas/swiebodzice/index.md): Świebodzice, powiat świdnicki, Dolnośląskie
+- [Płońsk](https://softonsofa.com/pol-civ/pl/atlas/plonsk/index.md): Płońsk, powiat płoński, Mazowieckie
+- [Ostrów Mazowiecka](https://softonsofa.com/pol-civ/pl/atlas/ostrow-mazowiecka/index.md): Ostrów Mazowiecka, powiat ostrowski, Mazowieckie
+- [Goleniów](https://softonsofa.com/pol-civ/pl/atlas/goleniow/index.md): Goleniów, powiat goleniowski, Zachodniopomorskie
+- [Szczytno](https://softonsofa.com/pol-civ/pl/atlas/szczytno/index.md): Szczytno, powiat szczycieński, Warmińsko-Mazurskie
+- [Józefów](https://softonsofa.com/pol-civ/pl/atlas/jozefow/index.md): Józefów, powiat otwocki, Mazowieckie
+- [Kluczbork](https://softonsofa.com/pol-civ/pl/atlas/kluczbork/index.md): Kluczbork, powiat kluczborski, Opolskie
+- [Łaziska Górne](https://softonsofa.com/pol-civ/pl/atlas/laziska-gorne/index.md): Łaziska Górne, powiat mikołowski, Śląskie
+- [Polkowice](https://softonsofa.com/pol-civ/pl/atlas/polkowice/index.md): Polkowice, powiat polkowicki, Dolnośląskie
+- [Bartoszyce](https://softonsofa.com/pol-civ/pl/atlas/bartoszyce/index.md): Bartoszyce, powiat bartoszycki, Warmińsko-Mazurskie
+- [Sandomierz](https://softonsofa.com/pol-civ/pl/atlas/sandomierz/index.md): Sandomierz, powiat sandomierski, Świętokrzyskie
+- [Grajewo](https://softonsofa.com/pol-civ/pl/atlas/grajewo/index.md): Grajewo, powiat grajewski, Podlaskie
+- [Świebodzin](https://softonsofa.com/pol-civ/pl/atlas/swiebodzin/index.md): Świebodzin, powiat świebodziński, Lubuskie
+- [Zambrów](https://softonsofa.com/pol-civ/pl/atlas/zambrow/index.md): Zambrów, powiat zambrowski, Podlaskie

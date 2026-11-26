@@ -1,6 +1,7 @@
 # Jaworzno
 
 Source page: https://softonsofa.com/pol-civ/atlas/jaworzno/
+Polish version: https://softonsofa.com/pol-civ/pl/atlas/jaworzno/
 Last updated: 2026-11-26
 
 Jaworzno had 84,835 residents on 30 June 2026. Between 2015 and 2025 it lost 8.2% of its residents.
@@ -61,6 +62,6 @@ The median of the 154 towns of 20,000+ with a station within 25 km was 16.4 µg/
 - [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
 - [Statistics Poland (GUS): GUS labour publication tables (GUS, October 2026, May 2026, and December 2025)](https://stat.gov.pl/obszary-tematyczne/rynek-pracy/)
 - [Ministry of Finance and Statistics Poland (GUS): Polish local income, housing, and tourism statistics (Ministry of Finance 2026; GUS annual 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
-- [Państwowa Komisja Wyborcza (PKW): Election results by gmina (presidential 2025, Sejm 2023) (PKW: presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 Oct 2023))](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach)
+- [Państwowa Komisja Wyborcza (PKW): Election results by gmina (presidential 2015, 2020 and 2025, Sejm 2023) (PKW: presidential election runoffs of 24 May 2015 and 12 July 2020; presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 October 2023))](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach)
 - [Główny Inspektorat Ochrony Środowiska (GIOŚ): Air quality: annual means of PM2.5, PM10 and benzo(a)pyrene by station (GIOS annual statistics 2025)](https://powietrze.gios.gov.pl/pjp/archives)
-- [UNESCO World Heritage Centre (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl): UNESCO World Heritage in Poland and Pomniki Historii (UNESCO whc001 (2026-11-22); NID Pomniki Historii 2026-09-30 + Dz.U. 2026 poz. 1334)](https://data.unesco.org/explore/dataset/whc001/)
+- [UNESCO World Heritage Centre (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl): UNESCO World Heritage in Poland and Pomniki Historii (UNESCO whc001 (22 November 2026); NID Pomniki Historii 30 September 2026 + Dz.U. 2026 poz. 1334)](https://data.unesco.org/explore/dataset/whc001/)

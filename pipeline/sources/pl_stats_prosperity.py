@@ -2,14 +2,20 @@
 
 from __future__ import annotations
 
+import json
 import tempfile
 import zipfile
+from collections.abc import Collection
 from pathlib import Path
 
-from pipeline.core.bdl import is_whole_gmina, read_xlsx
+from pipeline.core.bdl import is_whole_gmina, read_xlsx, teryt_from_bdl
 from pipeline.core.source import Source, SourceInfo
+from pipeline.sources.pl_more_gus import BDL_LICENCE, bdl_note, fetch_bdl_series, read_bdl_series
 from pipeline.sources.pl_stats_population import (
+    AREA_FILE,
+    AREA_URL,
     POPULATION_URL,
+    _area,
     _ascii_name,
     _best_population_table,
     _on_current_code,
@@ -30,6 +36,13 @@ TOURISM_URL = (
     "https://stat.gov.pl/download/gfx/portalinformacyjny/pl/defaultaktualnosci/5494/1/23/1/"
     "turystykaw2025r._tablice.zip"
 )
+TOURISM_CITIES_DIMENSIONS_URL = (
+    "https://api-dbw.stat.gov.pl/api/variable/variable-section-position?id-przekroj=1408&lang=pl"
+)
+TOURISM_CITIES_URL = (
+    "https://api-dbw.stat.gov.pl/api/variable/variable-data-section?"
+    "id-zmienna=94&id-przekroj=1408&id-rok=2025&id-okres=282&ile-na-stronie=5000&numer-strony=0&lang=pl"
+)
 
 MF_INCOME_FILE = "mf-income-2026.xlsx"
 MF_INDICATORS_FILE = "mf-tax-indicators-2026.xlsx"
@@ -37,6 +50,24 @@ POPULATION_FILE = "population-2025-12-31.zip"
 HOUSING_FILE = "housing-2025.xlsx"
 PROPERTY_FILE = "property-market-2025.xlsx"
 TOURISM_FILE = "tourism-2025.zip"
+TOURISM_CITIES_DIMENSIONS_FILE = "dbw/tourism-city-dimensions.json"
+TOURISM_CITIES_FILE = "dbw/tourism-city-2025.json"
+ANNUAL_YEAR = 2025
+HOUSING_RATE = 747060
+TOURISM_RATE = 60298
+PRICE_VARIABLES = {
+    "median_dwelling_price_m2": (633677, "Median dwelling sale price"),
+    "median_dwelling_price_m2_primary": (633682, "Median primary-market dwelling sale price"),
+    "median_dwelling_price_m2_secondary": (633687, "Median secondary-market dwelling sale price"),
+    "average_dwelling_price_m2": (633692, "Average dwelling sale price"),
+    "average_dwelling_price_m2_primary": (633697, "Average primary-market dwelling sale price"),
+    "average_dwelling_price_m2_secondary": (633702, "Average secondary-market dwelling sale price"),
+}
+
+
+def positive_price(value):
+    """A sale price exists only when at least one transaction produced a positive price."""
+    return value if type(value) in (int, float) and value > 0 else None
 
 VOIVODESHIPS = {
     "dolnoslaskie": "02",
@@ -259,6 +290,132 @@ def build_property_tables(property_rows: list[list[object | None]]) -> dict:
     }
 
 
+def tourism_city_rates(
+    dimensions: list[dict], values: list[dict], populations: dict[str, int | float]
+) -> dict[str, float | None]:
+    codes = {}
+    for dimension in dimensions:
+        if dimension["id-wymiar"] != 1101:  # selected cities
+            continue
+        symbol = dimension["symbol"]
+        if len(symbol) != 14 or not symbol.startswith("10"):
+            raise ValueError(f"invalid DBW city code {symbol!r}")
+        code = teryt_from_bdl(symbol[2:], 6)
+        if is_whole_gmina(code):
+            codes[dimension["id-pozycja"]] = code
+
+    rates = {}
+    for row in values:
+        if row["id-pozycja-2"] != 6874517:  # all tourist origins
+            continue
+        code = codes.get(row["id-pozycja-1"])
+        if code is None:
+            continue
+        if row["id-sposob-prezentacji-miara"] != 39:  # thousands of nights
+            raise ValueError(f"DBW city {code} tourist nights use an unexpected unit")
+        population = _on_current_code(populations, code)
+        nights_thousands = _number(row.get("wartosc"))
+        # DBW dictionaries mark 253 as a present value and 43 as public.
+        published = row["id-brak-wartosci"] == 253 and row["id-tajnosci"] == 43
+        rate = None
+        if published and nights_thousands is not None and population and population > 0:
+            rate = round(nights_thousands * 1000 / population, 4)
+        rates[code] = rate
+    return rates
+
+
+def build_local_tourism(
+    rates: dict[str, int | float | None],
+    gmina_codes: Collection[str],
+    city_rates: dict[str, float | None],
+) -> dict:
+    field = "overnight_stays_per_person"
+    powiat = {
+        code: {field: value / 1000 if value is not None else None}
+        for code, value in rates.items()
+    }
+    gmina = {
+        code: {field: powiat[code[:4]][field]}
+        for code in gmina_codes
+        if code.endswith("011") and int(code[2:4]) > 60 and code[:4] in powiat
+    }
+    for code, rate in city_rates.items():
+        if code in gmina_codes and (code not in gmina or gmina[code][field] is None):
+            gmina[code] = {field: rate}
+    fields = {
+        field: {
+            "label": "Tourist nights per resident",
+            "unit": "nights/person",
+            "year": ANNUAL_YEAR,
+            "note": (
+                "Annual stays in tourist accommodation with at least 10 beds. "
+                f"BDL rate per 1,000 people divided by 1,000. {bdl_note(TOURISM_RATE, 5, ANNUAL_YEAR)}"
+            ),
+        },
+    }
+    return {
+        "tourism_powiat": {"level": "powiat", "fields": fields, "rows": powiat},
+        "tourism_gmina": {
+            "level": "gmina",
+            "fields": {
+                field: {
+                    **fields[field],
+                    "note": (
+                        f"{fields[field]['note']} Cities with powiat rights use the same-area powiat rate. "
+                        "Other published city rates divide DBW nights by population on 31 December 2025. "
+                        f"See {TOURISM_CITIES_URL}."
+                    ),
+                },
+            },
+            "rows": gmina,
+        },
+    }
+
+
+def build_local_tables(raw_dir: Path, populations: dict[str, int | float]) -> tuple[dict, list[str]]:
+    gmina_codes = _area(raw_dir / AREA_FILE)
+    housing, housing_files = read_bdl_series(raw_dir, HOUSING_RATE, 6, ANNUAL_YEAR)
+    tourism, tourism_files = read_bdl_series(raw_dir, TOURISM_RATE, 5, ANNUAL_YEAR)
+    field = "dwellings_completed_per_1000"
+    tables = {
+        "housing_gmina": {
+            "level": "gmina",
+            "fields": {
+                field: {
+                    "label": "Dwellings completed per 1,000 people",
+                    "unit": "dwellings/1,000 people",
+                    "year": ANNUAL_YEAR,
+                    "note": f"Annual housing construction indicators. {bdl_note(HOUSING_RATE, 6, ANNUAL_YEAR)}",
+                },
+            },
+            "rows": {code: {field: _on_current_code(housing, code)} for code in gmina_codes},
+        },
+    }
+    city_dimensions = json.loads((raw_dir / TOURISM_CITIES_DIMENSIONS_FILE).read_text(encoding="utf-8"))
+    city_values = json.loads((raw_dir / TOURISM_CITIES_FILE).read_text(encoding="utf-8"))["data"]
+    city_rates = tourism_city_rates(city_dimensions, city_values, populations)
+    tables.update(build_local_tourism(tourism, gmina_codes, city_rates))
+    files = [AREA_FILE, TOURISM_CITIES_DIMENSIONS_FILE, TOURISM_CITIES_FILE, *housing_files, *tourism_files]
+    price_fields = {}
+    price_rows = {}
+    for field, (variable, label) in PRICE_VARIABLES.items():
+        values, series_files = read_bdl_series(raw_dir, variable, 5, ANNUAL_YEAR)
+        price_fields[field] = {
+            "label": label,
+            "unit": "PLN/m2",
+            "year": ANNUAL_YEAR,
+            "note": f"Market sales of dwellings in multi-unit buildings. {bdl_note(variable, 5, ANNUAL_YEAR)}",
+        }
+        for code, value in values.items():
+            price_rows.setdefault(code, {})[field] = positive_price(value)
+        files.extend(series_files)
+    for row in price_rows.values():
+        for field in price_fields:
+            row.setdefault(field, None)
+    tables["housing_prices_powiat"] = {"level": "powiat", "fields": price_fields, "rows": price_rows}
+    return tables, files
+
+
 def build_tables(raw_dir: Path) -> tuple[dict, list[str]]:
     populations = _best_population_table(raw_dir / POPULATION_FILE)
     tables = {
@@ -276,6 +433,8 @@ def build_tables(raw_dir: Path) -> tuple[dict, list[str]]:
         ),
     }
     tables.update(build_property_tables(read_xlsx(raw_dir / PROPERTY_FILE, 3)))
+    local_tables, local_files = build_local_tables(raw_dir, populations)
+    tables.update(local_tables)
     return tables, [
         MF_INCOME_FILE,
         MF_INDICATORS_FILE,
@@ -283,6 +442,7 @@ def build_tables(raw_dir: Path) -> tuple[dict, list[str]]:
         HOUSING_FILE,
         PROPERTY_FILE,
         TOURISM_FILE,
+        *local_files,
     ]
 
 
@@ -296,7 +456,7 @@ class PlStatsProsperitySource(Source):
             "terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-"
             "oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia"
         ),
-        description="Gmina PIT income and bulk housing, property, and tourism statistics.",
+        description="Gmina PIT income and housing completions. Powiat dwelling prices and tourist nights.",
         license="Public sector information reuse terms and CC BY 4.0",
         used_for=["Yields", "City View", "Advisors", "Lenses"],
     )
@@ -309,11 +469,18 @@ class PlStatsProsperitySource(Source):
             (HOUSING_URL, HOUSING_FILE),
             (PROPERTY_URL, PROPERTY_FILE),
             (TOURISM_URL, TOURISM_FILE),
+            (AREA_URL, AREA_FILE),
         ):
             path = self.download(url, filename, force=force, expect_binary=True)
             if not zipfile.is_zipfile(path):
                 self.discard(filename)
                 raise RuntimeError(f"{url} did not return an XLSX or ZIP file")
+        self.download(TOURISM_CITIES_DIMENSIONS_URL, TOURISM_CITIES_DIMENSIONS_FILE, force=force)
+        self.download(TOURISM_CITIES_URL, TOURISM_CITIES_FILE, force=force)
+        fetch_bdl_series(self, HOUSING_RATE, 6, ANNUAL_YEAR, force=force)
+        fetch_bdl_series(self, TOURISM_RATE, 5, ANNUAL_YEAR, force=force)
+        for variable, _ in PRICE_VARIABLES.values():
+            fetch_bdl_series(self, variable, 5, ANNUAL_YEAR, force=force)
 
     def process(self) -> dict:
         tables, files = build_tables(self.raw_dir)
@@ -324,10 +491,24 @@ class PlStatsProsperitySource(Source):
                 "Ministry amounts are planned JST income for budget year 2026.",
                 "The 2026 individual wealth indicator replaces the former G indicator under the new JST income law.",
                 "PIT per person uses GUS population on 31 December 2025, including city counties.",
-                "The GUS housing bulk table supports voivodeships, not gminas.",
-                "The GUS tourism bulk tables support voivodeships and subregions, not gminas.",
-                "The GUS property bulk table publishes national price indices, not price per m2 by powiat.",
-                "Incomplete BDL API pages are excluded from this interim.",
+                BDL_LICENCE,
+                "Gmina housing uses the BDL annual rate and maps type-only changes to the 2026 TERYT register.",
+                "Gmina completions: https://bdl.stat.gov.pl/BDL/metadane/metryka/3820.",
+                "GUS published the 2025 powiat dwelling prices on 22 October 2026. See "
+                "https://bdl.stat.gov.pl/bdl/metadane/metryka/3787 and "
+                "https://bdl.stat.gov.pl/bdl/metadane/metryka/3788.",
+                "The annual GUS property workbook supplies the national price indices.",
+                "GUS uses the value divided by total floor area for average prices. Primary-market prices include VAT.",
+                "Sales of detached houses are outside the BDL dwelling price series. Unreported prices remain null.",
+                "A zero price means no priced transaction and remains null.",
+                "GUS reports incomplete price records for Szczecin from 2020 onward.",
+                "Tourist nights: https://bdl.stat.gov.pl/BDL/metadane/metryka/2396.",
+                "Since 2015, GUS publishes nationwide annual tourist nights starting at powiat level "
+                "for confidentiality. Cities with powiat rights have matching gmina values. "
+                "See https://bdl.stat.gov.pl/BDL/metadane/podgrupy/240.",
+                "Statistics Poland DBW publishes extra city totals. "
+                f"See {TOURISM_CITIES_URL} and {TOURISM_CITIES_DIMENSIONS_URL}.",
+                "GUS withholds use figures for areas with fewer than three reporting establishments.",
                 "Tourism counts cover establishments with at least 10 beds.",
                 "REGON entities by PKD, useful floor area, and household disposable income remain gaps.",
             ],

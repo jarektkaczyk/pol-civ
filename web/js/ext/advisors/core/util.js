@@ -1,5 +1,14 @@
 // Small shared helpers for the advisor kit: numbers, scales, colour ramps, DOM.
-export { esc } from "../../../format.js";
+import { esc } from "../../../format.js";
+export { esc };
+
+/**
+ * A translated template whose vars are HTML: the template text is escaped, each {name} takes vars[name] as it is.
+ * Pass the template from t("...") with no vars, or from t.plural(n, forms, { n: "{n}" }) to keep {n} for HTML.
+ */
+export function fillHtml(template, vars = {}) {
+  return esc(template).replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k] ?? "") : m));
+}
 
 export const fin = Number.isFinite;
 export const clamp = (v, a, b) => Math.max(a, Math.min(b, v));

@@ -47,7 +47,7 @@ COVER_KEYS = [
 PCT_KEYS = ["forest", "crop", "pasture", "grass", "shrub", "wetland", "developed"]
 YIELD_KEYS = ["food", "production", "gold", "science", "culture"]
 # Lenses whose data exists only for some gminas (university towns, stations within 25 km, the 2021 census map).
-SPARSE_LENSES = {"students", "pm25", "higher_ed"}
+SPARSE_LENSES = {"students", "pm25", "higher_ed", "silesian", "kashubian", "german", "belarusian", "minority"}
 LENS_FORMATS = {"int", "pln", "pct", "float", "minutes", "years", "category"}
 LENS_SCALES = {"log", "linear"}
 HIGHER_IS = {"good", "bad", "neutral"}

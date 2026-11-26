@@ -1,6 +1,7 @@
 // Shared building blocks for the city and state panels (both render into #city-panel).
 import { compact, dollars, esc, int, money, pct, yieldValue } from "../format.js";
 import { icon, glyph } from "./icon.js";
+import { t, num } from "../i18n.js";
 
 // Industry → a "district" glyph: SVG icons i-<key> from icons.js; these emoji are only the fallback.
 // Keys are the PKD sections of nation.json industries (pipeline/build/yields.py SECTIONS).
@@ -18,12 +19,13 @@ export function yieldGrid(nation, yields, ranks = null, rankOf = 0) {
     .map((y) => {
       const v = yields?.[y.key];
       const r = ranks?.[y.key];
-      const label = y.key === "gold" ? "GDP" : y.label;
-      return `<div class="yield-tile" title="${esc(y.label)}${y.key === "gold" ? " (GDP)" : ""}: ${esc(y.description || "")}">
+      const label = y.key === "gold" ? t("GDP") : t(y.label);
+      const name = y.key === "gold" ? t("{yield} (GDP)", { yield: t(y.label) }) : t(y.label);
+      return `<div class="yield-tile" title="${esc(name)}: ${esc(t(y.description || ""))}">
         <div class="ico" style="color:${esc(y.color)}">${glyph(y, 20)}</div>
         <div class="val" style="color:${esc(y.color)}">${yieldValue(y, v)}</div>
         <div class="lbl">${esc(label)}</div>
-        ${r ? `<div class="rank" title="Rank among the ${rankOf} mapped states (1 = largest)">#${r} of ${rankOf}</div>` : ""}</div>`;
+        ${r ? `<div class="rank" title="${esc(t("Rank among the {n} voivodeships (1 = largest)", { n: rankOf }))}">${esc(t("#{rank} of {total}", { rank: r, total: rankOf }))}</div>` : ""}</div>`;
     })
     .join("");
 }
@@ -43,11 +45,11 @@ export function statRow(ic, fallback, label, v, nv, fmt, higherIsGood) {
 
 // Prosperity rows: wage and unemployment are published per powiat (the town's powiat), PIT per gmina.
 export function amenities(o, n) {
-  const powiat = o.scope && o.scope !== "city" && o.wage_exact === false ? " (powiat)" : "";
+  const powiat = o.scope && o.scope !== "city" && o.wage_exact === false;
   return `
-    ${statRow("l-wage", "💵", `Average wage${powiat}`, o.wage, n.wage, (x) => (x == null ? "–" : `${dollars(x)}/mo`), true)}
-    ${statRow("unemployment", "😐", `Unemployment${powiat}`, o.unemployment, n.unemployment, (x) => pct(x), false)}
-    ${statRow("l-income", "💰", "PIT revenue per person", o.pit_per_person, n.pit_per_person, dollars, true)}`;
+    ${statRow("l-wage", "💵", powiat ? t("Average wage (powiat)") : t("Average wage"), o.wage, n.wage, (x) => (x == null ? "–" : t("{value}/mo", { value: dollars(x) })), true)}
+    ${statRow("unemployment", "😐", powiat ? t("Unemployment (powiat)") : t("Unemployment"), o.unemployment, n.unemployment, (x) => pct(x), false)}
+    ${statRow("l-income", "💰", t("PIT revenue per person"), o.pit_per_person, n.pit_per_person, dollars, true)}`;
 }
 
 // Workforce by industry with location quotients vs. the nation ("specialisation"). limit = max rows (0 = all).
@@ -66,11 +68,11 @@ export function industries(o, nation, limit = 0) {
       const share = v / total;
       const nShare = (n.jobs?.[k] || 0) / nTotal;
       const lq = nShare > 0 ? share / nShare : 1;
-      const tip = `Share of workers is ${lq.toFixed(1)}× the share in Poland`;
-      const badge = lq >= 1.3 ? `<span class="lq hi" title="${tip}">×${lq.toFixed(1)}</span>`
-        : lq <= 0.6 ? `<span class="lq lo" title="${tip}">×${lq.toFixed(1)}</span>` : "";
+      const tip = esc(t("Share of workers is {lq}× the share in Poland", { lq: num(lq, 1) }));
+      const badge = lq >= 1.3 ? `<span class="lq hi" title="${tip}">×${num(lq, 1)}</span>`
+        : lq <= 0.6 ? `<span class="lq lo" title="${tip}">×${num(lq, 1)}</span>` : "";
       return `<div class="ind"><span aria-hidden="true">${icon(`i-${k}`, DISTRICT_ICON[k] || "•")}</span>
-        <span>${esc(nation.industries?.[k] || k)}${badge}</span><span class="n">${compact(v)} · ${pct(share, 0)}</span>
+        <span>${esc(nation.industries?.[k] ? t(nation.industries[k]) : k)}${badge}</span><span class="n">${compact(v)} · ${pct(share, 0)}</span>
         <div class="bar"><i style="width:${(share / maxShare) * 100}%;background:${lq >= 1.3 ? "#9fd76a" : "#c9a45c"}"></i></div></div>`;
     })
     .join("");
@@ -78,8 +80,8 @@ export function industries(o, nation, limit = 0) {
 
 export const gdpRow = (o) =>
   o.gdp != null
-    ? `<div class="stat-row"><span class="sl">${icon("y-gold", "💰", { size: 14 })}GDP${o.gdp_estimated ? " share" : ""}${o.gdp_year ? ` (${o.gdp_year})` : ""}</span><span><b>${money(o.gdp)}</b>${
-        o.population ? `<span class="cmp">${money(o.gdp / o.population)} per person</span>` : ""}</span></div>`
+    ? `<div class="stat-row"><span class="sl">${icon("y-gold", "💰", { size: 14 })}${esc(o.gdp_estimated ? t("GDP share") : t("GDP"))}${o.gdp_year ? ` (${esc(o.gdp_year)})` : ""}</span><span><b>${money(o.gdp)}</b>${
+        o.population ? `<span class="cmp">${esc(t("{value} per person", { value: money(o.gdp / o.population) }))}</span>` : ""}</span></div>`
     : "";
 
 // " · ▲ 3.4% since 2015" from growth / growth_years (towns and voivodeships), compared with Poland in the tooltip.
@@ -87,17 +89,21 @@ export const gdpRow = (o) =>
 export function growthSpan(o, n = null) {
   if (!Number.isFinite(o?.growth)) return "";
   const yrs = Array.isArray(o.growth_years) && o.growth_years.length === 2 ? o.growth_years : null;
-  const p = (g) => `${g >= 0 ? "+" : "−"}${Math.abs(g * 100).toFixed(1)}%`;
-  const period = yrs ? `${yrs[0]}–${yrs[1]}` : "the last few years";
-  const pl = Number.isFinite(n?.growth) ? ` (Poland ${p(n.growth)})` : "";
-  const tip = `Population change ${period}: ${p(o.growth)}${pl}`;
+  const p = (g) => `${g >= 0 ? "+" : "−"}${num(Math.abs(g * 100), 1)}%`;
+  const period = yrs ? `${yrs[0]}–${yrs[1]}` : t("the last few years");
+  const tip = Number.isFinite(n?.growth)
+    ? t("Population change {period}: {change} (Poland {national})", { period, change: p(o.growth), national: p(n.growth) })
+    : t("Population change {period}: {change}", { period, change: p(o.growth) });
   const cls = o.growth >= 0 ? "good" : "bad";
-  return ` · <span class="growth ${cls}" title="${esc(tip)}">${o.growth >= 0 ? "▲" : "▼"} ${Math.abs(o.growth * 100).toFixed(1)}%${
-    yrs ? ` <span class="since">since ${yrs[0]}</span>` : ""}</span>`;
+  return ` · <span class="growth ${cls}" title="${esc(tip)}">${o.growth >= 0 ? "▲" : "▼"} ${num(Math.abs(o.growth * 100), 1)}%${
+    yrs ? ` <span class="since">${esc(t("since {year}", { year: String(yrs[0]) }))}</span>` : ""}</span>`;
 }
 
+// The count stays bold: the plural text keeps its {n} and the number goes in after escaping.
+const boldCount = (text, v) => esc(text).replace("{n}", `<b>${int(v)}</b>`);
 export const popLine = (o, extra = "") =>
-  `<div class="cp-pop">${icon("pop", "👥", { size: 16 })} <b>${int(o.population)}</b> people${o.employed != null ? ` · ${int(o.employed)} workers` : ""}${extra}</div>`;
+  `<div class="cp-pop">${icon("pop", "👥", { size: 16 })} ${boldCount(t.plural(o.population, { one: "{n} person", other: "{n} people" }, { n: "{n}" }), o.population)}${
+    o.employed != null ? ` · ${esc(t.plural(o.employed, { one: "{n} worker", other: "{n} workers" }))}` : ""}${extra}</div>`;
 
 /**
  * Fill and show the panel.
@@ -106,19 +112,20 @@ export const popLine = (o, extra = "") =>
 export function showPanel(spec) {
   const panel = panelEl();
   panel.dataset.kind = spec.kind;
-  panel.setAttribute("aria-label", `${spec.kind === "state" ? "Voivodeship" : "Town"}: ${spec.title}`);
+  const kindLabel = spec.kindLabel || (spec.kind === "state" ? t("Voivodeship") : t("Town"));
+  panel.setAttribute("aria-label", `${kindLabel}: ${spec.title}`);
   panel.innerHTML = `
     <div class="sheet-grip" aria-hidden="true"></div>
     <div class="cp-head">
       <div class="stripe" style="background:${spec.stripe}"></div>
-      <button class="icon-btn cp-close" aria-label="Close panel (Esc)" title="Close (Esc)">${icon("close", "✕", { size: 13 })}</button>
-      <div class="cp-kind">${spec.kindLabel || (spec.kind === "state" ? "Voivodeship" : "Town")}</div>
+      <button class="icon-btn cp-close" aria-label="${esc(t("Close panel (Esc)"))}" title="${esc(t("Close (Esc)"))}">${icon("close", "✕", { size: 13 })}</button>
+      <div class="cp-kind">${esc(kindLabel)}</div>
       <h2 class="cp-name">${spec.titleHtml ?? esc(spec.title)}</h2>
       ${spec.sub ? `<div class="cp-full">${spec.sub}</div>` : ""}
       ${spec.headExtra || ""}
     </div>
-    ${spec.sections.filter(Boolean).map((s) => `<section class="cp-section"><h3>${s.title}</h3>${s.html}</section>`).join("")}
-    <div class="cp-foot">${spec.foot || ""} <a href="#" data-pedia>Almanac</a></div>`;
+    ${spec.sections.filter(Boolean).map((s) => `<section class="cp-section"><h3>${esc(s.title)}</h3>${s.html}</section>`).join("")}
+    <div class="cp-foot">${spec.foot || ""} <a href="#" data-pedia>${esc(t("Almanac"))}</a></div>`;
   panel.hidden = false;
   panel.scrollTop = 0;
   panel.classList.remove("dragging-sheet");

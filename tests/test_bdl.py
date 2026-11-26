@@ -114,6 +114,11 @@ class BdlPageTests(unittest.TestCase):
         self.assertIsNone(value_for_year(record, 2025))
         self.assertEqual(latest_value(record), (2024, 10))
 
+    def test_published_zero_stays_zero(self):
+        record = {"values": [{"year": "2025", "value": 0, "attrId": 0}]}
+        self.assertEqual(value_for_year(record, 2025), 0)
+        self.assertEqual(latest_value(record), (2025, 0))
+
     def test_stops_before_request_91(self):
         class FakeSource:
             id = "test"

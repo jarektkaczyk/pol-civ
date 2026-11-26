@@ -111,6 +111,13 @@ def _detail(props: dict) -> str | None:
     return " - ".join(parts) or None
 
 
+def _status_parts(props: dict) -> dict:
+    """The pieces of `detail`, so the browser can write it in the reader's language: status_label (English text of
+    the status code) and status_note (English free text)."""
+    return {"status_label": str(props["status"]).replace("_", " ").capitalize() if props.get("status") else None,
+            "status_note": props.get("status_note")}
+
+
 def plant_items(locator: Locator, points: list[dict]) -> list[dict]:
     out = []
     for point in points:
@@ -125,7 +132,7 @@ def plant_items(locator: Locator, points: list[dict]) -> list[dict]:
         out.append({
             "id": point["id"], "type": type_id, "name": point["name"], "value": props.get("mw"),
             "status": props.get("status"), "operator": props.get("operator"), "detail": _detail(props),
-            "year": props.get("mw_year"), "ref": props.get("ref"), **at,
+            **_status_parts(props), "year": props.get("mw_year"), "ref": props.get("ref"), **at,
         })
     return out
 
@@ -144,7 +151,7 @@ def mine_items(locator: Locator, points: list[dict]) -> list[dict]:
             "id": point["id"], "type": type_id, "name": point["name"], "value": 1,
             "output": props.get("output"), "output_unit": props.get("output_unit"),
             "status": props.get("status"), "operator": props.get("operator"), "detail": _detail(props),
-            "year": props.get("output_year"), "ref": props.get("ref"), **at,
+            **_status_parts(props), "year": props.get("output_year"), "ref": props.get("ref"), **at,
         })
     return out
 
@@ -173,7 +180,7 @@ def oil_gas_items(locator: Locator, points: list[dict]) -> list[dict]:
             "id": point["id"], "type": type_id, "name": point["name"], "value": value,
             "output": props.get("output"), "output_unit": props.get("output_unit"),
             "status": props.get("status"), "operator": props.get("operator"), "detail": detail,
-            "year": props.get("year"), "ref": props.get("ref"), **at,
+            "status_label": _status_parts(props)["status_label"], "status_note": None, "year": props.get("year"), "ref": props.get("ref"), **at,
         })
     return out
 

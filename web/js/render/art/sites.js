@@ -11,6 +11,7 @@
 //   WONDER_KINDS, WONDER_MOTIFS, MOTIF_LABELS, drawWonder(ctx, kind, x, y, size, {rank, motif, variant})
 //   drawPlaque(ctx, text, x, y, {kind, sub, scale})              screen-space name plate (css px)
 import { bucketPx, deviceScale, getSprite, drawSprite, makePattern } from "./sprites.js";
+import { t } from "../../i18n.js";
 
 const TAU = Math.PI * 2;
 
@@ -62,14 +63,14 @@ function flag(g, upx, x, y, h, col) {
 
 /** Component palettes: walls, roof / accent, flag. */
 export const FORT_KINDS = {
-  army: { name: "Land Forces", wall: "#a8966a", accent: "#5f6b3a", flag: "#e0b44a", pad: "rgba(96,108,58,.72)" },
-  navy: { name: "Navy", wall: "#98a4b2", accent: "#22406a", flag: "#e8e2d0", pad: "rgba(34,64,106,.62)" },
-  air: { name: "Air Force", wall: "#b2bac4", accent: "#3a6aa8", flag: "#9cc4ec", pad: "rgba(58,106,168,.55)" },
-  marines: { name: "Special Forces", wall: "#b0946e", accent: "#8a2a2a", flag: "#e2b84a", pad: "rgba(138,42,42,.6)" },
-  guard: { name: "Territorial Defence", wall: "#a8a28c", accent: "#6a6a52", flag: "#cfc3a0", pad: "rgba(110,110,84,.55)" },
-  air_guard: { name: "Air base", wall: "#aeb0b2", accent: "#5a6a7a", flag: "#b9c8d8", pad: "rgba(90,106,122,.55)" },
-  reserve: { name: "Allied site", wall: "#a49e92", accent: "#6a6258", flag: "#d8cfba", pad: "rgba(106,98,88,.5)" },
-  other: { name: "Military site", wall: "#a2a2a2", accent: "#4a4a5a", flag: "#d0d0d0", pad: "rgba(74,74,90,.5)" },
+  army: { name: t("Land Forces"), wall: "#a8966a", accent: "#5f6b3a", flag: "#e0b44a", pad: "rgba(96,108,58,.72)" },
+  navy: { name: t("Navy"), wall: "#98a4b2", accent: "#22406a", flag: "#e8e2d0", pad: "rgba(34,64,106,.62)" },
+  air: { name: t("Air Force"), wall: "#b2bac4", accent: "#3a6aa8", flag: "#9cc4ec", pad: "rgba(58,106,168,.55)" },
+  marines: { name: t("Special Forces"), wall: "#b0946e", accent: "#8a2a2a", flag: "#e2b84a", pad: "rgba(138,42,42,.6)" },
+  guard: { name: t("Territorial Defence"), wall: "#a8a28c", accent: "#6a6a52", flag: "#cfc3a0", pad: "rgba(110,110,84,.55)" },
+  air_guard: { name: t("Air base"), wall: "#aeb0b2", accent: "#5a6a7a", flag: "#b9c8d8", pad: "rgba(90,106,122,.55)" },
+  reserve: { name: t("Allied site"), wall: "#a49e92", accent: "#6a6258", flag: "#d8cfba", pad: "rgba(106,98,88,.5)" },
+  other: { name: t("Military site"), wall: "#a2a2a2", accent: "#4a4a5a", flag: "#d0d0d0", pad: "rgba(74,74,90,.5)" },
 };
 
 /** military.json component id -> a fort kind above. */
@@ -466,11 +467,11 @@ export function drawProtected(ctx, sets, vp, o) {
 // --- wonders --------------------------------------------------------------------------------------------------------
 
 export const WONDER_KINDS = {
-  unesco: { name: "World Heritage", ring: "#ecc46a", base: "#6a4a1c", icon: "w-landmark" },
-  memorial: { name: "Memorial site", ring: "#8a8d92", base: "#45484d", icon: "w-landmark" },
-  natural: { name: "National park", ring: "#8fd07a", base: "#3f6a34", icon: "w-park" },
-  university: { name: "Research university", ring: "#8fb8ec", base: "#2c4a78", icon: "w-university" },
-  landmark: { name: "Landmark", ring: "#ecc46a", base: "#6a4a1c", icon: "w-landmark" },
+  unesco: { name: t("World Heritage"), ring: "#ecc46a", base: "#6a4a1c", icon: "w-landmark" },
+  memorial: { name: t("Memorial site"), ring: "#8a8d92", base: "#45484d", icon: "w-landmark" },
+  natural: { name: t("National park"), ring: "#8fd07a", base: "#3f6a34", icon: "w-park" },
+  university: { name: t("Research university"), ring: "#8fb8ec", base: "#2c4a78", icon: "w-university" },
+  landmark: { name: t("Landmark"), ring: "#ecc46a", base: "#6a4a1c", icon: "w-landmark" },
 };
 
 /**

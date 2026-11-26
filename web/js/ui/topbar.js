@@ -1,15 +1,16 @@
 import { esc } from "../format.js";
 import { icon, glyph } from "./icon.js";
 import { statDefs, fmtStat } from "./yieldReport.js";
+import { t, langHref } from "../i18n.js";
 
 // The national stats are buttons: each opens its report (ui/yieldReport.js, wired in main.js).
 export function renderTopbar(nation) {
   const items = statDefs(nation).map((d) => {
     const ic = d.yield ? glyph(d.yield, 17) : icon(d.iconId, d.emoji, { size: 17 });
     const value = fmtStat(d, d.value);
-    const tip = `${d.name}: ${d.description} Click for the report.`;
+    const tip = t("{name}: {description} Click for the report.", { name: d.name, description: d.description });
     return `<button type="button" class="yield" data-report="${esc(d.key)}" aria-expanded="false" aria-haspopup="dialog" aria-controls="yield-report"
-      title="${esc(tip)}" aria-label="${esc(d.name)}: ${esc(value)}. Open the report">
+      title="${esc(tip)}" aria-label="${esc(t("{name}: {value}. Open the report", { name: d.name, value }))}">
       <span class="ico" style="color:${esc(d.color)}">${ic}</span><span style="color:${esc(d.color)}">${esc(value)}</span><span class="caret" aria-hidden="true"></span></button>`;
   });
   const el = document.getElementById("yields");
@@ -20,7 +21,7 @@ export function renderTopbar(nation) {
   if (typeof ResizeObserver === "function") new ResizeObserver(check).observe(el);
   check();
   watchBarOverflow(document.getElementById("topbar"));
-  document.getElementById("turn").innerHTML = nation.year != null ? `Turn <b>${esc(nation.year)}</b>` : "";
+  document.getElementById("turn").innerHTML = nation.year != null ? esc(t("Turn {year}", { year: String(nation.year) })).replace(esc(String(nation.year)), `<b>${esc(nation.year)}</b>`) : "";
 }
 
 // Phones scroll the whole bar sideways. Mark which ends have more to show (.more-l / .more-r) so CSS can fade
@@ -46,4 +47,20 @@ function watchBarOverflow(bar) {
   // Extensions add top-bar buttons later.
   if (typeof MutationObserver === "function") new MutationObserver(queue).observe(bar, { childList: true, subtree: true });
   queue();
+}
+
+// The EN | PL links: each points at the same view (path and hash) in its language. The app rewrites the hash with
+// history.replaceState, which fires no event, so the hrefs are also refreshed just before a link is used.
+export function initLangSwitch(nav = document.getElementById("lang-switch")) {
+  if (!nav || nav.dataset.wired) return;
+  nav.dataset.wired = "1";
+  const links = [...nav.querySelectorAll("a[data-lang]")];
+  const sync = () => {
+    for (const a of links) a.setAttribute("href", langHref(a.dataset.lang));
+  };
+  for (const a of links) {
+    for (const ev of ["pointerdown", "focus", "mouseenter"]) a.addEventListener(ev, sync);
+  }
+  addEventListener("hashchange", sync);
+  sync();
 }

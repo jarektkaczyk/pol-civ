@@ -1,6 +1,6 @@
 # pol-civ: Poland as a strategy map, built from real data
 
-**Live: [softonsofa.com/pol-civ](https://softonsofa.com/pol-civ/)**
+**Live map:** [English](https://softonsofa.com/pol-civ/) | [Polski](https://softonsofa.com/pol-civ/pl/)
 
 ![Poland drawn as a 4X strategy map: painted hex terrain, the Baltic coast, rivers, voivodeships and town banners](docs/images/hero.jpg)
 
@@ -12,8 +12,8 @@ pol-civ is a fork of [usaciv](https://karpathy.ai/usaciv) by Andrej Karpathy (MI
 
 - **The map.** About 4,800 land hexes of 5 km: the Baltic coast with the Hel and Vistula spits, the Masurian and Pomeranian lake districts, the Vistula and Oder river systems, the Tatra, Sudety and Bieszczady with relief and snow, forests, wetlands and the farmland of the plains. Neighbours sit under fog.
 - **Yields.** Food, Production, Gold, Science and Culture. Gold is GDP. The others are employment by PKD section.
-- **Towns.** 1,026 towns with their population on 31 December 2025. 204 of them open a City View with citizens (age, education, sector of work), districts from employment location quotients, and badges such as Port city, Copper town or University town. Metros are Eurostat functional urban areas.
-- **Lenses.** 28 lenses by gmina, powiat or voivodeship: density, age, growth, migration, Ukrainian residents with PESEL UKR, PIT revenue per person, wages, unemployment, education, health, faith and Mass attendance, the 2025 presidential vote and turnout, the 2023 Sejm vote, air quality, the 2024 flood area, land cover.
+- **Towns.** 1,026 towns with their population on 30 June 2026. 203 of them open a City View with citizens (age, education, sector of work), districts from employment location quotients, and badges such as Port city, Copper town or University town. Metros are Eurostat functional urban areas.
+- **Lenses.** 49 lenses show population, identity, commuting, housing, jobs, elections, health, faith, education, local finances, EU funding and land cover. Each lens names the geographic level of its figures.
 - **Layers.** Motorways, expressways and main railways (OpenStreetMap), seaports by tonnage, airports by passengers, power plants by fuel, mines, Baltic offshore wind farms, garrisons and allied sites, freight routes, and wonders chosen by published rules (UNESCO sites, the most visited national parks, the largest research universities, landmarks). Memorial sites are shown as memorials.
 - **Advisors.** Podskarbi (economy), Ochmistrz (prosperity), Gdańsk Merchant (commerce), Żupnik (energy and resources), Lustrator (people), Rektor (knowledge), Kustosz (culture), Geometra (land), Hetman (military) and the Kartograf, an explorer that turns any column into a table and a scatter plot linked to the map.
 
@@ -38,7 +38,7 @@ The pipeline is standard-library Python. Sources live in `pipeline/sources/` (on
 
 ## Data sources
 
-33 public sources, none needing an API key. Main publishers:
+41 public sources, none needing an API key. Main publishers:
 
 | Publisher | Used for |
 |---|---|
@@ -64,5 +64,9 @@ The pipeline is standard-library Python. Sources live in `pipeline/sources/` (on
 ## Licence and credits
 
 The code is MIT-licensed (see [LICENSE](LICENSE)): the original usaciv code by Andrej Karpathy and this fork's changes. The licence covers the code only. The data belong to their publishers and are used under their terms: Polish public statistics and registers are free to reuse with attribution; Eurostat and Copernicus data under their reuse policies; ESA WorldCover and HydroSHEDS under CC BY 4.0; OpenStreetMap data © OpenStreetMap contributors under the ODbL, so the derived road, rail and position data in `web/data/` stay under the ODbL.
+
+The 1914 partition borders and the borders of interwar Poland use simplified lines from [CShapes 2.0](https://icr.ethz.ch/data/cshapes/). The dataset and the adapted lines in `web/data/history.json` share the [CC BY-NC-SA 4.0 licence](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+Schvitz, Guy, Seraina Rüegger, Luc Girardin, Lars-Erik Cederman, Nils Weidmann, and Kristian Skrede Gleditsch. 2022. "[Mapping The International System, 1886-2017: The CShapes 2.0 Dataset](https://doi.org/10.1177/00220027211013563)." *Journal of Conflict Resolution* 66(1): 144-61.
 
 The look is inspired by turn-based 4X strategy games. Every glyph, icon and texture is original and drawn in code. This project is not affiliated with or endorsed by any game publisher.

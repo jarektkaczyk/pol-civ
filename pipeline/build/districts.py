@@ -12,6 +12,7 @@ import json
 import math
 from pathlib import Path
 
+from ..core.i18n import t
 from ..core.paths import WEB_DATA
 from ..core.store import load_interim, write_web
 from .plstats import Stats, Units, num, total
@@ -170,31 +171,39 @@ def badge_for(town: dict, rec: dict, nat: dict, ctx: dict) -> dict | None:
     bcl = lq(bc, tot, total(nat.get(f"workers_{s}") for s in "BC"), nat["workers_total"])
     students = ctx["students"].get(town["gmina"])
     for rid, label, district, _ in BADGE_RULES:
-        text = None
+        text, tpl, tvars = None, None, None
         if rid == "capital" and town.get("capital"):
-            text = "Capital of Poland"
+            text = tpl = "Capital of Poland"
         elif rid == "port" and (p := near(town, ctx["ports"], {"seaport"}, PORT_KM)):
-            text = p["name"]
+            text = tpl = p["name"]
         elif rid == "copper" and (p := near(town, ctx["mines"], {"copper_mine", "copper_smelter"}, MINE_KM)):
             text = p["name"]
         elif rid == "coal" and (p := near(town, ctx["mines"], {"coal_mine", "lignite_mine"}, MINE_KM)):
             text = p["name"]
         elif rid == "tech" and jl is not None and jl >= TECH_LQ and num(rec.get("workers_J")) / tot >= TECH_SHARE:
-            text = f"IT and telecoms: {jl:.1f} times the national share of workers"
+            tpl, tvars = "IT and telecoms: {lq} times the national share of workers", {"lq": round(jl, 1)}
         elif rid == "university" and students and town.get("gmina_population") and \
                 students / town["gmina_population"] >= UNIVERSITY_SHARE:
-            text = f"{students:,} university students, {students / town['gmina_population']:.0%} of residents"
+            tpl = "{students} university students, {share}% of residents"
+            tvars = {"students": students, "share": round(100 * students / town["gmina_population"])}
         elif rid == "spa" and "Zdrój" in town["name"]:
-            text = "Spa town by name"
+            text = tpl = "Spa town by name"
         elif rid == "tourist" and il is not None and il >= TOURIST_LQ:
-            text = f"Hotels and restaurants: {il:.1f} times the national share of workers"
+            tpl, tvars = "Hotels and restaurants: {lq} times the national share of workers", {"lq": round(il, 1)}
         elif rid == "industrial" and bcl is not None and bcl >= INDUSTRIAL_LQ:
-            text = f"Mines and factories: {bcl:.1f} times the national share of workers"
+            tpl, tvars = "Mines and factories: {lq} times the national share of workers", {"lq": round(bcl, 1)}
         elif rid == "garrison" and (p := near(town, ctx["military"], ctx["mil_kinds"], GARRISON_KM)):
             text = p["props"].get("short") or p["name"]
+        if tvars is not None:
+            text = t(tpl, "en", **tvars)
         if text:
-            return {"id": BY_ID[district]["badge"]["id"], "rule": rid, "label": label, "district": district,
-                    "basis": "rule", "text": text}
+            # text is the English line; tpl and vars let the browser write it in the reader's language (t()).
+            out = {"id": BY_ID[district]["badge"]["id"], "rule": rid, "label": label, "district": district,
+                   "basis": "rule", "text": text}
+            out["tpl"] = tpl or text  # a place name (a mine, a garrison) is its own template
+            if tvars:
+                out["vars"] = tvars
+            return out
     return None
 
 

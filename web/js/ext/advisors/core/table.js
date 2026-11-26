@@ -11,6 +11,7 @@
 //   search: placeholder text (adds a name filter), searchText(row) = row.name, rank (show the position)
 //   onHover(row|null), onClick(row), caption (aria label), empty (text when no rows)
 import { esc, fin, rafThrottle, onWidth } from "./util.js";
+import { t, int, LOCALE } from "../../../i18n.js";
 
 export function createTable(host, opts) {
   const rowH = opts.rowH || 28;
@@ -31,7 +32,7 @@ export function createTable(host, opts) {
     <div class="adv-thead" role="row"></div>
     <div class="adv-tbody" role="rowgroup" tabindex="-1"><div class="adv-tspace"></div></div>`;
   root.setAttribute("role", "table");
-  root.setAttribute("aria-label", opts.caption || "Data table");
+  root.setAttribute("aria-label", opts.caption || t("Data table"));
   host.appendChild(root);
   width = Math.round(root.clientWidth) || 0;
   cols = visibleCols();
@@ -48,7 +49,7 @@ export function createTable(host, opts) {
     head.innerHTML = `${opts.rank ? `<span class="th r" role="columnheader">#</span>` : ""}${cols.map((c) => {
       const s = sort?.key === c.key ? sort.dir : null;
       return `<span class="th ${c.align === "l" ? "l" : "r"}" role="columnheader" aria-sort="${s === "asc" ? "ascending" : s === "desc" ? "descending" : "none"}">
-        <button type="button" data-sort="${esc(c.key)}" title="${esc(c.title || `Sort by ${c.label}`)}">${c.short ? c.short : esc(c.label)}${s ? `<span class="arr" aria-hidden="true">${s === "asc" ? "\u25b2" : "\u25bc"}</span>` : ""}</button></span>`;
+        <button type="button" data-sort="${esc(c.key)}" title="${esc(c.title || t("Sort by {label}", { label: c.label }))}">${c.short ? c.short : esc(c.label)}${s ? `<span class="arr" aria-hidden="true">${s === "asc" ? "\u25b2" : "\u25bc"}</span>` : ""}</button></span>`;
     }).join("")}`;
   }
 
@@ -64,11 +65,11 @@ export function createTable(host, opts) {
         const va = val(a), vb = val(b);
         const na = va == null || (typeof va === "number" && !fin(va)), nb = vb == null || (typeof vb === "number" && !fin(vb));
         if (na || nb) return na === nb ? 0 : na ? 1 : -1; // nulls last either way
-        if (typeof va === "string" || typeof vb === "string") return dir * String(va).localeCompare(String(vb));
+        if (typeof va === "string" || typeof vb === "string") return dir * String(va).localeCompare(String(vb), LOCALE);
         return dir * (va - vb);
       });
     }
-    if (cnt) cnt.textContent = `${view.length.toLocaleString("en-US")} of ${all.length.toLocaleString("en-US")}`;
+    if (cnt) cnt.textContent = t("{a} of {b}", { a: int(view.length), b: int(all.length) });
     const maxH = opts.maxHeight || 340;
     const h = Math.min(maxH, Math.max(rowH * 2, view.length * rowH + 2));
     body.style.height = `${h}px`;
@@ -99,7 +100,7 @@ export function createTable(host, opts) {
         return `<span class="td ${c.align === "l" ? "l" : "r"}${c.bar ? " hasbar" : ""}" role="cell"${tip ? ` title="${esc(tip)}"` : ""}>${inner}</span>`;
       }).join("")}</div>`;
     }
-    space.innerHTML = html || `<div class="adv-empty pad">${esc(opts.empty || "No rows.")}</div>`;
+    space.innerHTML = html || `<div class="adv-empty pad">${esc(opts.empty || t("No rows."))}</div>`;
   }
 
   body.addEventListener("scroll", rafThrottle(() => renderRows()), { passive: true });
@@ -139,7 +140,7 @@ export function createTable(host, opts) {
   });
   // Keyboard: the body is focusable; arrows move the hot row, Enter opens it.
   body.tabIndex = 0;
-  body.setAttribute("aria-label", `${opts.caption || "Table"}: use the arrow keys to move between rows and Enter to open one`);
+  body.setAttribute("aria-label", t("{caption}: use the arrow keys to move between rows and Enter to open one", { caption: opts.caption || t("Table") }));
   body.addEventListener("keydown", (e) => {
     if (!view.length) return;
     let i = view.findIndex((r) => String(keyOf(r)) === String(hot));

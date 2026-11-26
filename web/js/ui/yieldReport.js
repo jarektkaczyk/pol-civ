@@ -4,6 +4,7 @@
 // The first half is pure data (statDefs, buildReport): plain objects from nation.json, states.json, cities.json and
 // lenses.json, no DOM, so it is easy to check from the console (`window.__app.reports`). The second half renders.
 import { compact, dollars, esc, int, money, pct } from "../format.js";
+import { t, num, date, LANG } from "../i18n.js";
 import { hasIcon } from "../icons.js";
 import { icon, glyph } from "./icon.js";
 import { DISTRICT_ICON } from "./infoPanel.js";
@@ -18,29 +19,30 @@ const LENS_FOR = { population: "density", gold: "income", food: "farmland", unem
 // The advisor dashboard (ext/advisors) that explores each report further; `industry` preselects the Economy
 // advisor's specialisation ranking. Buttons show only when the advisors extension is installed.
 const ADVISOR_FOR = {
-  population: [{ id: "people", label: "People" }],
-  gold: [{ id: "economy", label: "Economy" }],
-  food: [{ id: "land", label: "Land" }, { id: "economy", label: "Economy (farming)", industry: "agriculture" }],
-  production: [{ id: "economy", label: "Economy (manufacturing)", industry: "manufacturing" }, { id: "energy", label: "Energy & Resources" }],
-  science: [{ id: "knowledge", label: "Knowledge" }],
-  culture: [{ id: "economy", label: "Economy (arts)", industry: "arts" }],
-  unemployment: [{ id: "prosperity", label: "Prosperity" }],
+  population: [{ id: "people", label: t("People") }],
+  gold: [{ id: "economy", label: t("Economy") }],
+  food: [{ id: "land", label: t("Land") }, { id: "economy", label: t("Economy (farming)"), industry: "agriculture" }],
+  production: [{ id: "economy", label: t("Economy (manufacturing)"), industry: "manufacturing" }, { id: "energy", label: t("Energy & Resources") }],
+  science: [{ id: "knowledge", label: t("Knowledge") }],
+  culture: [{ id: "economy", label: t("Economy (arts)"), industry: "arts" }],
+  unemployment: [{ id: "prosperity", label: t("Prosperity") }],
 };
 const advisorApp = () => (typeof window !== "undefined" && window.__app?.hasMode?.("advisor") ? window.__app : null);
 
 const fin = Number.isFinite;
 const ratio = (a, b) => (fin(a) && fin(b) && b > 0 ? a / b : null);
-export const signedPct = (g, d = 1) => (fin(g) ? `${g >= 0 ? "+" : "−"}${Math.abs(g * 100).toFixed(d)}%` : "–");
+export const signedPct = (g, d = 1) => (fin(g) ? `${g >= 0 ? "+" : "\u2212"}${num(Math.abs(g * 100), d)}%` : "\u2013");
 
 // Counts to three significant figures (leaderboards: 1.12M vs 1.11M rather than 1.1M twice).
+const UNIT3 = LANG === "pl" ? ["\u00a0bln", "\u00a0mld", "\u00a0mln", "\u00a0tys."] : ["T", "B", "M", "K"];
 export function count3(n) {
-  if (!fin(n)) return "–";
+  if (!fin(n)) return "\u2013";
   const a = Math.abs(n);
-  const sig = (d, unit) => (n / d).toFixed(a / d >= 100 ? 0 : a / d >= 10 ? 1 : 2) + unit;
-  if (a >= 1e12) return sig(1e12, "T");
-  if (a >= 1e9) return sig(1e9, "B");
-  if (a >= 1e6) return sig(1e6, "M");
-  if (a >= 1e4) return sig(1e3, "K");
+  const sig = (d, unit) => num(n / d, a / d >= 100 ? 0 : a / d >= 10 ? 1 : 2) + unit;
+  if (a >= 1e12) return sig(1e12, UNIT3[0]);
+  if (a >= 1e9) return sig(1e9, UNIT3[1]);
+  if (a >= 1e6) return sig(1e6, UNIT3[2]);
+  if (a >= 1e4) return sig(1e3, UNIT3[3]);
   return int(n);
 }
 
@@ -55,32 +57,34 @@ export function fmtStat(def, v) {
 // Every top-bar stat in display order: population, the yields from nation.json, unemployment.
 export function statDefs(nation) {
   const n = nation?.nation || {};
+  // Labels, descriptions and vintages are data text (nation.json), shown in the page language.
   const yields = (nation?.yields || []).map((y) => ({
     key: y.key,
-    label: y.label,
-    name: y.key === "gold" ? `${y.label} (GDP)` : y.label,
+    label: t(y.label),
+    name: y.key === "gold" ? t("{yield} (GDP)", { yield: t(y.label) }) : t(y.label),
     color: y.color,
     yield: y,
     unit: y.unit,
-    description: y.description || "",
-    source: y.key === "gold" ? nation.gdp_vintage || nation.vintage || "" : nation.vintage || "",
+    description: y.description ? t(y.description) : "",
+    source: t(y.key === "gold" ? nation.gdp_vintage || nation.vintage || "" : nation.vintage || ""),
     value: y.key === "gold" ? n.gdp ?? n.yields?.gold ?? null : n.yields?.[y.key] ?? null,
   }));
   return [
     {
-      key: "population", label: "Population", name: "Population", color: "#e8dcc0", iconId: "pop", emoji: "👥", unit: "people",
-      description: `Residents on ${nation?.population_date || "31 December 2025"} (GUS).`, source: nation?.vintage || "", value: n.population ?? null,
+      key: "population", label: t("Population"), name: t("Population"), color: "#e8dcc0", iconId: "pop", emoji: "👥", unit: "people",
+      description: t("Residents on {date} (GUS).", { date: date(nation?.population_date || "2025-12-31") }), source: t(nation?.vintage || ""), value: n.population ?? null,
     },
     ...yields,
     {
-      key: "unemployment", label: "Unemployment", name: "Unemployment rate", color: "#e8dcc0", iconId: "unemployment", emoji: "😐",
-      unit: "rate", description: "Registered unemployment rate, end of October 2026 (GUS).", source: nation?.vintage || "", value: n.unemployment ?? null,
+      key: "unemployment", label: t("Unemployment"), name: t("Unemployment rate"), color: "#e8dcc0", iconId: "unemployment", emoji: "😐",
+      unit: "rate", description: t("Registered unemployment rate, end of 2026-10 (GUS)."), source: t(nation?.vintage || ""), value: n.unemployment ?? null,
     },
   ];
 }
 
 const industryLabel = (nation, k, gdp = false) => {
-  const full = (gdp ? nation.gdp_industries?.[k] : null) || nation.industries?.[k] || (k === "government" ? "Government" : k);
+  const name = (gdp ? nation.gdp_industries?.[k] : null) || nation.industries?.[k];
+  const full = name ? t(name) : k === "government" ? t("Government") : k;
   return { label: full.replace(/\s*\(.*\)\s*$/, ""), full };
 };
 const industryIcon = (k) => (hasIcon(`i-${k}`) ? `i-${k}` : k === "government" && hasIcon("i-public_admin") ? "i-public_admin" : null);
@@ -111,18 +115,17 @@ function rank(list, valueOf, { asc = false, min = 0, fmt = count3, exact = int, 
 // Which voivodeships the rankings cover. states.json holds the voivodeships drawn on the map; when the national total
 // includes people outside them, say so rather than imply every unit is ranked.
 function stateScope(n, st) {
-  const abbrs = new Set(st.map((r) => r.o.abbr).filter(Boolean));
-  const hasDC = abbrs.has("DC");
   const sum = st.reduce((a, r) => a + (fin(r.o.population) ? r.o.population : 0), 0);
   const gap = fin(n.population) && n.population > 0 ? (n.population - sum) / n.population : 0;
-  const label = "Voivodeships";
+  const label = t("Voivodeships");
   if (!st.length || gap < 0.001) return { label, note: "" };
-  const missing = [["AK", "Alaska"], ["HI", "Hawaii"]].filter(([a]) => !abbrs.has(a)).map(([, name]) => name);
-  const outside = missing.length ? missing.join(" and ") : `${compact(n.population - sum)} residents`;
-  const what = `${st.length} voivodeships`;
+  // Residents counted nationally but outside the voivodeships drawn on the map.
   return {
-    label, inMap: "Voivodeships",
-    note: `Ranks the ${what}; ${outside} ${missing.length > 1 ? "are" : "is"} in the national total but not ranked.`,
+    label, inMap: label,
+    note: t.plural(st.length, {
+      one: "Ranks the {n} voivodeship; {outside} residents are in the national total but not ranked.",
+      other: "Ranks the {n} voivodeships; {outside} residents are in the national total but not ranked.",
+    }, { outside: compact(n.population - sum) }),
   };
 }
 
@@ -158,7 +161,7 @@ export function buildReport(key, { nation, states, cities, lenses, lensVintage }
   const lens = lensId && Array.isArray(lenses) ? lenses.find((l) => l.id === lensId) : null;
   if (lens) {
     const vintage = lens.source && /^acs/i.test(lens.source) && typeof lensVintage === "string" ? lensVintage : "";
-    rep.lens = { id: lens.id, name: lens.name || lens.id, unit: lens.unit || "", vintage };
+    rep.lens = { id: lens.id, name: lens.name ? t(lens.name) : lens.id, unit: lens.unit ? t(lens.unit) : "", vintage };
   }
 
   if (key === "population") reportPopulation(rep, n, st, metros);
@@ -170,32 +173,40 @@ export function buildReport(key, { nation, states, cities, lenses, lensVintage }
 
 function reportPopulation(rep, n, st, metros) {
   const yrs = Array.isArray(n.growth_years) && n.growth_years.length === 2 ? n.growth_years : null;
-  const since = yrs ? ` since ${yrs[0]}` : "";
-  if (fin(n.growth)) rep.context.push(`${signedPct(n.growth)}${since}`);
+  const from = yrs ? String(yrs[0]) : "";
+  if (fin(n.growth)) rep.context.push(yrs ? t("{change} since {year}", { change: signedPct(n.growth), year: from }) : signedPct(n.growth));
   const emp = ratio(n.employed, n.population);
-  if (emp != null) rep.context.push(`${compact(n.employed)} workers, ${pct(emp)} of residents`);
+  if (emp != null) rep.context.push(t("{workers} workers, {share} of residents", { workers: compact(n.employed), share: pct(emp) }));
 
   const g = (o) => o.growth;
   const row = (x, prefix = "") => ({
     label: `${prefix}${x.r.name}`, sub: x.r.kind === "city" ? x.r.sub : "", value: x.v, text: signedPct(x.v), tone: x.v >= 0 ? "good" : "bad",
   });
   const groups = [];
-  if (fin(n.growth)) groups.push({ rows: [{ label: "Poland", value: n.growth, text: signedPct(n.growth), tone: n.growth >= 0 ? "good" : "bad", strong: true }] });
-  const extremes = (list, what) => {
+  if (fin(n.growth)) groups.push({ rows: [{ label: t("Poland"), value: n.growth, text: signedPct(n.growth), tone: n.growth >= 0 ? "good" : "bad", strong: true }] });
+  // titles: [fastest, shrinking, slowest]
+  const extremes = (list, titles) => {
     if (list.length < 2) return;
     const k = Math.min(3, Math.floor(list.length / 2));
     const top = list.slice(0, k), bottom = list.slice(-k).reverse();
-    groups.push({ title: `Fastest-growing ${what}`, rows: top.map((x) => row(x)) });
-    groups.push({ title: bottom.every((x) => x.v < 0) ? `Shrinking ${what}` : `Slowest-growing ${what}`, rows: bottom.map((x) => row(x)) });
+    groups.push({ title: titles[0], rows: top.map((x) => row(x)) });
+    groups.push({ title: bottom.every((x) => x.v < 0) ? titles[1] : titles[2], rows: bottom.map((x) => row(x)) });
   };
-  extremes(sorted(st, g), "voivodeships");
-  extremes(sorted(metros, g, METRO_MIN), `towns (${compact(METRO_MIN)}+)`);
-  if (groups.length) rep.breakdown = { title: yrs ? `Population change ${yrs[0]}–${yrs[1]}` : "Population change", note: rep.scope.note, groups };
+  const min = { min: compact(METRO_MIN) };
+  extremes(sorted(st, g), [t("Fastest-growing voivodeships"), t("Shrinking voivodeships"), t("Slowest-growing voivodeships")]);
+  extremes(sorted(metros, g, METRO_MIN), [t("Fastest-growing towns ({min}+)", min), t("Shrinking towns ({min}+)", min), t("Slowest-growing towns ({min}+)", min)]);
+  if (groups.length) {
+    const title = yrs ? t("Population change {from}–{to}", { from, to: String(yrs[1]) }) : t("Population change");
+    rep.breakdown = { title, note: rep.scope.note, groups };
+  }
 
   rep.boards.modes = [
-    { id: "abs", label: "Largest", states: rank(st, (o) => o.population), metros: rank(metros, (o) => o.population) },
+    { id: "abs", label: t("Largest"), states: rank(st, (o) => o.population), metros: rank(metros, (o) => o.population) },
     {
-      id: "rel", label: "Fastest growing", hint: `Population change${since}; towns of ${compact(METRO_MIN)}+ people with their own gmina.`,
+      id: "rel", label: t("Fastest growing"),
+      hint: yrs
+        ? t("Population change since {year}; towns of {min}+ people with their own gmina.", { year: from, ...min })
+        : t("Population change; towns of {min}+ people with their own gmina.", min),
       states: rank(st, g, { fmt: signedPct, exact: (v) => signedPct(v, 2) }), metros: rank(metros, g, { fmt: signedPct, exact: (v) => signedPct(v, 2), min: METRO_MIN }),
     },
   ];
@@ -203,25 +214,29 @@ function reportPopulation(rep, n, st, metros) {
 
 function reportUnemployment(rep, n, st, metros) {
   const u = (o) => o.unemployment;
-  if (fin(n.unemployment) && n.unemployment > 0) rep.context.push(`About 1 in ${Math.round(1 / n.unemployment)} people in the labour force is out of work`);
+  if (fin(n.unemployment) && n.unemployment > 0) rep.context.push(t("About 1 in {n} people in the labour force is out of work", { n: Math.round(1 / n.unemployment) }));
   const ss = sorted(st, u);
-  if (ss.length >= 2) rep.context.push(`${rep.scope.note ? rep.scope.inMap : rep.scope.label} range from ${pct(ss.at(-1).v)} to ${pct(ss[0].v)}`);
+  if (ss.length >= 2) rep.context.push(t("Voivodeships range from {low} to {high}", { low: pct(ss.at(-1).v), high: pct(ss[0].v) }));
 
   const tone = (v) => (!fin(n.unemployment) || Math.abs(v / n.unemployment - 1) < 0.03 ? null : v > n.unemployment ? "bad" : "good");
-  const row = (label, x) => ({ label: `${label}: ${x.r.name}`, sub: x.r.kind === "city" ? x.r.sub : "", value: x.v, text: pct(x.v), tone: tone(x.v) });
-  const spread = (list) => (list.length >= 3 ? [row("Highest", list[0]), row("Median", list[Math.floor(list.length / 2)]), row("Lowest", list.at(-1))] : []);
+  const row = (label, x) => ({ label, sub: x.r.kind === "city" ? x.r.sub : "", value: x.v, text: pct(x.v), tone: tone(x.v) });
+  const spread = (list) => {
+    if (list.length < 3) return [];
+    const hi = list[0], mid = list[Math.floor(list.length / 2)], lo = list.at(-1);
+    return [row(t("Highest: {name}", { name: hi.r.name }), hi), row(t("Median: {name}", { name: mid.r.name }), mid), row(t("Lowest: {name}", { name: lo.r.name }), lo)];
+  };
   const groups = [];
-  if (fin(n.unemployment)) groups.push({ rows: [{ label: "Poland", value: n.unemployment, text: pct(n.unemployment), strong: true }] });
+  if (fin(n.unemployment)) groups.push({ rows: [{ label: t("Poland"), value: n.unemployment, text: pct(n.unemployment), strong: true }] });
   const sRows = spread(ss), mRows = spread(sorted(metros, u, BIG_METRO_MIN));
   if (sRows.length) groups.push({ title: rep.scope.label, rows: sRows });
-  if (mRows.length) groups.push({ title: `Large towns (${compact(BIG_METRO_MIN)}+)`, rows: mRows });
-  if (groups.length) rep.breakdown = { title: "Spread", note: rep.scope.note, groups };
+  if (mRows.length) groups.push({ title: t("Large towns ({min}+)", { min: compact(BIG_METRO_MIN) }), rows: mRows });
+  if (groups.length) rep.breakdown = { title: t("Spread"), note: rep.scope.note, groups };
 
-  const hint = `Towns of ${compact(BIG_METRO_MIN)}+ people; rates are per powiat.`;
+  const hint = t("Towns of {min}+ people; rates are per powiat.", { min: compact(BIG_METRO_MIN) });
   const o = { fmt: pct, exact: (v) => pct(v, 2) };
   rep.boards.modes = [
-    { id: "abs", label: "Highest", hint, states: rank(st, u, o), metros: rank(metros, u, { ...o, min: BIG_METRO_MIN }) },
-    { id: "rel", label: "Lowest", hint, states: rank(st, u, { ...o, asc: true }), metros: rank(metros, u, { ...o, asc: true, min: BIG_METRO_MIN }) },
+    { id: "abs", label: t("Highest"), hint, states: rank(st, u, o), metros: rank(metros, u, { ...o, min: BIG_METRO_MIN }) },
+    { id: "rel", label: t("Lowest"), hint, states: rank(st, u, { ...o, asc: true }), metros: rank(metros, u, { ...o, asc: true, min: BIG_METRO_MIN }) },
   ];
 }
 
@@ -230,9 +245,10 @@ function reportGold(rep, nation, n, st, metros) {
   const pp = ratio(rep.total, n.population);
   // GDP and population can come from different years (GDP 2025 vs population in mid-2026): say which.
   const popYear = fin(nation.year) ? nation.year : null;
-  const years = n.gdp_year && popYear && n.gdp_year !== popYear ? `${n.gdp_year} GDP ÷ ${popYear} residents` : "GDP ÷ residents";
-  if (pp != null) rep.context.push(`${money(pp)} per person (${years})`);
-  if (n.gdp_year) rep.context.push(`Year ${n.gdp_year}, current złoty`);
+  const years = n.gdp_year && popYear && n.gdp_year !== popYear
+    ? t("{gdpYear} GDP ÷ {popYear} residents", { gdpYear: String(n.gdp_year), popYear: String(popYear) }) : t("GDP ÷ residents");
+  if (pp != null) rep.context.push(t("{value} per person ({years})", { value: money(pp), years }));
+  if (n.gdp_year) rep.context.push(t("Year {year}, current złoty", { year: String(n.gdp_year) }));
 
   const rows = Object.entries(n.gdp_by_industry || {})
     .filter(([, v]) => fin(v))
@@ -242,13 +258,14 @@ function reportGold(rep, nation, n, st, metros) {
       const s = ratio(v, rep.total);
       return { label, full, iconId: industryIcon(k), emoji: DISTRICT_ICON[k] || "•", value: v, text: money(v), sub: s != null ? pct(s) : "" };
     });
-  if (rows.length) rep.breakdown = { title: "GDP by industry", groups: [{ rows }], collapseAfter: GDP_ROWS };
+  if (rows.length) rep.breakdown = { title: t("GDP by industry"), groups: [{ rows }], collapseAfter: GDP_ROWS };
 
   const perPerson = (o) => ratio(gdp(o), o.population);
   rep.boards.modes = [
-    { id: "abs", label: "Largest GDP", states: rank(st, gdp, { fmt: money, exact: dollars }), metros: rank(metros, gdp, { fmt: money, exact: dollars }) },
+    { id: "abs", label: t("Largest GDP"), states: rank(st, gdp, { fmt: money, exact: dollars }), metros: rank(metros, gdp, { fmt: money, exact: dollars }) },
     {
-      id: "rel", label: "Per person", hint: `${years}; towns of ${compact(METRO_MIN)}+ people. Below the voivodeship, GDP is a share of the subregion's.`,
+      id: "rel", label: t("Per person"),
+      hint: t("{years}; towns of {min}+ people. Below the voivodeship, GDP is a share of the subregion's.", { years, min: compact(METRO_MIN) }),
       states: rank(st, perPerson, { fmt: money, exact: dollars }), metros: rank(metros, perPerson, { fmt: money, exact: dollars, min: METRO_MIN }),
     },
   ];
@@ -257,19 +274,21 @@ function reportGold(rep, nation, n, st, metros) {
 function reportJobs(rep, def, nation, n, st, metros) {
   const key = def.key;
   const nShare = ratio(rep.total, n.employed);
-  if (nShare != null) rep.context.push(`${pct(nShare)} of the ${compact(n.employed)} employed`);
+  if (nShare != null) rep.context.push(t("{share} of the {employed} employed", { share: pct(nShare), employed: compact(n.employed) }));
   const per1k = ratio(rep.total, n.population);
-  if (per1k != null) rep.context.push(`${Math.round(per1k * 1000)} per 1,000 residents`);
+  if (per1k != null) rep.context.push(t("{n} per 1,000 residents", { n: Math.round(per1k * 1000) }));
 
   const inds = Array.isArray(def.yield?.industries) ? def.yield.industries : [];
   const gdpOf = inds.map((k) => n.gdp_by_industry?.[k]);
   if (inds.length && gdpOf.every(fin) && fin(n.gdp)) {
     const sum = gdpOf.reduce((a, b) => a + b, 0);
-    rep.context.push(`${inds.length > 1 ? "These industries produce" : "The industry produces"} ${money(sum)} of GDP (${pct(sum / n.gdp)}${n.gdp_year ? `, ${n.gdp_year}` : ""})`);
+    const vars = { value: money(sum), detail: [pct(sum / n.gdp), n.gdp_year ? String(n.gdp_year) : ""].filter(Boolean).join(", ") };
+    rep.context.push(inds.length > 1 ? t("These industries produce {value} of GDP ({detail})", vars) : t("The industry produces {value} of GDP ({detail})", vars));
   }
   // Worker counts and GDP come from different releases: credit both.
-  if (inds.some((k) => fin(n.gdp_by_industry?.[k])) && nation.gdp_vintage && nation.gdp_vintage !== rep.source) {
-    rep.source = `${rep.source ? `${rep.source} (workers); ` : ""}${nation.gdp_vintage} (GDP)`;
+  const gdpVintage = nation.gdp_vintage ? t(nation.gdp_vintage) : "";
+  if (inds.some((k) => fin(n.gdp_by_industry?.[k])) && gdpVintage && gdpVintage !== rep.source) {
+    rep.source = rep.source ? t("{workers} (workers); {gdp} (GDP)", { workers: rep.source, gdp: gdpVintage }) : t("{gdp} (GDP)", { gdp: gdpVintage });
   }
   const rows = inds
     .map((k) => {
@@ -278,26 +297,26 @@ function reportJobs(rep, def, nation, n, st, metros) {
       const { label, full } = industryLabel(nation, k);
       const s = ratio(v, n.employed);
       const g = n.gdp_by_industry?.[k];
-      const sub = [s != null ? `${pct(s)} of all workers` : "", fin(g) ? `GDP ${money(g)}` : ""].filter(Boolean).join(" · ");
+      const sub = [s != null ? t("{share} of all workers", { share: pct(s) }) : "", fin(g) ? t("GDP {value}", { value: money(g) }) : ""].filter(Boolean).join(" · ");
       return { label, full, iconId: industryIcon(k), emoji: DISTRICT_ICON[k] || "•", value: v, text: compact(v), sub };
     })
     .filter(Boolean)
     .sort((a, b) => b.value - a.value);
-  if (rows.length) rep.breakdown = { title: "Workers by sector", note: "Counted where the employer is.", groups: [{ rows }] };
+  if (rows.length) rep.breakdown = { title: t("Workers by sector"), note: t("Counted where the employer is."), groups: [{ rows }] };
 
   const y = (o) => o.yields?.[key];
   const lq = (o) => (nShare ? ratio(ratio(y(o), o.employed), nShare) : null);
   const shareSub = (o) => {
     const s = ratio(y(o), o.employed);
-    return s != null ? `${pct(s)} of workers` : "";
+    return s != null ? t("{share} of workers", { share: pct(s) }) : "";
   };
-  const fmtLq = (v) => `×${v.toFixed(2)}`;
-  const exactLq = (v) => `×${v.toFixed(3)}`;
+  const fmtLq = (v) => `\u00d7${num(v, 2)}`;
+  const exactLq = (v) => `\u00d7${num(v, 3)}`;
   rep.boards.modes = [
-    { id: "abs", label: "Most workers", states: rank(st, y), metros: rank(metros, y) },
+    { id: "abs", label: t("Most workers"), states: rank(st, y), metros: rank(metros, y) },
     {
-      id: "rel", label: "Specialisation",
-      hint: `Share of the area's workers in ${def.label.toLowerCase()} ÷ the share in Poland (${pct(nShare)}); towns of ${compact(METRO_MIN)}+ people.`,
+      id: "rel", label: t("Specialisation"),
+      hint: t("Share of the area's workers in {yield} ÷ the share in Poland ({share}); towns of {min}+ people.", { yield: def.label.toLowerCase(), share: pct(nShare), min: compact(METRO_MIN) }),
       states: rank(st, lq, { fmt: fmtLq, exact: exactLq, subOf: shareSub }), metros: rank(metros, lq, { fmt: fmtLq, exact: exactLq, subOf: shareSub, min: METRO_MIN }),
     },
   ];
@@ -332,17 +351,17 @@ function barsHtml(bd, expanded) {
     })
     .join("");
   const more = bd.collapseAfter && all.length > bd.collapseAfter
-    ? `<button class="yr-more" data-more aria-expanded="${expanded}">${expanded ? "Show fewer" : `Show all ${all.length}`}</button>` : "";
+    ? `<button class="yr-more" data-more aria-expanded="${expanded}">${esc(expanded ? t("Show fewer") : t("Show all {n}", { n: all.length }))}</button>` : "";
   return groups + more;
 }
 
 function boardHtml(rows) {
-  if (!rows?.length) return `<p class="muted yr-empty">No data.</p>`;
+  if (!rows?.length) return `<p class="muted yr-empty">${esc(t("No data."))}</p>`;
   const max = Math.max(0, ...rows.map((r) => Math.abs(r.value)));
   return `<ol class="yr-list">${rows
     .map((r) => {
       const w = max > 0 ? (Math.abs(r.value) / max) * 100 : 0;
-      const tip = `Open ${r.name}${r.exact && r.exact !== r.text ? ` (${r.exact})` : ""}`;
+      const tip = r.exact && r.exact !== r.text ? t("Open {name} ({value})", { name: r.name, value: r.exact }) : t("Open {name}", { name: r.name });
       return `<li><button class="yr-row" data-kind="${r.kind}" data-ref="${esc(r.ref)}" title="${esc(tip)}">
         <span class="yr-rk">${r.rank}</span>
         <span class="yr-nm">${esc(r.name)}${r.sub ? ` <span class="muted">${esc(r.sub)}</span>` : ""}</span>
@@ -402,29 +421,29 @@ export function initYieldReports(opts) {
     pop.innerHTML = `
       <div class="yr-head">
         <span class="yr-ic" style="color:${esc(def.color)}">${defIcon(def, 26)}</span>
-        <div class="yr-titles"><div class="yr-kind">National report</div><h2 id="yr-title">${esc(def.name)}</h2></div>
-        <button class="icon-btn yr-close" aria-label="Close report (Esc)" title="Close (Esc)">${icon("close", "✕", { size: 12 })}</button>
+        <div class="yr-titles"><div class="yr-kind">${esc(t("National report"))}</div><h2 id="yr-title">${esc(def.name)}</h2></div>
+        <button class="icon-btn yr-close" aria-label="${esc(t("Close report (Esc)"))}" title="${esc(t("Close (Esc)"))}">${icon("close", "✕", { size: 12 })}</button>
       </div>
       <div class="yr-total"><b style="color:${esc(def.color)}">${esc(rep.totalText)}</b>
         ${rep.context.length ? `<ul class="yr-ctx">${rep.context.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>` : ""}</div>
       ${rep.definition ? `<p class="yr-def">${esc(rep.definition)}</p>` : ""}
-      ${rep.source ? `<div class="yr-src">Source: ${esc(rep.source)}</div>` : ""}
+      ${rep.source ? `<div class="yr-src">${esc(t("Source: {source}", { source: rep.source }))}</div>` : ""}
       ${rep.breakdown ? `<section class="yr-sec"><h3>${esc(rep.breakdown.title)}</h3>
         ${rep.breakdown.note ? `<p class="yr-note">${esc(rep.breakdown.note)}</p>` : ""}
         <div class="yr-bars">${barsHtml(rep.breakdown, expanded)}</div></section>` : ""}
-      ${modes.length ? `<section class="yr-sec"><h3>Leaderboards</h3>
+      ${modes.length ? `<section class="yr-sec"><h3>${esc(t("Leaderboards"))}</h3>
         <div class="yr-controls">
-          <div class="yr-tabs" role="tablist" aria-label="Areas">
-            <button role="tab" id="yr-tab-states" data-tab="states" aria-controls="yr-board" aria-selected="${tab === "states"}" tabindex="${tab === "states" ? 0 : -1}" ${hasStates ? "" : "disabled"}>Voivodeships</button>
-            <button role="tab" id="yr-tab-metros" data-tab="metros" aria-controls="yr-board" aria-selected="${tab === "metros"}" tabindex="${tab === "metros" ? 0 : -1}" ${hasMetros ? "" : "disabled"}>Towns</button>
+          <div class="yr-tabs" role="tablist" aria-label="${esc(t("Areas"))}">
+            <button role="tab" id="yr-tab-states" data-tab="states" aria-controls="yr-board" aria-selected="${tab === "states"}" tabindex="${tab === "states" ? 0 : -1}" ${hasStates ? "" : "disabled"}>${esc(t("Voivodeships"))}</button>
+            <button role="tab" id="yr-tab-metros" data-tab="metros" aria-controls="yr-board" aria-selected="${tab === "metros"}" tabindex="${tab === "metros" ? 0 : -1}" ${hasMetros ? "" : "disabled"}>${esc(t("Towns"))}</button>
           </div>
-          ${modes.length > 1 ? `<div class="yr-modes" role="group" aria-label="Ranking">${modes
+          ${modes.length > 1 ? `<div class="yr-modes" role="group" aria-label="${esc(t("Ranking"))}">${modes
             .map((x) => `<button data-mode="${x.id}" aria-pressed="${x.id === mode}">${esc(x.label)}</button>`).join("")}</div>` : ""}
         </div>
         <p class="yr-note yr-hint">${esc(hintText(m))}</p>
         <div id="yr-board" role="tabpanel" aria-labelledby="yr-tab-${tab}">${boardHtml(m?.[tab])}</div></section>` : ""}
-      ${rep.lens ? `<div class="yr-foot"><p class="yr-note yr-lens-note">Related measure, not this total: ${esc(rep.lens.unit || rep.lens.name)}${rep.lens.vintage ? ` (${esc(rep.lens.vintage)})` : ""}.</p>
-        <button class="btn yr-lens" data-lens="${esc(rep.lens.id)}">${icon("layers", "🗺️", { size: 14 })}Related map: ${esc(rep.lens.name)} lens</button></div>` : ""}
+      ${rep.lens ? `<div class="yr-foot"><p class="yr-note yr-lens-note">${esc(t("Related measure, not this total: {measure}.", { measure: (rep.lens.unit || rep.lens.name) + (rep.lens.vintage ? ` (${rep.lens.vintage})` : "") }))}</p>
+        <button class="btn yr-lens" data-lens="${esc(rep.lens.id)}">${icon("layers", "🗺️", { size: 14 })}${esc(t("Related map: {lens} lens", { lens: rep.lens.name }))}</button></div>` : ""}
       ${advisorButtons(rep.key)}`;
   }
 
@@ -433,7 +452,7 @@ export function initYieldReports(opts) {
     const list = advisorApp() ? ADVISOR_FOR[key] || [] : [];
     if (!list.length) return "";
     return `<div class="yr-foot yr-adv">${list.map((a) => `<button class="btn yr-advisor" data-advisor="${esc(a.id)}"${a.industry ? ` data-industry="${esc(a.industry)}"` : ""}
-      title="Open the ${esc(a.label.replace(/ \(.*\)$/, ""))} advisor: charts, tables and the map linked together">${icon("g-people", "👥", { size: 14 })}Open advisor: ${esc(a.label)}</button>`).join("")}</div>`;
+      title="${esc(t("Open the {advisor} advisor: charts, tables and the map linked together", { advisor: a.label.replace(/ \(.*\)$/, "") }))}">${icon("g-people", "👥", { size: 14 })}${esc(t("Open advisor: {advisor}", { advisor: a.label }))}</button>`).join("")}</div>`;
   }
 
   // The ranking's hint, plus (on the States tab) which states are ranked.
@@ -501,41 +520,41 @@ export function initYieldReports(opts) {
   });
 
   pop.addEventListener("click", (e) => {
-    const t = e.target.closest("button");
-    if (!t || !current) return;
-    if (t.classList.contains("yr-close")) return close();
-    if (t.dataset.tab) {
-      tab = t.dataset.tab;
+    const btn = e.target.closest("button");
+    if (!btn || !current) return;
+    if (btn.classList.contains("yr-close")) return close();
+    if (btn.dataset.tab) {
+      tab = btn.dataset.tab;
       return renderBoard();
     }
-    if (t.dataset.mode) {
-      mode = t.dataset.mode;
+    if (btn.dataset.mode) {
+      mode = btn.dataset.mode;
       return renderBoard();
     }
-    if (t.hasAttribute("data-more")) {
+    if (btn.hasAttribute("data-more")) {
       expanded = !expanded;
       const bars = pop.querySelector(".yr-bars");
       if (bars) bars.innerHTML = barsHtml(current.rep.breakdown, expanded);
       pop.querySelector("[data-more]")?.focus();
       return;
     }
-    if (t.dataset.advisor) {
+    if (btn.dataset.advisor) {
       const app = advisorApp();
-      const params = { id: t.dataset.advisor, ...(t.dataset.industry ? { industry: t.dataset.industry } : {}) };
+      const params = { id: btn.dataset.advisor, ...(btn.dataset.industry ? { industry: btn.dataset.industry } : {}) };
       close(false);
       return app?.setMode("advisor", params);
     }
-    if (t.dataset.lens) {
-      const id = t.dataset.lens;
+    if (btn.dataset.lens) {
+      const id = btn.dataset.lens;
       close();
       return opts.onLens?.(id);
     }
-    if (t.dataset.kind === "state") {
+    if (btn.dataset.kind === "state") {
       close(false);
-      return opts.onState?.(Number(t.dataset.ref));
+      return opts.onState?.(Number(btn.dataset.ref));
     }
-    if (t.dataset.kind === "city") {
-      const city = cityById.get(t.dataset.ref);
+    if (btn.dataset.kind === "city") {
+      const city = cityById.get(btn.dataset.ref);
       if (!city) return close();
       close(false);
       return opts.onCity?.(city);
@@ -577,10 +596,10 @@ export function initYieldReports(opts) {
 
   // Tabs: arrow keys move between them (WAI-ARIA tabs pattern).
   pop.addEventListener("keydown", (e) => {
-    const t = e.target.closest?.("[role=tab]");
-    if (!t || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+    const el = e.target.closest?.("[role=tab]");
+    if (!el || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
     const tabs = [...pop.querySelectorAll("[role=tab]:not([disabled])")];
-    let i = tabs.indexOf(t);
+    let i = tabs.indexOf(el);
     if (i < 0 || tabs.length < 2) return;
     i = e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : (i + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
     e.preventDefault();

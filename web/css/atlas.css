@@ -54,6 +54,13 @@ a:hover { text-decoration-thickness: 2px; }
   border: 1px solid rgba(201, 164, 92, .6); border-radius: 4px; padding: 3px 10px; background: rgba(179, 38, 46, .55);
 }
 .bar-open:hover { background: rgba(179, 38, 46, .85); }
+.bar-open { margin-left: auto; }
+.bar .lang { display: flex; gap: 2px; font-family: var(--serif); font-size: 14px; }
+.bar .lang a {
+  color: #b9ab88; text-decoration: none; padding: 3px 7px; border-radius: 4px; border: 1px solid transparent;
+}
+.bar .lang a:hover { color: var(--gold-bright); }
+.bar .lang a[aria-current] { color: var(--gold-bright); border-color: rgba(201, 164, 92, .6); }
 
 main { max-width: 860px; margin: 0 auto; padding: 8px 16px 32px; }
 .crumbs ol { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; font-size: 14px; color: var(--ink-dim); }
@@ -111,4 +118,6 @@ footer a { color: var(--ink-dim); }
   .figures th, .figures td { border-bottom: none; padding: 5px 4px; }
   .figures .w { grid-column: 1 / -1; padding: 0 4px 6px; }
   .bar-open { font-size: 14px; padding: 3px 8px; }
+  .bar { gap: 8px; padding: 8px 12px; }
+  .bar .lang a { padding: 3px 5px; }
 }

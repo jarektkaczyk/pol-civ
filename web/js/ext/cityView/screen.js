@@ -3,27 +3,28 @@
 // Plain HTML strings + inline SVG charts; render(el, model, handlers) fills `el`. The citizens and districts files
 // load on demand (h.loadData) and fill their sections when they arrive.
 import { dollars, esc, int, pct } from "../../format.js";
-import { compact, money, popShort, yieldValue } from "./fmt.js";
+import { compact, money, popShort, yieldValue, fillHtml } from "./fmt.js";
+import { t, num } from "../../i18n.js";
 import { icon, glyph } from "../../ui/icon.js";
 import { css } from "../../color.js";
 import { isCapital } from "../../world.js";
 import { sparkline, meter, bar } from "./charts.js";
-import { popSeries, rankCount, resourceValue, LAND } from "./model.js";
+import { popSeries, rankCount, resourceValue, siteDetail, LAND } from "./model.js";
 import { citizensHtml, mountCitizens } from "./citizens.js";
 import { badgeHtml, cityDistricts, districtsHtml } from "./districts.js";
 
 const TABS = [
-  ["citizens", "Citizens", "pop"],
-  ["districts", "Districts", "l-developed"],
-  ["economy", "Economy", "y-gold"],
-  ["workforce", "Workforce", "y-production"],
-  ["resources", "Resources", "resources"],
-  ["compare", "Compare", "layers"],
+  ["citizens", t("Citizens"), "pop"],
+  ["districts", t("Districts"), "l-developed"],
+  ["economy", t("Economy"), "y-gold"],
+  ["workforce", t("Workforce"), "y-production"],
+  ["resources", t("Resources"), "resources"],
+  ["compare", t("Compare"), "layers"],
 ];
 
 const MINUS = "\u2212";
 const DASH = "\u2013";
-const signed = (g, d = 1) => (g == null ? DASH : `${g >= 0 ? "+" : MINUS}${Math.abs(g * 100).toFixed(d)}%`);
+const signed = (g, d = 1) => (g == null ? DASH : `${g >= 0 ? "+" : MINUS}${pct(Math.abs(g), d)}`);
 const rankCache = new WeakMap();
 function countOf(cities, key) {
   let m = rankCache.get(cities);
@@ -42,15 +43,16 @@ export function powiatOf(c) {
 function rankBadge(rank, of, label, tip) {
   if (rank == null) return "";
   const tier = rank <= 10 ? "gold" : rank <= 50 ? "silver" : "bronze";
-  return `<div class="cv-rank ${tier}" title="${esc(tip || `${label}: #${rank} of ${of} towns (1 = highest)`)}">
-    <span class="cv-medal">#${rank}</span><span class="cv-rank-l">${esc(label)}</span></div>`;
+  const title = tip || t.plural(of, { one: "{label}: #{rank} of {n} town (1 = highest)", other: "{label}: #{rank} of {n} towns (1 = highest)" }, { label, rank });
+  return `<div class="cv-rank ${tier}" title="${esc(title)}">
+    <span class="cv-medal">${esc(t("#{rank}", { rank }))}</span><span class="cv-rank-l">${esc(label)}</span></div>`;
 }
 
 function lqBadge(lq) {
   if (lq == null) return "";
-  const tip = `This share is ${lq.toFixed(2)} times Poland's share`;
+  const tip = t("This share is {lq} times Poland's share", { lq: num(lq, 2) });
   const cls = lq >= 1.25 ? "hi" : lq <= 0.75 ? "lo" : "mid";
-  return `<span class="cv-lq ${cls}" title="${esc(tip)}">\u00d7${lq.toFixed(1)}</span>`;
+  return `<span class="cv-lq ${cls}" title="${esc(tip)}">\u00d7${num(lq, 1)}</span>`;
 }
 
 function medallion(id, fallback, bg, size = 18) {
@@ -63,43 +65,47 @@ function header(m) {
   const cities = m.cityList;
   const col = css(m.stateRGB);
   const chips = m.states.map((s) => (s.index >= 0
-    ? `<button class="chip" data-state="${s.index}" title="Open ${esc(s.name)}">${esc(s.abbr)}</button>`
+    ? `<button class="chip" data-state="${s.index}" title="${esc(t("Open {name}", { name: s.name }))}">${esc(s.abbr)}</button>`
     : `<span class="chip">${esc(s.abbr)}</span>`)).join("");
   const g = Number.isFinite(c.growth) ? c.growth : null;
   const yrs = Array.isArray(c.growth_years) ? c.growth_years : null;
-  const growth = g == null ? "" : `<span class="cv-growth ${g >= 0 ? "good" : "bad"}" title="Population change${yrs ? ` ${yrs[0]}${DASH}${yrs[1]}` : ""}. Poland: ${signed(n.growth)}">${g >= 0 ? "\u25b2" : "\u25bc"} ${Math.abs(g * 100).toFixed(1)}%${yrs ? ` <small>since ${yrs[0]}</small>` : ""}</span>`;
+  const growthTip = yrs
+    ? t("Population change {from}\u2013{to}. Poland: {pl}", { from: String(yrs[0]), to: String(yrs[1]), pl: signed(n.growth) })
+    : t("Population change. Poland: {pl}", { pl: signed(n.growth) });
+  const growth = g == null ? "" : `<span class="cv-growth ${g >= 0 ? "good" : "bad"}" title="${esc(growthTip)}">${g >= 0 ? "\u25b2" : "\u25bc"} ${pct(Math.abs(g), 1)}${yrs ? ` <small>${esc(t("since {year}", { year: String(yrs[0]) }))}</small>` : ""}</span>`;
   const perCap = c.gdp != null && c.population ? c.gdp / c.population : null;
   const r = c.ranks || {};
   const N = (k) => countOf(cities, k);
+  const kind = c.kind === "city" ? t("City with powiat rights") : t("Town");
   return `
   <div class="sheet-grip cv-grip" aria-hidden="true"></div>
   <header class="cv-head" style="--sc:${col}">
     <div class="cv-ribbon" aria-hidden="true"></div>
-    <button class="icon-btn cv-close" data-close aria-label="Close the City View (Esc)" title="Back to the map (Esc)">${icon("close", "x", { size: 13 })}</button>
-    <div class="cv-kind">City View \u00b7 ${c.kind === "city" ? "City with powiat rights" : "Town"}</div>
+    <button class="icon-btn cv-close" data-close aria-label="${esc(t("Close the City View (Esc)"))}" title="${esc(t("Back to the map (Esc)"))}">${icon("close", "x", { size: 13 })}</button>
+    <div class="cv-kind">${esc(t("City View"))} \u00b7 ${esc(kind)}</div>
     <div class="cv-title">
       <div class="cv-crest" aria-hidden="true"><span>${esc(popShort(c.population))}</span></div>
       <div class="cv-tt">
-        <h2 class="cv-name" tabindex="-1">${isCapital(c) ? `<span class="cv-cap" title="Capital of Poland">\u2605</span> ` : ""}${esc(c.name)}</h2>
+        <h2 class="cv-name" tabindex="-1">${isCapital(c) ? `<span class="cv-cap" title="${esc(t("Capital of Poland"))}">\u2605</span> ` : ""}${esc(c.name)}</h2>
         <div class="cv-full">${esc(c.full || "")}</div>
         <div class="cv-typeslot" data-ctype></div>
         ${chips ? `<div class="chips">${chips}</div>` : ""}
       </div>
     </div>
     <div class="cv-headline">
-      <div class="cv-big"><span class="lbl">${icon("pop", "", { size: 13 })} Population</span><b>${int(c.population)}</b>${growth}</div>
-      <div class="cv-big"><span class="lbl">${icon("y-gold", "", { size: 13 })} GDP${c.gdp_year ? ` ${c.gdp_year}` : ""}</span><b>${money(c.gdp)}</b>${
-        perCap != null ? `<span class="cv-sub">${money(perCap)} per person</span>` : ""}</div>
+      <div class="cv-big"><span class="lbl">${icon("pop", "", { size: 13 })} ${esc(t("Population"))}</span><b>${int(c.population)}</b>${growth}</div>
+      <div class="cv-big"><span class="lbl">${icon("y-gold", "", { size: 13 })} ${esc(t("GDP"))}${c.gdp_year ? ` ${c.gdp_year}` : ""}</span><b>${money(c.gdp)}</b>${
+        perCap != null ? `<span class="cv-sub">${esc(t("{value} per person", { value: money(perCap) }))}</span>` : ""}</div>
     </div>
-    <div class="cv-ranks" aria-label="Ranks among ${cities.length} towns">
-      ${rankBadge(r.population, N("population"), "Population")}
-      ${rankBadge(r.gdp, N("gdp"), "GDP")}
-      ${rankBadge(r.gdp_per_capita, N("gdp_per_capita"), "GDP / person")}
-      ${rankBadge(r.growth, N("growth"), "Growth", r.growth != null ? `Growth: #${r.growth} of ${N("growth")} towns (1 = fastest growing)` : "")}
+    <div class="cv-ranks" aria-label="${esc(t.plural(cities.length, { one: "Ranks among {n} town", other: "Ranks among {n} towns" }))}">
+      ${rankBadge(r.population, N("population"), t("Population"))}
+      ${rankBadge(r.gdp, N("gdp"), t("GDP"))}
+      ${rankBadge(r.gdp_per_capita, N("gdp_per_capita"), t("GDP / person"))}
+      ${rankBadge(r.growth, N("growth"), t("Growth"), r.growth != null ? t.plural(N("growth"), { one: "Growth: #{rank} of {n} town (1 = fastest growing)", other: "Growth: #{rank} of {n} towns (1 = fastest growing)" }, { rank: r.growth }) : "")}
     </div>
   </header>
-  <nav class="cv-tabs" aria-label="City View sections">
-    ${TABS.map(([id, label, ic]) => `<button type="button" data-tab="${id}">${icon(ic, "", { size: 14 })}<span>${label}</span></button>`).join("")}
+  <nav class="cv-tabs" aria-label="${esc(t("City View sections"))}">
+    ${TABS.map(([id, label, ic]) => `<button type="button" data-tab="${id}">${icon(ic, "", { size: 14 })}<span>${esc(label)}</span></button>`).join("")}
   </nav>`;
 }
 
@@ -109,8 +115,9 @@ function citizens(m) {
   const series = popSeries(c);
   const ch = series.length >= 2 ? series.at(-1).value / series[0].value - 1 : null;
   const pw = powiatOf(c);
+  const poland = (v) => t("Poland {value}", { value: v });
   // sub: the small line beside the value; by default Poland's value, left out when there is none.
-  const row = (ic, label, v, pl, fmt, better, max, sub = pl != null ? `Poland ${fmt(pl)}` : "", tick = pl, tip = "") => `
+  const row = (ic, label, v, pl, fmt, better, max, sub = pl != null ? esc(poland(fmt(pl))) : "", tick = pl, tip = "") => `
     <div class="cv-stat"${tip ? ` title="${esc(tip)}"` : ""}>
       <div class="cv-stat-top"><span class="sl">${icon(ic, "", { size: 14 })}${esc(label)}</span>
         <span class="sv"><b>${v == null ? DASH : fmt(v)}</b>${sub ? `<small>${sub}</small>` : ""}</span></div>
@@ -120,27 +127,31 @@ function citizens(m) {
   const per100 = c.employed != null && c.population > 0 ? (c.employed / c.population) * 100 : null;
   const plPer100 = n.employed != null && n.population > 0 ? (n.employed / n.population) * 100 : null;
   const empSub = per100 == null ? ""
-    : `${Math.round(per100)} per 100 residents${plPer100 != null ? ` \u00b7 Poland ${Math.round(plPer100)}` : ""}`;
-  const powiatSub = (pl, fmt) => [pl != null ? `Poland ${fmt(pl)}` : "", pw ? esc(pw) : ""].filter(Boolean).join(" \u00b7 ");
+    : esc([t("{n} per 100 residents", { n: Math.round(per100) }), plPer100 != null ? poland(int(plPer100)) : ""].filter(Boolean).join(" \u00b7 "));
+  const powiatSub = (pl, fmt) => [pl != null ? esc(poland(fmt(pl))) : "", pw ? esc(pw) : ""].filter(Boolean).join(" \u00b7 ");
   const multi = m.tiles.length > 1;
   const tilesNote = multi
-    ? `On the map each hex of ${esc(c.name)} shows <b>about how many people live there</b> and its <b>main land use</b>.`
-    : `${esc(c.name)} fits inside one map hex (about ${compact(m.hexArea)} km\u00b2).`;
+    ? fillHtml(t("On the map each hex of {name} shows {people} and its {land}.", { name: c.name, people: "{people}", land: "{land}" }), {
+      people: `<b>${esc(t("about how many people live there"))}</b>`, land: `<b>${esc(t("main land use"))}</b>` })
+    : esc(t("{name} fits inside one map hex (about {area} km\u00b2).", { name: c.name, area: compact(m.hexArea) }));
+  const popHead = series.length
+    ? t("Population {from}\u2013{to}", { from: String(series[0].year), to: String(series.at(-1).year) })
+    : t("Population");
   return `
   <section class="cv-sec" id="cv-citizens" data-sec="citizens" aria-labelledby="cv-h-citizens">
-    <h3 id="cv-h-citizens">${icon("pop", "", { size: 15 })}Citizens</h3>
+    <h3 id="cv-h-citizens">${icon("pop", "", { size: 15 })}${esc(t("Citizens"))}</h3>
     <div class="cv-citizens" data-citizens>${citizensHtml(m, undefined)}</div>
-    <h4 class="cv-h4">Population</h4>
+    <h4 class="cv-h4">${esc(t("Population"))}</h4>
     <div class="cv-card">
-      <div class="cv-card-h"><span>Population ${series.length ? `${series[0].year}${DASH}${series.at(-1).year}` : ""}</span>${
+      <div class="cv-card-h"><span>${esc(popHead)}</span>${
         ch != null ? `<span class="${ch >= 0 ? "good" : "bad"}">${signed(ch)}</span>` : ""}</div>
-      ${sparkline(series, { fmt: (v) => popShort(v), title: `Population of ${c.name} by year` })}
+      ${sparkline(series, { fmt: (v) => popShort(v), title: t("Population of {name} by year", { name: c.name }) })}
     </div>
     <div class="cv-stats">
-      ${row("pop", "Workers", c.employed, null, int, null, c.population, empSub, plPer100 != null ? (plPer100 / 100) * c.population : null)}
-      ${row("unemployment", "Registered unemployment", c.unemployment, n.unemployment, (x) => pct(x), "low", undefined, powiatSub(n.unemployment, (x) => pct(x)))}
-      ${row("l-income", "Average gross wage / month", c.wage, n.wage, dollars, "high", undefined, powiatSub(n.wage, dollars))}
-      ${row("y-gold", "PIT revenue per resident", c.pit_per_person, n.pit_per_person, dollars, "high")}
+      ${row("pop", t("Workers"), c.employed, null, int, null, c.population, empSub, plPer100 != null ? (plPer100 / 100) * c.population : null)}
+      ${row("unemployment", t("Registered unemployment"), c.unemployment, n.unemployment, (x) => pct(x), "low", undefined, powiatSub(n.unemployment, (x) => pct(x)))}
+      ${row("l-income", t("Average gross wage / month"), c.wage, n.wage, dollars, "high", undefined, powiatSub(n.wage, dollars))}
+      ${row("y-gold", t("PIT revenue per resident"), c.pit_per_person, n.pit_per_person, dollars, "high")}
     </div>
     <div class="cv-legend-tiles">${tileLegend(m)}<p>${tilesNote}</p></div>
   </section>`;
@@ -148,7 +159,7 @@ function citizens(m) {
 
 function tileLegend(m) {
   const counts = new Map();
-  for (const t of m.tiles) if (t.land) counts.set(t.land.key, (counts.get(t.land.key) || 0) + 1);
+  for (const tile of m.tiles) if (tile.land) counts.set(tile.land.key, (counts.get(tile.land.key) || 0) + 1);
   return `<div class="cv-tl">${LAND.filter((g) => counts.has(g.key)).map((g) =>
     `<span class="cv-tl-i"><i style="background:${esc(m.landColor(g.key))}"></i>${esc(g.label)} <small>${counts.get(g.key)}</small></span>`).join("")}</div>`;
 }
@@ -157,7 +168,7 @@ function tileLegend(m) {
 function districts(m) {
   return `
   <section class="cv-sec" id="cv-districts" data-sec="districts" aria-labelledby="cv-h-districts">
-    <h3 id="cv-h-districts">${icon("l-developed", "", { size: 15 })}Districts</h3>
+    <h3 id="cv-h-districts">${icon("l-developed", "", { size: 15 })}${esc(t("Districts"))}</h3>
     <div data-districts>${districtsHtml(m, undefined, null)}</div>
   </section>`;
 }
@@ -172,23 +183,23 @@ function economy(m) {
   const yields = nat.yields.map((y) => {
     const v = c.yields?.[y.key];
     const rk = r[y.key];
-    return `<div class="cv-yield" style="--yc:${esc(y.color)}" title="${esc(y.label)}">
+    return `<div class="cv-yield" style="--yc:${esc(y.color)}" title="${esc(t(y.label))}">
       <div class="ico">${glyph(y, 20)}</div><div class="val">${v == null ? DASH : yieldValue(y, v)}</div>
-      <div class="lbl">${esc(y.key === "gold" ? "GDP" : y.label)}</div>
-      ${rk != null ? `<div class="rk">#${rk} <small>of ${countOf(cities, y.key)}</small></div>` : ""}</div>`;
+      <div class="lbl">${esc(y.key === "gold" ? t("GDP") : t(y.label))}</div>
+      ${rk != null ? `<div class="rk">${esc(t("#{rank}", { rank: rk }))} <small>${esc(t("of {n}", { n: countOf(cities, y.key) }))}</small></div>` : ""}</div>`;
   }).join("");
   const share = c.gdp != null && n.gdp ? c.gdp / n.gdp : null;
   return `
   <section class="cv-sec" id="cv-economy" data-sec="economy" aria-labelledby="cv-h-economy">
-    <h3 id="cv-h-economy">${icon("y-gold", "", { size: 15 })}Economy</h3>
+    <h3 id="cv-h-economy">${icon("y-gold", "", { size: 15 })}${esc(t("Economy"))}</h3>
     <div class="cv-gdp">
-      <div><span class="lbl">GDP${c.gdp_year ? ` (${c.gdp_year})` : ""}</span><b>${money(c.gdp)}</b>${r.gdp != null ? `<small>#${r.gdp} of ${countOf(cities, "gdp")}</small>` : ""}</div>
-      <div><span class="lbl">GDP per person</span><b>${money(perCap)}</b>${
-        plPerCap && perCap != null ? `<small class="${perCap >= plPerCap ? "good" : "bad"}">Poland ${money(plPerCap)}</small>` : ""}</div>
-      <div><span class="lbl">Share of Poland's GDP</span><b>${share != null ? pct(share, 2) : DASH}</b>${
-        c.population && n.population ? `<small>${pct(c.population / n.population, 2)} of people</small>` : ""}</div>
+      <div><span class="lbl">${esc(t("GDP"))}${c.gdp_year ? ` (${c.gdp_year})` : ""}</span><b>${money(c.gdp)}</b>${r.gdp != null ? `<small>${esc(t("#{rank} of {n}", { rank: r.gdp, n: countOf(cities, "gdp") }))}</small>` : ""}</div>
+      <div><span class="lbl">${esc(t("GDP per person"))}</span><b>${money(perCap)}</b>${
+        plPerCap && perCap != null ? `<small class="${perCap >= plPerCap ? "good" : "bad"}">${esc(t("Poland {value}", { value: money(plPerCap) }))}</small>` : ""}</div>
+      <div><span class="lbl">${esc(t("Share of Poland's GDP"))}</span><b>${share != null ? pct(share, 2) : DASH}</b>${
+        c.population && n.population ? `<small>${esc(t("{share} of people", { share: pct(c.population / n.population, 2) }))}</small>` : ""}</div>
     </div>
-    <h4 class="cv-h4">Yields <span class="muted">rank among towns</span></h4>
+    <h4 class="cv-h4">${esc(t("Yields"))} <span class="muted">${esc(t("rank among towns"))}</span></h4>
     <div class="cv-yields">${yields}</div>
   </section>`;
 }
@@ -198,44 +209,51 @@ function workforce(m) {
   const c = m.city;
   const cards = m.inds.map((d) => {
     const spec = d.lq != null && d.lq >= 1.25;
-    return `<div class="cv-bld${spec ? " spec" : ""}" title="${esc(d.label)}: ${int(d.jobs)} workers (${pct(d.share)}; Poland ${pct(d.natShare)})">
+    const count = t.plural(d.jobs, { one: "{n} worker", other: "{n} workers" }, { n: int(d.jobs) });
+    const tip = t("{label}: {count} ({share}; Poland {pl})", { label: d.label, count, share: pct(d.share), pl: pct(d.natShare) });
+    return `<div class="cv-bld${spec ? " spec" : ""}" title="${esc(tip)}">
       ${medallion(d.icon, "", d.color, 17)}
       <div class="cv-bld-t"><span class="cv-bld-n">${esc(d.short)}</span>
         <span class="cv-bld-v">${compact(d.jobs)} <small>${pct(d.share, 1)}</small></span></div>
       ${lqBadge(d.lq)}
     </div>`;
   }).join("");
+  const mark = `<span class="cv-lq hi">\u00d7N</span>`;
   const lead = m.indsBySection
-    ? `${esc(c.name)}'s ${int(c.employed)} workers by industry. <span class="cv-lq hi">\u00d7N</span> compares an industry's share with Poland's.`
-    : `${esc(c.name)}'s ${int(c.employed)} workers by yield. <span class="cv-lq hi">\u00d7N</span> compares a share with Poland's.`;
+    ? fillHtml(t("{name}'s {n} workers by industry. {mark} compares an industry's share with Poland's.", { name: c.name, n: int(c.employed), mark: "{mark}" }), { mark })
+    : fillHtml(t("{name}'s {n} workers by yield. {mark} compares a share with Poland's.", { name: c.name, n: int(c.employed), mark: "{mark}" }), { mark });
   return `
   <section class="cv-sec" id="cv-workforce" data-sec="workforce" aria-labelledby="cv-h-workforce">
-    <h3 id="cv-h-workforce">${icon("y-production", "", { size: 15 })}Workforce</h3>
+    <h3 id="cv-h-workforce">${icon("y-production", "", { size: 15 })}${esc(t("Workforce"))}</h3>
     ${m.inds.length ? `<p class="cv-lead">${lead}</p>` : ""}
-    <div class="cv-blds">${cards || `<p class="muted cv-note">No workforce figures for ${esc(c.name)}.</p>`}</div>
+    <div class="cv-blds">${cards || `<p class="muted cv-note">${esc(t("No workforce figures for {name}.", { name: c.name }))}</p>`}</div>
   </section>`;
 }
 
 // --- resources -----------------------------------------------------------------------------------------------------
 function resources(m) {
   const list = m.sites.map((s, k) => {
-    const t = s.type;
-    const val = resourceValue(s.item, t, compact);
-    return `<button type="button" class="cv-site" data-site="${k}" title="Fly to ${esc(s.item.name)}">
-      <span class="cv-med" style="--bg:${esc(t?.color || "#3a4a5e")}">${glyph(t, 16)}</span>
-      <span class="cv-site-t"><b>${esc(s.item.name)}</b><small>${esc(t?.name || s.item.type)}${s.item.state ? ` \u00b7 ${esc(s.item.state)}` : ""}</small>
-        ${s.item.detail ? `<small class="cv-site-d">${esc(s.item.detail)}</small>` : ""}</span>
+    const ty = s.type;
+    const val = resourceValue(s.item, ty, compact);
+    const detail = siteDetail(s.item);
+    return `<button type="button" class="cv-site" data-site="${k}" title="${esc(t("Fly to {name}", { name: s.item.name }))}">
+      <span class="cv-med" style="--bg:${esc(ty?.color || "#3a4a5e")}">${glyph(ty, 16)}</span>
+      <span class="cv-site-t"><b>${esc(s.item.name)}</b><small>${esc(ty?.name ? t(ty.name) : s.item.type)}${s.item.state ? ` \u00b7 ${esc(s.item.state)}` : ""}</small>
+        ${detail ? `<small class="cv-site-d">${esc(detail)}</small>` : ""}</span>
       <span class="cv-site-v">${esc(val)}</span>
     </button>`;
   }).join("");
   const mw = m.sites.filter((s) => s.type?.unit === "MW").reduce((a, s) => a + (s.item.value || 0), 0);
-  const summary = m.sites.length
-    ? `<p class="cv-lead">${m.sites.length} mapped site${m.sites.length === 1 ? "" : "s"}${
-      mw ? ` \u00b7 ${mw >= 1000 ? `${(mw / 1000).toFixed(1)} GW` : `${Math.round(mw)} MW`} of generating capacity` : ""}. Click one to fly there.</p>`
-    : `<p class="muted cv-note">No mapped resource sites in ${esc(m.city.name)}.</p>`;
+  const n = m.sites.length;
+  const cap = mw >= 1000 ? `${num(mw / 1000, 1)} GW` : `${int(mw)} MW`;
+  const summary = n
+    ? `<p class="cv-lead">${esc(mw
+      ? t.plural(n, { one: "{n} mapped site \u00b7 {cap} of generating capacity. Click one to fly there.", other: "{n} mapped sites \u00b7 {cap} of generating capacity. Click one to fly there." }, { cap })
+      : t.plural(n, { one: "{n} mapped site. Click one to fly there.", other: "{n} mapped sites. Click one to fly there." }))}</p>`
+    : `<p class="muted cv-note">${esc(t("No mapped resource sites in {name}.", { name: m.city.name }))}</p>`;
   return `
   <section class="cv-sec" id="cv-resources" data-sec="resources" aria-labelledby="cv-h-resources">
-    <h3 id="cv-h-resources">${icon("resources", "", { size: 15 })}Resources</h3>
+    <h3 id="cv-h-resources">${icon("resources", "", { size: 15 })}${esc(t("Resources"))}</h3>
     ${summary}
     <div class="cv-sites">${list}</div>
   </section>`;
@@ -244,16 +262,16 @@ function resources(m) {
 // --- compare -------------------------------------------------------------------------------------------------------
 const COMPARE = {
   size: [
-    ["Population", (c) => c.population, (v) => popShort(v)],
-    ["GDP / person", (c) => (c.gdp != null && c.population ? c.gdp / c.population : null), money],
-    ["Wage", (c) => c.wage, money],
-    ["Growth", (c) => (Number.isFinite(c.growth) ? c.growth : null), (v) => signed(v)],
+    [t("Population"), (c) => c.population, (v) => popShort(v)],
+    [t("GDP / person"), (c) => (c.gdp != null && c.population ? c.gdp / c.population : null), money],
+    [t("Wage"), (c) => c.wage, money],
+    [t("Growth"), (c) => (Number.isFinite(c.growth) ? c.growth : null), (v) => signed(v)],
   ],
   work: [
-    ["Workers", (c) => c.employed, compact],
-    ["Jobless", (c) => c.unemployment, (v) => pct(v)],
-    ["PIT / person", (c) => c.pit_per_person, money],
-    ["Wage", (c) => c.wage, money],
+    [t("Workers"), (c) => c.employed, compact],
+    [t("Jobless"), (c) => c.unemployment, (v) => pct(v)],
+    [t("PIT / person"), (c) => c.pit_per_person, money],
+    [t("Wage"), (c) => c.wage, money],
   ],
 };
 
@@ -261,10 +279,10 @@ export function compareTable(m, set = "size") {
   const rows = [m.city, ...m.peers];
   const cols = COMPARE[set] || COMPARE.size;
   const max = cols.map(([, f]) => Math.max(...rows.map((c) => Math.abs(f(c) ?? 0))) || 1);
-  return `<div class="cv-cmp" role="table" aria-label="${esc(m.city.name)} and its peers">
-    <div class="cv-cmp-r cv-cmp-h" role="row"><span role="columnheader">Town</span>${cols.map(([l]) => `<span role="columnheader">${esc(l)}</span>`).join("")}</div>
+  return `<div class="cv-cmp" role="table" aria-label="${esc(t("{name} and its peers", { name: m.city.name }))}">
+    <div class="cv-cmp-r cv-cmp-h" role="row"><span role="columnheader">${esc(t("Town"))}</span>${cols.map(([l]) => `<span role="columnheader">${esc(l)}</span>`).join("")}</div>
     ${rows.map((c, k) => `<div class="cv-cmp-r${k === 0 ? " me" : ""}" role="row">
-      <span role="cell">${k === 0 ? `<b class="cv-cmp-n">${esc(c.name)}</b>` : `<button type="button" class="cv-cmp-n" data-peer="${esc(c.id)}" title="Open ${esc(c.full || c.name)} in the City View">${esc(c.name)}</button>`}<small>${esc((c.states || []).join(" "))}</small></span>
+      <span role="cell">${k === 0 ? `<b class="cv-cmp-n">${esc(c.name)}</b>` : `<button type="button" class="cv-cmp-n" data-peer="${esc(c.id)}" title="${esc(t("Open {name} in the City View", { name: c.full || c.name }))}">${esc(c.name)}</button>`}<small>${esc((c.states || []).join(" "))}</small></span>
       ${cols.map(([, f, fmt], j) => {
         const v = f(c);
         const col = v != null && v < 0 ? "#f08a6a" : k === 0 ? "#ecd08e" : "#8fa6bd";
@@ -278,19 +296,20 @@ function compare(m) {
   const n = m.peers.length;
   return `
   <section class="cv-sec" id="cv-compare" data-sec="compare" aria-labelledby="cv-h-compare">
-    <h3 id="cv-h-compare">${icon("layers", "", { size: 15 })}Compare</h3>
-    ${n ? `<p class="cv-lead">The ${n} town${n === 1 ? "" : "s"} closest in population. Click one to open it.</p>
-    <div class="cv-seg" role="group" aria-label="Metrics">
-      <button type="button" data-set="size" aria-pressed="true">Size &amp; wealth</button>
-      <button type="button" data-set="work" aria-pressed="false">Work &amp; income</button>
+    <h3 id="cv-h-compare">${icon("layers", "", { size: 15 })}${esc(t("Compare"))}</h3>
+    ${n ? `<p class="cv-lead">${esc(t.plural(n, { one: "The {n} town closest in population. Click one to open it.", other: "The {n} towns closest in population. Click one to open it." }))}</p>
+    <div class="cv-seg" role="group" aria-label="${esc(t("Metrics"))}">
+      <button type="button" data-set="size" aria-pressed="true">${esc(t("Size & wealth"))}</button>
+      <button type="button" data-set="work" aria-pressed="false">${esc(t("Work & income"))}</button>
     </div>` : ""}
     <div data-compare>${compareTable(m, "size")}</div>
   </section>`;
 }
 
 function footer(m) {
-  return `<div class="cv-foot">Ranks are among all ${int(m.cityList.length)} towns on the map.
-    <a href="#" data-pedia>Almanac</a></div>`;
+  const n = m.cityList.length;
+  return `<div class="cv-foot">${esc(t.plural(n, { one: "Ranks are among all {n} town on the map.", other: "Ranks are among all {n} towns on the map." }))}
+    <a href="#" data-pedia>${esc(t("Almanac"))}</a></div>`;
 }
 
 /**
@@ -315,9 +334,9 @@ export function goToSection(el, id) {
   const stop = () => {
     ro?.disconnect();
     ro = null;
-    for (const t of ["wheel", "touchstart", "keydown", "pointerdown"]) el.removeEventListener(t, stop);
+    for (const ev of ["wheel", "touchstart", "keydown", "pointerdown"]) el.removeEventListener(ev, stop);
   };
-  for (const t of ["wheel", "touchstart", "keydown", "pointerdown"]) el.addEventListener(t, stop, { passive: true });
+  for (const ev of ["wheel", "touchstart", "keydown", "pointerdown"]) el.addEventListener(ev, stop, { passive: true });
   if (typeof ResizeObserver === "function") {
     ro = new ResizeObserver(() => { if (sec.isConnected) align(); else stop(); });
     for (const c of el.children) ro.observe(c);
@@ -358,8 +377,8 @@ export function render(el, m, h) {
   // Tabs scroll to their section; the active tab follows the scroll position.
   const nav = el.querySelector(".cv-tabs");
   const tabs = [...el.querySelectorAll("[data-tab]")];
-  const secs = tabs.map((t) => el.querySelector(`[data-sec="${t.dataset.tab}"]`));
-  tabs.forEach((t, k) => (t.onclick = () => {
+  const secs = tabs.map((tb) => el.querySelector(`[data-sec="${tb.dataset.tab}"]`));
+  tabs.forEach((tb, k) => (tb.onclick = () => {
     const top = secs[k].offsetTop - nav.offsetHeight - 4;
     el.scrollTo({ top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }));
@@ -368,7 +387,7 @@ export function render(el, m, h) {
     let k = 0;
     secs.forEach((s, j) => { if (s.offsetTop <= y) k = j; });
     if (el.scrollTop + el.clientHeight >= el.scrollHeight - 4) k = secs.length - 1;
-    tabs.forEach((t, j) => t.classList.toggle("on", j === k));
+    tabs.forEach((tb, j) => tb.classList.toggle("on", j === k));
   };
   el.onscroll = spy;
   spy();

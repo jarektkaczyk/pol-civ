@@ -5,6 +5,7 @@ from pipeline.sources.pl_stats_prosperity import (
     build_income_table,
     build_property_tables,
     build_tourism_table,
+    positive_price,
 )
 
 
@@ -54,6 +55,10 @@ class PlStatsProsperityTest(unittest.TestCase):
         self.assertIsNone(row["average_dwelling_price_m2"])
         self.assertEqual(104.9, row["dwelling_price_index_2024_100"])
         self.assertEqual(216.8, row["dwelling_price_index_2015_100"])
+
+    def test_zero_transaction_price_stays_null(self):
+        self.assertIsNone(positive_price(0))
+        self.assertEqual(14561, positive_price(14561))
 
 
 if __name__ == "__main__":

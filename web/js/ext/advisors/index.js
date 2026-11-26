@@ -12,27 +12,28 @@ import { emblem } from "./core/emblems.js";
 import { frameNation } from "./core/frame.js";
 import { esc, el } from "./core/util.js";
 import { icon } from "../../ui/icon.js";
+import { t } from "../../i18n.js";
 
 export const ADVISORS = [
-  { id: "energy", name: "Żupnik", role: "Keeper of the Salt Mines and Power", color: "#d98a2b", dark: "#3a1f08", blurb: "Where the power comes from, and what lies underground.", load: () => import("./views/energy.js") },
-  { id: "economy", name: "Podskarbi", role: "Treasurer", color: "#c9a43a", dark: "#3a2c08", blurb: "Who makes what: output by industry and the regions that lead it.", load: () => import("./views/economy.js") },
-  { id: "people", name: "Lustrator", role: "Keeper of the Census", color: "#c46a4f", dark: "#3a140c", blurb: "Where people live, where they are moving, how old and how new.", load: () => import("./views/people.js") },
-  { id: "prosperity", name: "Ochmistrz", role: "Steward", color: "#3f9c82", dark: "#082a22", blurb: "Wages, work, homes and who is being left behind.", load: () => import("./views/prosperity.js") },
-  { id: "knowledge", name: "Rektor", role: "Royal Scholar", color: "#4a86d6", dark: "#0a1c3a", blurb: "Schooling, universities and the science workforce.", load: () => import("./views/knowledge.js") },
-  { id: "land", name: "Geometra", role: "Royal Surveyor", color: "#6e9a3c", dark: "#18280a", blurb: "Forest, farmland, lakes and towns: what covers the country.", load: () => import("./views/land.js") },
-  { id: "military", name: "Hetman", role: "Commander of the Army", color: "#8796ab", dark: "#141b26", blurb: "Garrisons, training grounds, troops and defence spending.", load: () => import("./views/military.js") },
-  { id: "commerce", name: "Gdańsk Merchant", role: "Master of Trade", color: "#2fa4b8", dark: "#062630", blurb: "The great freight routes, and the busiest ports and airports.", load: () => import("./views/commerce.js") },
-  { id: "culture", name: "Kustosz", role: "Keeper of Heritage", color: "#c25b9a", dark: "#2e0c22", blurb: "Heritage sites and landmarks, faith and wellbeing, and the disasters places endure.", load: () => import("./views/culture.js") },
-  { id: "explorer", name: "Kartograf", role: "Cartographer", color: "#9a7bc9", dark: "#1e1236", blurb: "Slice and dice every number: any level, any columns, any chart.", load: () => import("./views/explorer.js") },
+  { id: "energy", name: "Żupnik", role: t("Energy and resources"), color: "#d98a2b", dark: "#3a1f08", blurb: t("Where the power comes from, and what lies underground."), load: () => import("./views/energy.js") },
+  { id: "economy", name: "Podskarbi", role: t("Economy"), color: "#c9a43a", dark: "#3a2c08", blurb: t("Who makes what: output by industry and the regions that lead it."), load: () => import("./views/economy.js") },
+  { id: "people", name: "Lustrator", role: t("Population"), color: "#c46a4f", dark: "#3a140c", blurb: t("Where people live, where they are moving, how old and how new."), load: () => import("./views/people.js") },
+  { id: "prosperity", name: "Ochmistrz", role: t("Prosperity and housing"), color: "#3f9c82", dark: "#082a22", blurb: t("Wages, work, homes and who is being left behind."), load: () => import("./views/prosperity.js") },
+  { id: "knowledge", name: "Rektor", role: t("Knowledge"), color: "#4a86d6", dark: "#0a1c3a", blurb: t("Schooling, universities and the science workforce."), load: () => import("./views/knowledge.js") },
+  { id: "land", name: "Geometra", role: t("Land"), color: "#6e9a3c", dark: "#18280a", blurb: t("Forest, farmland, lakes and towns: what covers the country."), load: () => import("./views/land.js") },
+  { id: "military", name: "Hetman", role: t("Military"), color: "#8796ab", dark: "#141b26", blurb: t("Garrisons, training grounds, troops and defence spending."), load: () => import("./views/military.js") },
+  { id: "commerce", name: t("Gdańsk Merchant"), role: t("Commerce"), color: "#2fa4b8", dark: "#062630", blurb: t("The great freight routes, and the busiest ports and airports."), load: () => import("./views/commerce.js") },
+  { id: "culture", name: "Kustosz", role: t("Culture"), color: "#c25b9a", dark: "#2e0c22", blurb: t("Heritage sites and landmarks, faith and wellbeing, and the disasters places endure."), load: () => import("./views/culture.js") },
+  { id: "explorer", name: "Kartograf", role: t("Data explorer"), color: "#9a7bc9", dark: "#1e1236", blurb: t("Slice and dice every number: any level, any columns, any chart."), load: () => import("./views/explorer.js") },
 ];
 const byId = new Map(ADVISORS.map((a) => [a.id, a]));
 // The council picker groups its advisors (any advisor not listed here is added to the last group).
 const COUNCIL = (() => {
   const g = [
-    { label: "Wealth and work", ids: ["economy", "prosperity", "commerce", "energy"] },
-    { label: "People and land", ids: ["people", "knowledge", "culture", "land"] },
-    { label: "Defence", ids: ["military"] },
-    { label: "Your own questions", ids: ["explorer"] },
+    { label: t("Wealth and work"), ids: ["economy", "prosperity", "commerce", "energy"] },
+    { label: t("People and land"), ids: ["people", "knowledge", "culture", "land"] },
+    { label: t("Defence"), ids: ["military"] },
+    { label: t("Your own questions"), ids: ["explorer"] },
   ];
   const listed = new Set(g.flatMap((x) => x.ids));
   g[g.length - 1].ids.push(...ADVISORS.filter((a) => !listed.has(a.id)).map((a) => a.id));
@@ -69,18 +70,18 @@ export function install(app) {
 
   // --- top-bar button ---------------------------------------------------------------------------------------------
   const btn = app.ui.addTopButton({
-    id: "btn-advisors", icon: "g-people", label: "Advisors", title: "Advisors: explore the data behind the map",
+    id: "btn-advisors", icon: "g-people", label: t("Advisors"), title: t("Advisors: explore the data behind the map"),
     onClick: () => (app.mode === "advisor" ? app.setMode(null) : app.setMode("advisor", { id: lastId })),
   });
   if (btn) {
-    btn.innerHTML = `<svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.5 3 7v2h18V7z" fill="currentColor"/><path d="M5 10.5h2.6v7H5zM10.7 10.5h2.6v7h-2.6zM16.4 10.5H19v7h-2.6zM3.5 19h17v2.5h-17z" fill="currentColor"/></svg><span class="lbl">Advisors</span>`;
+    btn.innerHTML = `<svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.5 3 7v2h18V7z" fill="currentColor"/><path d="M5 10.5h2.6v7H5zM10.7 10.5h2.6v7h-2.6zM16.4 10.5H19v7h-2.6zM3.5 19h17v2.5h-17z" fill="currentColor"/></svg><span class="lbl">${esc(t("Advisors"))}</span>`;
     btn.setAttribute("aria-pressed", "false");
   }
   app.on("mode", ({ name }) => btn?.setAttribute("aria-pressed", String(name === "advisor")));
 
   // --- dock shell -------------------------------------------------------------------------------------------------
   function shell() {
-    dock = app.ui.dock("left", { width: dockW(), label: "Advisors" });
+    dock = app.ui.dock("left", { width: dockW(), label: t("Advisors") });
     if (dock.querySelector(".adv-root")) return dock.querySelector(".adv-root");
     dock.innerHTML = "";
     dock.classList.add("adv-dock");
@@ -88,19 +89,19 @@ export function install(app) {
     root.innerHTML = `
       <div class="adv-grip" aria-hidden="true"></div>
       <header class="adv-head">
-        <button type="button" class="adv-council-btn" data-adv="council" title="All advisors">${icon("g-people", "👥", { size: 14 })}<span>Council</span></button>
-        <nav class="adv-tabs" role="tablist" aria-label="Advisors">${ADVISORS.map((a) => `<button type="button" role="tab" data-adv="${a.id}" aria-selected="false" title="${esc(`${a.name}: ${a.role}`)}" style="--adv:${a.color}">${emblem(a, 30)}<span class="sr-only">${esc(a.name)}</span></button>`).join("")}</nav>
-        <button type="button" class="icon-btn adv-close" aria-label="Close the advisors (Esc)" title="Close (Esc)">${icon("close", "\u2715", { size: 12 })}</button>
+        <button type="button" class="adv-council-btn" data-adv="council" title="${esc(t("All advisors"))}">${icon("g-people", "👥", { size: 14 })}<span>${esc(t("Council"))}</span></button>
+        <nav class="adv-tabs" role="tablist" aria-label="${esc(t("Advisors"))}">${ADVISORS.map((a) => `<button type="button" role="tab" data-adv="${a.id}" aria-selected="false" title="${esc(`${a.name}: ${a.role}`)}" style="--adv:${a.color}">${emblem(a, 30)}<span class="sr-only">${esc(a.name)}</span></button>`).join("")}</nav>
+        <button type="button" class="icon-btn adv-close" aria-label="${esc(t("Close the advisors (Esc)"))}" title="${esc(t("Close (Esc)"))}">${icon("close", "\u2715", { size: 12 })}</button>
       </header>
       <div class="adv-main" tabindex="-1"></div>`;
     dock.appendChild(root);
     root.addEventListener("click", (e) => {
-      const t = e.target.closest("button");
-      if (!t) return;
-      if (t.classList.contains("adv-close")) return app.setMode(null);
-      if (t.dataset.adv) return switchTo(t.dataset.adv === "council" ? null : t.dataset.adv);
-      if (t.dataset.pedia) return app.pedia?.open?.(t.dataset.pedia);
-      if (t.hasAttribute("data-frame")) return link.frame() || frameNation(app);
+      const b = e.target.closest("button");
+      if (!b) return;
+      if (b.classList.contains("adv-close")) return app.setMode(null);
+      if (b.dataset.adv) return switchTo(b.dataset.adv === "council" ? null : b.dataset.adv);
+      if (b.dataset.pedia) return app.pedia?.open?.(b.dataset.pedia);
+      if (b.hasAttribute("data-frame")) return link.frame() || frameNation(app);
     });
     root.querySelector(".adv-tabs").addEventListener("keydown", (e) => {
       if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
@@ -164,13 +165,13 @@ export function install(app) {
       main.querySelectorAll(".adv-card").forEach((c) => c.addEventListener("click", () => switchTo(c.dataset.adv)));
       return;
     }
-    main.innerHTML = `${titleHtml(adv)}<div class="adv-body"><div class="adv-loading">${esc(adv.name)} is gathering the figures...</div></div>`;
+    main.innerHTML = `${titleHtml(adv)}<div class="adv-body"><div class="adv-loading">${esc(t("{name} is gathering the figures...", { name: adv.name }))}</div></div>`;
     let mod;
     try {
       [mod] = await Promise.all([adv.load(), ensureData()]);
     } catch (err) {
       console.error(err);
-      if (my === token) main.querySelector(".adv-body").innerHTML = `<p class="adv-empty pad">This advisor could not load (${esc(err.message || err)}).</p>`;
+      if (my === token) main.querySelector(".adv-body").innerHTML = `<p class="adv-empty pad">${esc(t("This advisor could not load ({error}).", { error: String(err.message || err) }))}</p>`;
       return;
     }
     if (my !== token || app.mode !== "advisor") return;
@@ -218,7 +219,7 @@ export function install(app) {
       a.api = (await mod.mount(ctx)) || {};
     } catch (err) {
       console.error(`advisor "${adv.id}" failed`, err);
-      body.insertAdjacentHTML("beforeend", `<p class="adv-empty pad">Something went wrong drawing this advisor.</p>`);
+      body.insertAdjacentHTML("beforeend", `<p class="adv-empty pad">${esc(t("Something went wrong drawing this advisor."))}</p>`);
       a.api = {};
     }
     loading?.remove();
@@ -244,8 +245,8 @@ export function install(app) {
   }
 
   function councilHtml() {
-    return `<div class="adv-title council"><div class="adv-titles"><h2>Advisors</h2><div class="adv-role">Your council</div>
-      <p>Each advisor keeps one ledger of the country. Hover a figure to find it on the map, hover the map to find it in the charts, click to look closer.</p></div></div>
+    return `<div class="adv-title council"><div class="adv-titles"><h2>${esc(t("Advisors"))}</h2><div class="adv-role">${esc(t("Your council"))}</div>
+      <p>${esc(t("Each advisor keeps one ledger of the country. Hover a figure to find it on the map, hover the map to find it in the charts, click to look closer."))}</p></div></div>
       ${COUNCIL.map((g) => `<h4 class="adv-council-h">${esc(g.label)}</h4><div class="adv-council">${g.ids.map((id) => byId.get(id)).filter(Boolean).map((a) => `<button type="button" class="adv-card" data-adv="${a.id}" style="--adv:${a.color}">
         ${emblem(a, 48)}<span class="t"><b>${esc(a.name)}</b><span class="r">${esc(a.role)}</span><span class="d">${esc(a.blurb)}</span></span></button>`).join("")}</div>`).join("")}`;
   }

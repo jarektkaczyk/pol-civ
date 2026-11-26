@@ -16,11 +16,14 @@ from ..core.hexgrid import HexGrid
 from ..core.store import load_interim, write_web
 from .counties import FLOOD_CATS, LEVEL_TEXT, METRIC, SEJM, SEJM_COLORS, Metrics, description, projection
 from .plstats import Stats, Units, cell_weights, optional, spread, unsampled_cells
+from .lenses_more_a import LENSES_A, lens_values
 from .yields import Economy
+from .lenses_more_b import REQUIRES_B, lenses_b  # identity, commuting and EU funds lenses (lenses_more_b.py)
 
 REQUIRES = ["_world", "pl_geo_teryt", "pl_geo_lau", "pl_geo_fua", "pl_stats_population", "pl_stats_labour", "pl_stats_prosperity",
             "pl_gdp", "pl_foreigners", "pl_census_2021", "pl_soc_elections", "pl_soc_faith", "pl_soc_air",
-            "pl_soc_health", "pl_soc_universities", "pl_soc_disasters"]
+            "pl_soc_health", "pl_soc_universities", "pl_soc_disasters", "pl_more_gus", "pl_more_exams",
+            "pl_more_finance"] + REQUIRES_B
 PRODUCES = ["lenses.json"]
 
 GROUPS = [
@@ -84,6 +87,7 @@ LENSES = [
     ("pm25", "pm25", "l-air", "🌫️", "smog", "linear", {}),
     ("flood", "flood_2024", "l-disasters", "🌊", None, "linear", {}),
 ]
+LENSES = [lens for lens in LENSES if lens[0] not in {more[0] for more in LENSES_A}] + LENSES_A
 NOTES = {
     "ukrainians": "Counts where the PESEL UKR number was issued, not where people live now.",
     "income": "Follows the taxable income of residents.",
@@ -91,11 +95,11 @@ NOTES = {
     "doctors": "Counted at the hospital or clinic, so city powiats rank high.",
     "catholic": "The census question was voluntary: about a fifth of residents did not answer.",
     "no_religion": "The census question was voluntary: about a fifth of residents did not answer.",
-    "vote": "Colours split at 50%: teal leans to Trzaskowski, amber to Nawrocki.",
+    "vote": "Per gmina, 2025. Colours split at 50%: teal leans to Trzaskowski, amber to Nawrocki.",
     "pm25": "The nearest station within 25 km. Blank: no station that close.",
     "flood": "A declaration is a legal act that unlocks aid, not a measure of damage.",
     "sejm": "Shows only the committee with the most votes.",
-    "growth": "A few gminas changed borders since 2015 (Opole, Kamienica, Supraśl): their change includes that.",
+    "growth": "Gminas whose borders changed since 2015 (Opole and its neighbours, Kamienica, Supraśl) show no change.",
 }
 LAND = {
     "forest": (["forest"], "Forest", "l-forest", "🌲", "forest",
@@ -107,6 +111,24 @@ LAND = {
 }
 DIGITS = {"pct": 4, "float": 2, "years": 1, "pln": 0, "int": 0}
 DOMAIN_NOTE = " Colours span the 2nd to 98th percentile of hexes; values beyond are drawn at the end colours."
+
+# The dock has little horizontal room. The legend keeps the full statistical name; only dock buttons use these.
+SHORT_NAMES = {
+    "income": "PIT per person",
+    "wage": "Gross monthly wage",
+    "tourism_city": "City tourist nights",
+    "exam_8_maths": "Grade 8 maths",
+    "farm_area": "Farm area",
+    "farm_land_share": "Farmland share",
+    "vote": "2025 presidential vote",
+    "turnout": "2025 turnout",
+    "vote_2015": "2015 presidential vote",
+    "vote_2020": "2020 presidential vote",
+    "vote_shift_2020_2025": "Vote shift 2020-2025",
+    "kashubian": "Kashubian share",
+    "german": "German share",
+    "belarusian": "Belarusian share",
+}
 
 
 def nice(v: float, up: bool) -> float:
@@ -163,8 +185,9 @@ def build() -> None:
 
     lenses = []
     for lid, key, icon, emoji, ramp, scale, extra in LENSES:
-        metric = METRIC[key]
-        gv = m.values[key]
+        extra = dict(extra)
+        data = extra.pop("_data", None)
+        metric, gv = lens_values(data, stats, units.gminas) if data else (METRIC[key], m.values[key])
         if not any(v is not None for v in gv):
             print(f"    lens {lid}: no data yet ({metric['source']})")
             continue
@@ -192,6 +215,7 @@ def build() -> None:
         else:
             vals = spread(weights, gv, DIGITS.get(metric["format"], 2))
         lenses.append({**base, "format": metric["format"], "scale": scale, "ramp": R[ramp], "values": vals, **extra})
+    lenses += lenses_b(world, units, weights, R, GROUPS)
 
     pct = world.get("pct")
     if pct:
@@ -205,6 +229,8 @@ def build() -> None:
                            "values": vals})
 
     for lens in lenses:
+        if lens["id"] in SHORT_NAMES:
+            lens["short_name"] = SHORT_NAMES[lens["id"]]
         if "domain" in lens:
             continue
         lens["domain"] = percentile_domain(lens["values"], lens["scale"] == "log")
@@ -215,7 +241,7 @@ def build() -> None:
     print(f"    {len(lenses)} lenses: " + ", ".join(l["id"] for l in lenses))
 
 
-REQUIRED_NOTES = {"ukrainians", "vote", "pm25", "flood", "catholic"}
+REQUIRED_NOTES = {"ukrainians", "vote", "pm25", "flood", "catholic"} | {lens[0] for lens in LENSES_A}
 
 
 def check(web_dir) -> list[tuple[str, str]]:
@@ -224,18 +250,27 @@ def check(web_dir) -> list[tuple[str, str]]:
     import json
     from pathlib import Path
 
+    from ..core.i18n import t
+
     path = Path(web_dir) / "lenses.json"
     if not path.exists():
         return [("NOTE", "lenses.json missing (pipeline.check reports it)")]
     doc = json.loads(path.read_text())
     out = []
     by_id = {l.get("id"): l for l in doc.get("lenses", []) if isinstance(l, dict)}
+    for lid, lens in by_id.items():
+        full = t(lens.get("name", ""), "pl")
+        if len(full) > 22:
+            short = t(lens.get("short_name", ""), "pl")
+            if not short or len(short) > 22:
+                out.append(("FAIL", f"lens {lid}: Polish dock name is {len(full)} characters; short_name must be at most 22"))
     for lid in sorted(REQUIRED_NOTES & set(by_id)):
         if not by_id[lid].get("note"):
             out.append(("FAIL", f"lens {lid}: the legend caveat (note) is required"))
-    vote = by_id.get("vote")
-    if vote and vote.get("ramp") != R["vote"]:
-        out.append(("FAIL", "lens vote: must use the neutral teal-amber ramp, not party colours"))
+    for lid in ("vote", "vote_2015", "vote_2020", "vote_shift_2020_2025"):
+        vote = by_id.get(lid)
+        if vote and vote.get("ramp") != R["vote"]:
+            out.append(("FAIL", f"lens {lid}: must use the neutral teal-amber ramp, not party colours"))
     for lid, lens in by_id.items():
         vals = [v for v in lens.get("values") or [] if v is not None]
         if lens.get("format") == "category":

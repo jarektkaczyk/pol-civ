@@ -1,6 +1,7 @@
 # Pomorskie
 
 Source page: https://softonsofa.com/pol-civ/atlas/pomorskie/
+Polish version: https://softonsofa.com/pol-civ/pl/atlas/pomorskie/
 Last updated: 2026-11-26
 
 Pomorskie grew by 2.2% between 2015 and 2025, the 2nd fastest growth of the 16 voivodeships.
@@ -24,8 +25,8 @@ It has 43 towns; 15 of them have 20,000 or more residents.
 | Personal income tax revenue of the gminas per resident | 4,314 zł | 2026 plan | Ministry of Finance and Statistics Poland (GUS) |
 | Life expectancy at birth, women | 82.2 years | 2025 | Statistics Poland (GUS) |
 | Life expectancy at birth, men | 75.9 years | 2025 | Statistics Poland (GUS) |
-| Tourist nights per resident | 4.7 | 2025 | Ministry of Finance and Statistics Poland (GUS) |
-| New dwellings per 1,000 residents | 7.4 | 2025 | Ministry of Finance and Statistics Poland (GUS) |
+| Tourist nights per resident | 7.5 | 2025 | Ministry of Finance and Statistics Poland (GUS) |
+| New dwellings per 1,000 residents | 11.8 | 2025 | Ministry of Finance and Statistics Poland (GUS) |
 | Tree cover | 47% of the land | 2021 | European Space Agency (ESA WorldCover consortium) |
 
 ## Largest towns
@@ -83,7 +84,7 @@ It has 43 towns; 15 of them have 20,000 or more residents.
 - [Ministry of Finance and Statistics Poland (GUS): Polish local income, housing, and tourism statistics (Ministry of Finance 2026; GUS annual 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
 - [European Space Agency (ESA WorldCover consortium): ESA WorldCover 2021 (v200), 10 m land cover (ESA WorldCover 2021 v200, 1:32 overview (1/375 degree))](https://esa-worldcover.org/)
 - [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 30 June 2026 and position (GUS population 30 June 2026; towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
-- [UNESCO World Heritage Centre (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl): UNESCO World Heritage in Poland and Pomniki Historii (UNESCO whc001 (2026-11-22); NID Pomniki Historii 2026-09-30 + Dz.U. 2026 poz. 1334)](https://data.unesco.org/explore/dataset/whc001/)
+- [UNESCO World Heritage Centre (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl): UNESCO World Heritage in Poland and Pomniki Historii (UNESCO whc001 (22 November 2026); NID Pomniki Historii 30 September 2026 + Dz.U. 2026 poz. 1334)](https://data.unesco.org/explore/dataset/whc001/)
 - [Statistics Poland (GUS); Eurostat; port authorities and Gaz-System (curated items): Seaports of Poland: cargo tonnage and containers, LNG terminals (GUS maritime economy 2025 (preliminary); Eurostat ports 2025; TEU 2025)](https://stat.gov.pl/obszary-tematyczne/transport-i-lacznosc/transport/gospodarka-morska-w-polsce-w-2025-r-,7,23.html)
-- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 2026-11-26, PGE report 2025, other curated figures as of 2026-11)](https://www.openstreetmap.org/)
-- [ORLEN, Gaz-System (via the cited pages); positions from Wikidata and OpenStreetMap: Oil and gas in Poland: Baltic Pipe, main fields, refineries (curated) (Curated as of 2026-11 (ORLEN, Gaz-System))](https://www.orlen.pl/en)
+- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 26 November 2026, PGE report 2025, other curated figures as of November 2026)](https://www.openstreetmap.org/)
+- [ORLEN, Gaz-System (via the cited pages); positions from Wikidata and OpenStreetMap: Oil and gas in Poland: Baltic Pipe, main fields, refineries (curated) (Curated as of November 2026 (ORLEN, Gaz-System))](https://www.orlen.pl/en)

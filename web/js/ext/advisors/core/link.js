@@ -7,6 +7,7 @@
 // createBubbles(app, id): proportional circles drawn as a map overlay (world space), with hit testing.
 import { fin, withAlpha } from "./util.js";
 import { mapArea, frameBox, frameIfHidden } from "./frame.js";
+import { t } from "../../../i18n.js";
 
 const HOVER_COLOR = "#fff3c4";
 const GOLD = "#ffd36a";
@@ -73,11 +74,11 @@ export function createLinker(app) {
     if (done) ticking = false;
     else requestAnimationFrame(tick);
   }
-  function drawBeacon(ctx, t) {
-    if (!t) return;
+  function drawBeacon(ctx, tg) {
+    if (!tg) return;
     const cam = app.cam;
-    const [sx0, sy0] = cam.toScreen(t.box.x0, t.box.y0);
-    const [sx1, sy1] = cam.toScreen(t.box.x1, t.box.y1);
+    const [sx0, sy0] = cam.toScreen(tg.box.x0, tg.box.y0);
+    const [sx1, sy1] = cam.toScreen(tg.box.x1, tg.box.y1);
     const w = sx1 - sx0, h = sy1 - sy0;
     const cx = (sx0 + sx1) / 2, cy = (sy0 + sy1) / 2;
     const area = mapArea(app);
@@ -111,9 +112,9 @@ export function createLinker(app) {
         ctx.beginPath(); ctx.arc(cx, cy, 2.6, 0, Math.PI * 2);
         ctx.fillStyle = "#fff3c4"; ctx.fill();
         ctx.strokeStyle = "rgba(12,8,2,.9)"; ctx.lineWidth = 1.2; ctx.stroke();
-        if (t.label) label(ctx, t.label, cx, cy - r - 12, area);
-      } else if (t.label) label(ctx, t.label, cx, Math.max(area.y0 + 14, sy0 - 12), area);
-    } else if (t.label) {
+        if (tg.label) label(ctx, tg.label, cx, cy - r - 12, area);
+      } else if (tg.label) label(ctx, tg.label, cx, Math.max(area.y0 + 14, sy0 - 12), area);
+    } else if (tg.label) {
       // Off the free area: an arrow on its edge, pointing at the place.
       const ax = Math.max(area.x0 + inset, Math.min(area.x1 - inset, cx));
       const ay = Math.max(area.y0 + inset, Math.min(area.y1 - inset, cy));
@@ -129,7 +130,7 @@ export function createLinker(app) {
       ctx.stroke();
       ctx.fill();
       ctx.restore();
-      label(ctx, `${t.label} (off screen)`, ax, ay + (cy > ay ? -18 : 18), area);
+      label(ctx, t("{label} (off screen)", { label: tg.label }), ax, ay + (cy > ay ? -18 : 18), area);
     }
     ctx.restore();
   }

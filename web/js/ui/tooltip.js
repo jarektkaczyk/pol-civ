@@ -2,49 +2,51 @@ import { esc, int, popShort, compact } from "../format.js";
 import { formatLensValue } from "./lenses.js";
 import { glyph } from "./icon.js";
 import { FOREIGN } from "../world.js";
+import { t } from "../i18n.js";
 
 const el = () => document.getElementById("tooltip");
 
-const nameOf = (table, id) => table.find((t) => t.id === id)?.name;
+// Terrain names come from world.json tables (Land, Lake, Hills, ...): shown in the page language.
+const nameOf = (table, id) => { const n = table.find((r) => r.id === id)?.name; return n ? t(n) : n; };
 
 export function showCellTooltip(mx, my, w, i, lens, showResources = true) {
   const raw = w.raw;
   const lines = [];
   const city = w.cityByCell.get(i);
-  if (city) lines.push(`<b>${esc(city.name)}</b> <span class="muted">· ${popShort(city.population)} people</span>`);
+  if (city) lines.push(`<b>${esc(city.name)}</b> <span class="muted">· ${esc(t("{pop} people", { pop: popShort(city.population) }))}</span>`);
 
   const wt = w.water[i];
   if (wt) {
-    const depth = raw.elev[i] < 0 ? ` <span class="muted">· ${int(-raw.elev[i])} m deep</span>` : "";
-    lines.push(`<b>${esc(nameOf(w.tables.water, wt) || "Water")}</b>${depth}`);
+    const depth = raw.elev[i] < 0 ? ` <span class="muted">· ${esc(t("{depth} m deep", { depth: int(-raw.elev[i]) }))}</span>` : "";
+    lines.push(`<b>${esc(nameOf(w.tables.water, wt) || t("Water"))}</b>${depth}`);
   } else {
     const cover = w.cover[i] > 0 ? nameOf(w.tables.cover, w.cover[i]) : null;
     const relief = w.relief[i] > 0 ? nameOf(w.tables.relief, w.relief[i]) : null;
-    const terrain = [cover, relief].filter(Boolean).join(" · ") || (relief ?? "Land");
+    const terrain = [cover, relief].filter(Boolean).join(" · ") || (relief ?? t("Land"));
     lines.push(`<b>${esc(terrain)}</b> <span class="muted">· ${int(raw.elev[i])} m</span>`);
   }
   const o = raw.owner[i];
   if (o >= 0) {
     const g = raw.county[i] >= 0 ? raw.counties[raw.county[i]] : null;
-    const county = g ? (g.type === "urban" ? g.name : `gmina ${g.name}`) + ", " : "";
+    const county = g ? (g.type === "urban" ? g.name : t("gmina {name}", { name: g.name })) + ", " : "";
     lines.push(`${esc(county)}${esc(raw.states[o].name)}`);
-    if (lens) lines.push(`${glyph(lens, 13)} ${esc(lens.name)}: <b>${formatLensValue(lens, lens.values[i])}</b>`);
+    if (lens) lines.push(`${glyph(lens, 13)} ${esc(t(lens.name))}: <b>${formatLensValue(lens, lens.values[i])}</b>`);
   } else if (o === FOREIGN) {
-    lines.push(`<span class="muted">Beyond the borders (not mapped)</span>`);
+    lines.push(`<span class="muted">${esc(t("Beyond the borders (not mapped)"))}</span>`);
   }
   const res = showResources && w.resources?.byCell.get(i);
   if (res) {
     for (const it of res.slice(0, 4)) {
-      const t = w.resources.typeById.get(it.type);
+      const ty = w.resources.typeById.get(it.type);
       const num = it.value == null ? "" : Math.abs(it.value) < 1e6 ? int(it.value) : compact(it.value);
-      const val = num ? ` · ${num}${t.unit ? " " + esc(t.unit) : ""}` : "";
-      const kind = it.name && it.name !== t.name ? ` <span class="muted">· ${esc(t.name)}${val}</span>` : `<span class="muted">${val}</span>`;
-      lines.push(`<span style="color:${esc(t.color || "#efe4c6")}">${glyph(t, 13)}</span> ${esc(it.name || t.name)}${kind}`);
+      const val = num ? ` · ${num}${ty.unit ? " " + esc(t(ty.unit)) : ""}` : "";
+      const kind = it.name && it.name !== ty.name ? ` <span class="muted">· ${esc(t(ty.name))}${val}</span>` : `<span class="muted">${val}</span>`;
+      lines.push(`<span style="color:${esc(ty.color || "#efe4c6")}">${glyph(ty, 13)}</span> ${esc(it.name || t(ty.name))}${kind}`);
     }
-    if (res.length > 4) lines.push(`<span class="muted">+${res.length - 4} more</span>`);
+    if (res.length > 4) lines.push(`<span class="muted">${esc(t("+{n} more", { n: res.length - 4 }))}</span>`);
   }
-  if (city) lines.push(`<span class="muted">Click to open the town</span>`);
-  else if (o >= 0) lines.push(`<span class="muted">Click to open ${esc(raw.states[o].name)}</span>`);
+  if (city) lines.push(`<span class="muted">${esc(t("Click to open the town"))}</span>`);
+  else if (o >= 0) lines.push(`<span class="muted">${esc(t("Click to open {name}", { name: raw.states[o].name }))}</span>`);
   show(mx, my, lines.join("<br>"));
 }
 
@@ -59,16 +61,16 @@ export function showHtmlTooltip(mx, my, content) {
 }
 
 export function showCityTooltip(mx, my, city) {
-  show(mx, my, `<b>${esc(city.full)}</b><br><span class="muted">Click to open the town</span>`);
+  show(mx, my, `<b>${esc(city.full)}</b><br><span class="muted">${esc(t("Click to open the town"))}</span>`);
 }
 
 function show(mx, my, html) {
-  const t = el();
-  t.innerHTML = html;
-  t.hidden = false;
-  const r = t.getBoundingClientRect();
-  t.style.left = Math.max(4, Math.min(window.innerWidth - r.width - 8, mx + 16)) + "px";
-  t.style.top = Math.max(4, Math.min(window.innerHeight - r.height - 8, my + 16)) + "px";
+  const tip = el();
+  tip.innerHTML = html;
+  tip.hidden = false;
+  const r = tip.getBoundingClientRect();
+  tip.style.left = Math.max(4, Math.min(window.innerWidth - r.width - 8, mx + 16)) + "px";
+  tip.style.top = Math.max(4, Math.min(window.innerHeight - r.height - 8, my + 16)) + "px";
 }
 
 export function hideTooltip() {

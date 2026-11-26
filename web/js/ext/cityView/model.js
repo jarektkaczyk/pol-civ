@@ -1,27 +1,28 @@
 // City View data model: everything the city screen and its map layer show, derived from cities.json,
 // nation.json, lenses.json, world.json and resources.json. Pure functions over app.data / app.w (no DOM).
+import { t, int, num } from "../../i18n.js";
 
 // PKD section key (nation.json industries) -> short label and district colour (the medallion behind its icon).
 export const INDUSTRY = {
-  agriculture: { short: "Agriculture", color: "#4f7a2a" },
-  mining: { short: "Mining", color: "#6a5038" },
-  manufacturing: { short: "Manufacturing", color: "#9a5a22" },
-  energy: { short: "Power & heat", color: "#2a5f86" },
-  water: { short: "Water & waste", color: "#2f6f7a" },
-  construction: { short: "Construction", color: "#8a5426" },
-  trade: { short: "Trade", color: "#8a6a1e" },
-  transport: { short: "Transport", color: "#3d5f73" },
-  accommodation: { short: "Hospitality", color: "#6e3a5e" },
-  information: { short: "IT & telecoms", color: "#25557e" },
-  finance: { short: "Finance", color: "#7a6420" },
-  real_estate: { short: "Real estate", color: "#6b4a2f" },
-  professional: { short: "Professional", color: "#2b4f8a" },
-  admin: { short: "Business services", color: "#4b5a68" },
-  public_admin: { short: "Public admin", color: "#3a5a4a" },
-  education: { short: "Education", color: "#2a3f7a" },
-  health: { short: "Health care", color: "#7a2f2f" },
-  arts: { short: "Arts", color: "#5b3a7e" },
-  other: { short: "Other services", color: "#4b4b4b" },
+  agriculture: { short: t("Agriculture"), color: "#4f7a2a" },
+  mining: { short: t("Mining"), color: "#6a5038" },
+  manufacturing: { short: t("Manufacturing"), color: "#9a5a22" },
+  energy: { short: t("Power & heat"), color: "#2a5f86" },
+  water: { short: t("Water & waste"), color: "#2f6f7a" },
+  construction: { short: t("Construction"), color: "#8a5426" },
+  trade: { short: t("Trade"), color: "#8a6a1e" },
+  transport: { short: t("Transport"), color: "#3d5f73" },
+  accommodation: { short: t("Hospitality"), color: "#6e3a5e" },
+  information: { short: t("IT & telecoms"), color: "#25557e" },
+  finance: { short: t("Finance"), color: "#7a6420" },
+  real_estate: { short: t("Real estate"), color: "#6b4a2f" },
+  professional: { short: t("Professional"), color: "#2b4f8a" },
+  admin: { short: t("Business services"), color: "#4b5a68" },
+  public_admin: { short: t("Public admin"), color: "#3a5a4a" },
+  education: { short: t("Education"), color: "#2a3f7a" },
+  health: { short: t("Health care"), color: "#7a2f2f" },
+  arts: { short: t("Arts"), color: "#5b3a7e" },
+  other: { short: t("Other services"), color: "#4b4b4b" },
 };
 // Icon id (icons.js i-<key>); sections without their own icon borrow the nearest one.
 const ICON_ALIAS = { energy: "utilities", water: "utilities", trade: "retail", transport: "transportation", government: "public_admin" };
@@ -29,10 +30,10 @@ export const industryIcon = (k) => `i-${ICON_ALIAS[k] || k}`;
 
 // Land-use groups shown as a hex's "tile yield" (world.json pct keys -> group). Cover ids give the map colour.
 export const LAND = [
-  { key: "built", label: "Built-up", icon: "l-developed", cover: 9, keys: ["developed"] },
-  { key: "farm", label: "Farmland", icon: "l-farmland", cover: 7, keys: ["crop", "pasture"] },
-  { key: "forest", label: "Forest", icon: "l-forest", cover: 3, keys: ["forest"] },
-  { key: "open", label: "Open land", icon: null, cover: 4, keys: ["grass", "shrub", "wetland"] },
+  { key: "built", label: t("Built-up"), icon: "l-developed", cover: 9, keys: ["developed"] },
+  { key: "farm", label: t("Farmland"), icon: "l-farmland", cover: 7, keys: ["crop", "pasture"] },
+  { key: "forest", label: t("Forest"), icon: "l-forest", cover: 3, keys: ["forest"] },
+  { key: "open", label: t("Open land"), icon: null, cover: 4, keys: ["grass", "shrub", "wetland"] },
 ];
 
 const sum = (o) => Object.values(o || {}).reduce((a, v) => a + (Number.isFinite(v) ? v : 0), 0);
@@ -50,7 +51,7 @@ export function jobIndustries(city, nation) {
       const natShare = (n.jobs?.[key] || 0) / nTotal;
       return {
         key, jobs, share, natShare, lq: natShare > 0 ? share / natShare : null,
-        label: nation.industries?.[key] || key, short: INDUSTRY[key]?.short || key,
+        label: nation.industries?.[key] ? t(nation.industries[key]) : key, short: INDUSTRY[key]?.short || key,
         color: INDUSTRY[key]?.color || "#3a4a5e", icon: industryIcon(key),
       };
     })
@@ -78,7 +79,7 @@ export function yieldIndustries(city, nation) {
     const share = v / total, natShare = nv / nTotal;
     rows.push({
       key: y.key, jobs: v, share, natShare, lq: natShare > 0 && v > 0 ? share / natShare : null,
-      label: y.label, short: y.label, color: y.color, icon: y.icon, yieldDef: y,
+      label: t(y.label), short: t(y.label), color: y.color, icon: y.icon, yieldDef: y,
     });
   }
   if (!rows.length) return [];
@@ -86,7 +87,7 @@ export function yieldIndustries(city, nation) {
   if (rest > 0) {
     rows.push({
       key: "rest", jobs: rest, share: rest / total, natShare: Math.max(0, nTotal - nUsed) / nTotal, lq: null,
-      label: "Trade, services and public sector", short: "Services", color: "#4b5a68", icon: "i-other",
+      label: t("Trade, services and public sector"), short: t("Services"), color: "#4b5a68", icon: "i-other",
     });
   }
   return rows.sort((a, b) => b.jobs - a.jobs);
@@ -124,7 +125,7 @@ export function buildModel(app, city) {
 
   // Resource sites of the town (resources.json items tagged with its id in `cbsa` or `city`), biggest first per type.
   const items = resources?.items || [];
-  const typeById = new Map((resources?.types || []).map((t) => [t.id, t]));
+  const typeById = new Map((resources?.types || []).map((ty) => [ty.id, ty]));
   const sites = [];
   items.forEach((it, index) => {
     if (it.cbsa === city.id || it.city === city.id) sites.push({ item: it, index, type: typeById.get(it.type) || null });
@@ -182,7 +183,7 @@ export function buildModel(app, city) {
     const i = w.raw.states.findIndex((s) => s.abbr === abbr);
     return { abbr, index: i, name: i >= 0 ? (app.data.states?.[i]?.name || w.raw.states[i].name) : abbr };
   });
-  const residentsSum = tiles.reduce((a, t) => a + (t.residents || 0), 0);
+  const residentsSum = tiles.reduce((a, tile) => a + (tile.residents || 0), 0);
 
   return {
     city, N, nation, stateIdx, hexArea: area, stateRGB, states, footprint, mask, tiles, residentsSum,
@@ -225,14 +226,26 @@ export function rankCount(cities, key) {
   return n;
 }
 
-/** A resource value with its unit, short ("3.9 GW", "878 jobs"). */
+/** A resource value with its unit, short ("3.9 GW", "878 workers"). */
 export function resourceValue(item, type, compact) {
   const v = item.value;
   if (!Number.isFinite(v)) return "";
   const u = type?.unit || "";
-  if (u === "MW") return v >= 1000 ? `${(v / 1000).toFixed(v >= 10000 ? 0 : 1)} GW` : `${Math.round(v)} MW`;
-  if (u === "employees") return `${compact(v)} workers`;
-  if (/tons/.test(u)) return `${compact(v)} t/yr`;
-  if (/km\u00b2/.test(u)) return `${compact(v)} km\u00b2 play`;
-  return `${compact(v)} ${u}`.trim();
+  if (u === "MW") return v >= 1000 ? `${num(v / 1000, v >= 10000 ? 0 : 1)} GW` : `${int(v)} MW`;
+  if (u === "employees") return t.plural(Math.abs(v) >= 1e4 ? 1e6 : Math.round(v),
+    { one: "{n} worker", other: "{n} workers" }, { n: compact(v) });
+  if (/tons/.test(u)) return t("{n} t/yr", { n: compact(v) });
+  if (/km\u00b2/.test(u)) return t("{n} km\u00b2 play", { n: compact(v) });
+  return `${compact(v)} ${u ? t(u) : ""}`.trim();
+}
+
+/**
+ * A resource item's detail line in the page language: status, operator and status note joined with " - " (the
+ * file's `detail` is the English join of the same parts). Items without the parts keep `detail`.
+ */
+export function siteDetail(item) {
+  if (!item) return "";
+  if (item.status_label == null && item.status_note == null) return item.detail || "";
+  return [item.status_label ? t(item.status_label) : "", item.operator || "", item.status_note ? t(item.status_note) : ""]
+    .filter(Boolean).join(" - ");
 }

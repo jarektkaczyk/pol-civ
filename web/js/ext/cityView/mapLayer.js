@@ -4,6 +4,8 @@
 // city's own (see drawMarks). Share images get both (snapshot: true).
 import { drawIcon, hasIcon } from "../../icons.js";
 import { compact } from "./fmt.js";
+// `t` is a common local name in this file (tiles, time), so the translator is imported as `tr`.
+import { t as tr, num } from "../../i18n.js";
 import { css } from "../../color.js";
 import { LAND, resourceValue } from "./model.js";
 
@@ -187,7 +189,7 @@ export function createMapLayer(app, { focusRect = () => null } = {}) {
       let txt = "", tw = 0;
       if (label) {
         ctx.font = `600 ${Math.round(Math.min(11, Math.max(9, r * 0.32)))}px ${SANS}`;
-        txt = `${clip(d.short || "", 18)}${d.lq != null ? ` \u00d7${d.lq.toFixed(1)}` : ""}`;
+        txt = `${clip(d.short || "", 18)}${d.lq != null ? ` \u00d7${num(d.lq, 1)}` : ""}`;
         tw = ctx.measureText(txt).width + 10;
       }
       const rect = label
@@ -245,7 +247,7 @@ export function createMapLayer(app, { focusRect = () => null } = {}) {
     const plaqueRects = plaques.map(([d, sx, sy, r, label]) => {
       if (!label) return { x: sx - r, y: sy - r, w: 2 * r, h: 2 * r };
       ctx.font = `600 ${Math.round(Math.min(11, Math.max(9, r * 0.32)))}px ${SANS}`;
-      const tw = ctx.measureText(`${clip(d.short || "", 18)}${d.lq != null ? ` \u00d7${d.lq.toFixed(1)}` : ""}`).width + 10;
+      const tw = ctx.measureText(`${clip(d.short || "", 18)}${d.lq != null ? ` \u00d7${num(d.lq, 1)}` : ""}`).width + 10;
       return { x: Math.min(sx - r, sx - tw / 2), y: sy - r, w: Math.max(2 * r, tw), h: r * 0.98 + 7 + r };
     });
 
@@ -286,7 +288,7 @@ export function createMapLayer(app, { focusRect = () => null } = {}) {
         if (!onScreen(sx, sy0, 160)) continue;
         const top = list[0];
         const isCity = cell === m.city.cell;
-        const name = clip(top.item.name || top.type?.name || "", Rpx >= 40 ? 26 : 16);
+        const name = clip(top.item.name || (top.type?.name ? tr(top.type.name) : ""), Rpx >= 40 ? 26 : 16);
         const val = Rpx >= 30 ? resourceValue(top.item, top.type, compact) : "";
         const more = list.length > 1 ? ` +${list.length - 1}` : "";
         const W = siteLabelWidth(ctx, name, val, more), H = 17;

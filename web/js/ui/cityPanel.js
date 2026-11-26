@@ -1,5 +1,6 @@
 import { css } from "../color.js";
 import { esc } from "../format.js";
+import { t } from "../i18n.js";
 import { isCapital } from "../world.js";
 import { yieldGrid, amenities, industries, gdpRow, popLine, growthSpan, showPanel, hidePanel } from "./infoPanel.js";
 
@@ -16,7 +17,7 @@ export function openCityPanel(city, ctx) {
   const states = (city.states || [])
     .map((abbr) => ({ abbr, i: w.raw.states.findIndex((s) => s.abbr === abbr) }))
     .map(({ abbr, i }) => (i >= 0 && ctx.onState
-      ? `<button class="chip" data-state="${i}" title="Open ${esc(w.raw.states[i].name)}">${esc(abbr)}</button>`
+      ? `<button class="chip" data-state="${i}" title="${esc(t("Open {name}", { name: w.raw.states[i].name }))}">${esc(abbr)}</button>`
       : `<span class="chip">${esc(abbr)}</span>`))
     .join("");
 
@@ -26,14 +27,14 @@ export function openCityPanel(city, ctx) {
     kind: "city",
     stripe: col,
     title: city.name,
-    kindLabel: city.kind === "city" ? "City with powiat rights" : "Town",
-    titleHtml: `${isCapital(city) ? `<span class="cap" title="Capital of Poland">★</span> ` : ""}${esc(city.name)}`,
+    kindLabel: city.kind === "city" ? t("City with powiat rights") : t("Town"),
+    titleHtml: `${isCapital(city) ? `<span class="cap" title="${esc(t("Capital of Poland"))}">★</span> ` : ""}${esc(city.name)}`,
     sub: `${esc(city.full || "")}${states ? `<div class="chips">${states}</div>` : ""}`,
     headExtra: popLine(city, growth),
     sections: [
-      { title: "Yields", html: `<div class="yield-grid">${yieldGrid(nation, city.yields)}</div>` },
-      { title: city.scope === "urban-rural gmina" ? "Prosperity · whole gmina" : "Prosperity", html: amenities(city, n) + gdpRow(city) },
-      Object.keys(city.jobs || {}).length && { title: "Workers by sector", html: industries(city, nation) },
+      { title: t("Yields"), html: `<div class="yield-grid">${yieldGrid(nation, city.yields)}</div>` },
+      { title: city.scope === "urban-rural gmina" ? t("Prosperity · whole gmina") : t("Prosperity"), html: amenities(city, n) + gdpRow(city) },
+      Object.keys(city.jobs || {}).length && { title: t("Workers by sector"), html: industries(city, nation) },
     ],
     foot: "",
     onClose: ctx.onClose,

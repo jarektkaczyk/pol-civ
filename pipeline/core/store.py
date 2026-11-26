@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from .i18n import iso_dates_deep
 from .paths import INTERIM, WEB_DATA
 
 
@@ -54,6 +55,9 @@ def load_interim(name: str) -> Any:
 
 
 def write_web(name: str, data: Any) -> None:
+    """Write web/data/<name>. Dates in text become ISO ("30 June 2026" -> "2026-06-30"): the browser and the atlas
+    format them per language (pipeline/core/i18n.py)."""
+    data = iso_dates_deep(data)
     text = json.dumps(data, separators=(",", ":"), allow_nan=False)
     atomic_write_text(WEB_DATA / name, text)
     print(f"    → web/data/{name} ({len(text) / 1e3:.0f} kB)")
