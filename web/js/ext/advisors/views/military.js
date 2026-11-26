@@ -16,6 +16,31 @@ const pln = (value) => {
   return `PLN ${int(value)}`;
 };
 
+export function groupGarrisons(installations, compById, activeComponents, voivodeship = null) {
+  const order = new Map([...compById.keys()].map((id, index) => [id, index]));
+  const tierRank = { site: 0, base: 1, major: 2 };
+  const grouped = new Map();
+  for (const item of installations) {
+    if (!activeComponents.has(item.component) || (voivodeship && item.state !== voivodeship)) continue;
+    const key = `garrison:${item.name}`;
+    let row = grouped.get(key);
+    if (!row) {
+      row = { ...item, key, count: 0, units: [], branchCounts: new Map() };
+      grouped.set(key, row);
+    }
+    row.count += item.count || 0;
+    row.units.push(...(item.units || []));
+    row.branchCounts.set(item.component, (row.branchCounts.get(item.component) || 0) + (item.count || 0));
+    if ((tierRank[item.tier] || 0) > (tierRank[row.tier] || 0)) row.tier = item.tier;
+  }
+  for (const row of grouped.values()) {
+    row.branches = [...row.branchCounts]
+      .sort((a, b) => b[1] - a[1] || (order.get(a[0]) || 0) - (order.get(b[0]) || 0));
+    row.branchText = row.branches.map(([id]) => compById.get(id)?.name || id).join(", ");
+  }
+  return [...grouped.values()];
+}
+
 export async function mount(ctx) {
   const { app, data, el, link } = ctx;
   const mil = await app.loadData("military");
@@ -61,18 +86,19 @@ export async function mount(ctx) {
 
   const siteBody = section(el, { title: "Garrisons and allied sites" });
   const siteTable = createTable(siteBody, {
-    caption: "Garrison markers", search: "Search garrisons and branches", rank: true, maxHeight: 320, rows: [],
-    searchText: (r) => `${r.name} ${compById.get(r.component)?.name || ""} ${(r.units || []).join(" ")}`,
+    caption: "Garrison towns", search: "Search garrisons and branches", rank: true, maxHeight: 348, rowH: 58, rows: [],
+    searchText: (r) => `${r.name} ${r.branchText} ${(r.units || []).join(" ")}`,
     columns: [
-      { key: "name", label: "Garrison", align: "l", width: "minmax(0,1.5fr)", value: (r) => r.name, text: (r) => r.name },
-      { key: "branch", label: "Branch", align: "l", width: "minmax(0,1fr)", value: (r) => compById.get(r.component)?.name, text: (r) => compById.get(r.component)?.name || r.component },
-      { key: "units", label: "Entries", value: (r) => r.count, text: (r) => int(r.count) },
-      { key: "tier", label: "Scale", align: "l", value: (r) => r.tier, text: (r) => TIER[r.tier] || r.tier, hideBelow: 420 },
+      { key: "name", label: "Garrison", align: "l", width: "minmax(0,.9fr)", value: (r) => r.name, text: (r) => r.name },
+      { key: "branch", label: "Branches", align: "l", width: "minmax(0,2fr)", value: (r) => r.branchText, text: (r) => r.branchText },
+      { key: "units", label: "Entries", width: "48px", value: (r) => r.count, text: (r) => int(r.count) },
+      { key: "tier", label: "Scale", align: "l", value: (r) => r.tier, text: (r) => TIER[r.tier] || r.tier, hideBelow: 600 },
     ],
     sort: { key: "units", dir: "desc" },
     onHover: (r) => link.hover(r ? { cells: new Set([r.cell]), dimOthers: true, label: r.name } : null),
     onClick: (r) => focusPoint(app, r.x, r.y, Math.min(app.cam.maxScale, Math.max(app.cam.scale, (app.cam.fitScale || 1) * 3.2))),
   });
+  siteTable.el.classList.add("mil-garrisons");
 
   const rangeBody = section(el, { title: "Main training areas" });
   createTable(rangeBody, {
@@ -109,7 +135,7 @@ export async function mount(ctx) {
   barList(forceBody, { rows: forceRows, ariaLabel: "Polish Armed Forces personnel", rank: false, max: Math.max(1, ...forceRows.map((r) => r.value)) });
 
   function shown() {
-    return installations.filter((it) => filter.components.has(it.component) && (!filter.voivodeship || it.state === filter.voivodeship));
+    return groupGarrisons(installations, compById, filter.components, filter.voivodeship);
   }
 
   function setVoivodeship(abbr, fly = false) {
@@ -128,14 +154,14 @@ export async function mount(ctx) {
     siteTable.setRows(rows);
     const idx = filter.voivodeship ? voivodeshipIndex(filter.voivodeship) : null;
     link.base(idx != null ? { states: new Set([idx]), dimOthers: true } : null);
-    activePlace.innerHTML = idx != null ? `<span class="adv-fchip">Voivodeship: <b>${esc(voivodeshipName(filter.voivodeship))}</b> &middot; ${int(rows.length)} markers<button type="button" data-clear-place aria-label="Clear the voivodeship filter">x</button></span>` : "";
+    activePlace.innerHTML = idx != null ? `<span class="adv-fchip">Voivodeship: <b>${esc(voivodeshipName(filter.voivodeship))}</b> &middot; ${int(rows.length)} towns<button type="button" data-clear-place aria-label="Clear the voivodeship filter">x</button></span>` : "";
   }
   apply();
 
   return {
     onMapHover(event) {
       const item = event.item;
-      if (event.layer === "forts" && item?.data?.id) siteTable.setHot(item.data.id);
+      if (event.layer === "forts" && item?.data?.name) siteTable.setHot(`garrison:${item.data.name}`);
     },
     onEscape() {
       if (filter.voivodeship) { setVoivodeship(null); return true; }

@@ -40,10 +40,17 @@ LIGNITE = {"way/592157961", "relation/13268627", "way/448844031"}  # Bełchatów
 
 TAURON_2024 = ("https://www.tauron-wytwarzanie.pl/-/media/offer-documents/wytwarzanie/wydawnictwa/"
                "deklaracja-srodowiskowa-za-2024.ashx")
+PGE_2025_REPORT = ("https://www.gkpge.pl/content/download/1c17c9bb500a8cc7ea488bc573451f3e/file/"
+                   "pge_sz2025.pdf?contentId=231076&inLanguage=pol-PL&version=2")
 _TAURON = {"operator": "TAURON Wytwarzanie S.A.", "ref": TAURON_2024, "mw_year": 2024}
 
 # OSM object -> fields that replace OSM's, from operator and regulator pages (see `ref`).
 OVERRIDES: dict[str, dict] = {
+    "way/592157961": {
+        "operator": "PGE G\u00f3rnictwo i Energetyka Konwencjonalna S.A.", "fuel": "lignite", "mw": 5097.0,
+        "mw_year": 2025, "mw_note": "installed electrical capacity in the PGE Group management report for 2025",
+        "ref": PGE_2025_REPORT,
+    },
     "relation/9399159": {**_TAURON, "fuel": "hard_coal", "mw": 2255.0,
                          "mw_note": "Jaworzno III 1,345 MW plus the Nowe Jaworzno 910 MW unit, achievable capacity "
                                     "31 Dec 2024 (Jaworzno II, 189 MW, not included)"},
@@ -246,7 +253,7 @@ class PlEnergyPlants(Source):
                    "difference is mostly small wind and solar farms, rooftop solar and industrial plants under the "
                    "size rule." if nat["mw"] else f"Operating plants listed here total {gen_total:,.0f} MW.")
         return {
-            "vintage": f"OpenStreetMap extract {stamp[:10] if stamp else '?'}, curated figures as of 2026-11",
+            "vintage": f"OpenStreetMap extract {stamp[:10] if stamp else '?'}, PGE report 2025, other curated figures as of 2026-11",
             "tables": {"plants_by_fuel": {
                 "level": "country",
                 "fields": {f"{k}_mw": {"label": f"Operating plants in this list: {k}", "unit": "MW", "year": 2026}

@@ -3,7 +3,8 @@ import { esc, popShort } from "../format.js";
 import { icon } from "../ui/icon.js";
 import { track } from "./analytics.js";
 
-const norm = (s) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+const norm = (s) => String(s || "").replace(/[\u0141\u0142]/g, "l").normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 const MAX = 8;
 
 /**

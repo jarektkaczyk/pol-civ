@@ -14,8 +14,8 @@ Yield rules (blueprint section 8), all GUS workers counted where the employer is
   workers (exact for the 66 cities with powiat rights, which are one gmina each).
 * Culture = workers in accommodation and food service (I) plus arts, entertainment and recreation (R); shared to
   gminas like Science.
-* Gold = GDP in current PLN. Poland: GDP 2025 (Eurostat). Voivodeship: GDP 2024 (Eurostat NUTS 2; Mazowieckie
-  = PL91 + PL92). Powiat: the GDP 2023 of its NUTS 3 subregion, shared among the subregion's powiaty by their wage
+* Gold = GDP in current PLN. Poland: GDP 2025 (Eurostat). Voivodeship: GDP 2024 (GUS regional accounts, revision
+  of 30 September 2026; Mazowieckie = both its NUTS 2 regions). Powiat: the GDP 2023 of its NUTS 3 subregion, shared among the subregion's powiaty by their wage
   bill (average gross monthly wage x workers). Gmina: its powiat's GDP in proportion to its workers.
   Town and metro: the sum of their gminas.
 """
@@ -69,7 +69,7 @@ YIELDS = [
         "key": "gold", "icon": "y-gold", "emoji": "💰", "label": "Gold", "color": "#f2c94c", "unit": "pln",
         "industries": [],
         "description": "Gross domestic product per year in current złoty. Poland: 2025 (GUS, through Eurostat). "
-        "Voivodeships: 2024 (Eurostat NUTS 2). Powiaty: the 2023 GDP of their NUTS 3 subregion, shared among the "
+        "Voivodeships: 2024 (GUS regional accounts). Powiaty: the 2023 GDP of their NUTS 3 subregion, shared among the "
         "subregion's powiaty by their wage bill (average wage x workers). Gminas: their powiat's GDP in proportion "
         "to their workers. Towns and metros: the sum of their gminas. Below the voivodeship level the figure is "
         "a share of a published total, not a published GDP.",
@@ -99,6 +99,8 @@ class Economy:
         self.u, self.s = units, stats.rekey(units)
         pop = stats.rows("pl_stats_population", "population")
         self.pop = {g: num((pop.get(g) or {}).get("population")) for g in units.gminas}
+        # 31 December 2025: compared with 31 December 2015 and 2020 for change, and the base of 2025 per-person rates.
+        self.pop2025 = {g: num((pop.get(g) or {}).get("population_2025")) for g in units.gminas}
         self.pop2015 = {g: num((pop.get(g) or {}).get("population_2015")) for g in units.gminas}
         self.pop2020 = {g: num((pop.get(g) or {}).get("population_2020")) for g in units.gminas}
         sec = stats.rows("pl_stats_labour", "employment_sectors_gmina")
@@ -108,6 +110,7 @@ class Economy:
         self.pit = stats.rows("pl_stats_prosperity", "income_gmina")
         self.years = {
             "population": stats.field_year("pl_stats_population", "population", "population"),
+            "population_2025": stats.field_year("pl_stats_population", "population", "population_2025"),
             "workers": stats.field_year("pl_stats_labour", "employment_pkd_powiat", "workers_total"),
             "gdp_nuts3": stats.field_year("pl_gdp", "gdp_nuts3", "gdp_pln"),
             "gdp_voiv": stats.field_year("pl_gdp", "gdp_voivodeship", "gdp_pln"),
@@ -213,9 +216,11 @@ class Economy:
         pop = total(self.pop.get(g) for g in gminas)
         # Whole powiaty: a gmina created since 2015 is covered by the 2015 figure of the gmina it was split from.
         past = (lambda d: total(d.get(g) for g in gminas)) if powiaty else (lambda d: full(d, gminas))
-        growth = rate(pop, past(self.pop2015))
+        pop_end = past(self.pop2025)
+        growth = rate(pop_end, past(self.pop2015))
         pit = total((self.pit.get(g) or {}).get("pit_revenue_total") for g in gminas)
-        pit_pop = total(self.pop.get(g) for g in gminas if num((self.pit.get(g) or {}).get("pit_revenue_total")) is not None)
+        pit_pop = total(self.pop2025.get(g) for g in gminas
+                        if num((self.pit.get(g) or {}).get("pit_revenue_total")) is not None)
         # Powiat-level labour figures, weighted by the population each powiat contributes to the set.
         weight: dict[str, float] = {}
         for g in gminas:
@@ -248,11 +253,11 @@ class Economy:
             "gdp_year": self.years["gdp_nuts3"] if yields["gold"] is not None else None,
             "gdp_estimated": yields["gold"] is not None,
             "growth": growth,
-            "growth_years": [2015, self.years["population"] or 2025],
+            "growth_years": [2015, self.years["population_2025"] or 2025],
             "pop_series": {
                 "2015": _round(past(self.pop2015)),
                 "2020": _round(past(self.pop2020)),
-                str(self.years["population"] or 2025): _round(pop),
+                str(self.years["population_2025"] or 2025): _round(pop_end),
             },
         }
 

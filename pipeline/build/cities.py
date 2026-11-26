@@ -328,6 +328,7 @@ def build() -> None:
     write_web("nation.json", {
         "vintage": stats.vintage("pl_stats_population") or "GUS",
         "year": econ.years["population"] or 2025,
+        "population_date": stats.field_date("pl_stats_population", "population", "population"),
         "gdp_vintage": stats.vintage("pl_gdp"),
         "years": econ.years,
         "nation": nat,

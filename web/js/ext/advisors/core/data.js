@@ -104,13 +104,13 @@ export function buildData(app) {
   // --- economic fields (voivodeships, metros, towns) ------------------------------------------------------------
   const yieldsWorkers = (nation.yields || []).filter((y) => y.unit !== "pln" && y.unit !== "usd");
   const gdpDesc = {
-    states: `Gross domestic product in current złoty, published per voivodeship (Eurostat NUTS 2, ${yrs.gdp_voiv || 2024}).`,
+    states: `Gross domestic product in current złoty, published per voivodeship (GUS regional accounts, ${yrs.gdp_voiv || 2024}).`,
     metros: `Gross domestic product in current złoty: the member gminas' shares of their powiaty's GDP (Eurostat NUTS 3 ${yrs.gdp_nuts3 || 2023}, shared by wage bill and workers). An estimate.`,
     towns: `Gross domestic product in current złoty: the town's gmina share of its powiat's GDP (Eurostat NUTS 3 ${yrs.gdp_nuts3 || 2023}). An estimate.`,
   };
   const area = { states: "voivodeship", metros: "metro area", towns: "town" };
   const econFields = (lv) => [
-    F("population", "Population", "int", { unit: "people", source: "pl_stats_population", group: "People", lens: "density", description: `Residents on 31 December ${yrs.population || 2025} (GUS).` }),
+    F("population", "Population", "int", { unit: "people", source: "pl_stats_population", group: "People", lens: "density", description: `Residents on ${nation.population_date || `31 December ${yrs.population || 2025}`} (GUS).` }),
     F("growth", `Change ${growthYears}`, "signed", { unit: "population change", source: "pl_stats_population", group: "People", lens: "growth", description: `Population change ${growthYears} on today's borders (GUS).` }),
     F("gdp", "GDP", "money", { unit: "zł per year", source: "pl_gdp", description: gdpDesc[lv] }),
     F("gdp_pc", "GDP per person", "pln", { unit: "zł per resident", higher_is: "good", source: "pl_gdp", description: `GDP divided by residents (GDP ${lv === "states" ? yrs.gdp_voiv || 2024 : yrs.gdp_nuts3 || 2023}, population ${yrs.population || 2025}).`, derived: true }),

@@ -56,7 +56,8 @@ async function main() {
     loadJSON("metros", true), loadJSON("powiaty", true),
   ]);
   const lensFile = lenses && Array.isArray(lenses.lenses) ? lenses : { vintage: "", groups: [], lenses: [] };
-  const w = prepareWorld(world, cities, { resources });
+  const capitals = (Array.isArray(statesData) ? statesData : []).flatMap((st) => (st.capitals || []).map((c) => c.gmina));
+  const w = prepareWorld(world, cities, { resources, capitals });
   const state = {
     cities, lens: null, band: null, hoverCell: -1, selectedCity: null, selectedState: null, showResources: !!w.resources,
     highlight: null, // {cells?, cities?, states?, resources?, dimOthers?, color?} (render/overlays.js)

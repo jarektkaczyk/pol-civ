@@ -22,7 +22,7 @@ export const ADVISORS = [
   { id: "land", name: "Geometra", role: "Royal Surveyor", color: "#6e9a3c", dark: "#18280a", blurb: "Forest, farmland, lakes and towns: what covers the country.", load: () => import("./views/land.js") },
   { id: "military", name: "Hetman", role: "Commander of the Army", color: "#8796ab", dark: "#141b26", blurb: "Garrisons, training grounds, troops and defence spending.", load: () => import("./views/military.js") },
   { id: "commerce", name: "Gdańsk Merchant", role: "Master of Trade", color: "#2fa4b8", dark: "#062630", blurb: "The great freight routes, and the busiest ports and airports.", load: () => import("./views/commerce.js") },
-  { id: "culture", name: "Kustosz", role: "Keeper of Wonders", color: "#c25b9a", dark: "#2e0c22", blurb: "Heritage and wonders of the land, faith and wellbeing, and the disasters places endure.", load: () => import("./views/culture.js") },
+  { id: "culture", name: "Kustosz", role: "Keeper of Heritage", color: "#c25b9a", dark: "#2e0c22", blurb: "Heritage sites and landmarks, faith and wellbeing, and the disasters places endure.", load: () => import("./views/culture.js") },
   { id: "explorer", name: "Kartograf", role: "Cartographer", color: "#9a7bc9", dark: "#1e1236", blurb: "Slice and dice every number: any level, any columns, any chart.", load: () => import("./views/explorer.js") },
 ];
 const byId = new Map(ADVISORS.map((a) => [a.id, a]));

@@ -1,16 +1,49 @@
-// Anonymous, cookieless usage counts (PostHog EU). Loaded by index.html and by every atlas page.
+// Anonymous, cookieless usage counts (PostHog EU) and the Cloudflare Web Analytics beacon. Loaded by index.html and
+// by every atlas page.
 //
 //   track(name, props)   queue an event; a no-op when analytics is off. Props are small enums and numbers only:
 //                        never names of people, free text the user typed, or anything that identifies a visitor.
 //
-// Nothing loads when config.js has no POSTHOG_KEY, on localhost, 127.0.0.1 or file:, or under automation
-// (navigator.webdriver). The PostHog script is fetched after the first map frame (app) or after the load event
-// (atlas pages). It keeps state in memory only (no cookies, no localStorage), never records sessions, never
-// autocaptures clicks and never calls identify. Add ?analytics=debug to a URL to print each event to the console.
+// Nothing loads on localhost, 127.0.0.1 or file:, or under automation (navigator.webdriver); PostHog also needs
+// POSTHOG_KEY and the beacon CF_BEACON_TOKEN in config.js. Both scripts are fetched after the first map frame (app)
+// or after the load event (atlas pages). PostHog keeps state in memory only (no cookies, no localStorage), never
+// records sessions, never autocaptures clicks and never calls identify. Its automatic $pageview and $pageleave stay
+// on (they count visitors), but before_send rewrites every URL property to origin + path + hash, keeping only utm_*
+// query parameters, so a query such as ?email=... never leaves the page. Add ?analytics=debug to a URL to print each
+// event to the console.
 //
 // In the app, most events come from the extension API (window.__app events) and a few delegated DOM listeners, so
 // the modules that own those actions stay untouched. Search and the Explorer call track() directly.
-import { POSTHOG_KEY, POSTHOG_HOST, POSTHOG_ASSETS } from "./config.js";
+import { POSTHOG_KEY, POSTHOG_HOST, POSTHOG_ASSETS, CF_BEACON_TOKEN, CF_BEACON_SRC } from "./config.js";
+
+/** origin + path + hash of an absolute URL, with only its utm_* query parameters. Other strings pass unchanged. */
+export function sanitizeUrl(value) {
+  if (typeof value !== "string" || !/^https?:\/\//i.test(value)) return value;
+  try {
+    const u = new URL(value);
+    const keep = new URLSearchParams();
+    for (const [k, v] of u.searchParams) if (/^utm_/i.test(k)) keep.append(k, v);
+    const q = keep.toString();
+    return `${u.origin}${u.pathname}${q ? `?${q}` : ""}${u.hash}`;
+  } catch {
+    return value.replace(/[?#].*$/, "");
+  }
+}
+
+function sanitizeProps(props) {
+  if (!props || typeof props !== "object") return props;
+  for (const [k, v] of Object.entries(props)) if (typeof v === "string") props[k] = sanitizeUrl(v);
+  return props;
+}
+
+/** PostHog before_send: strip query text from $current_url, $referrer and every other URL-valued property. */
+export function sanitizeEvent(event) {
+  if (!event || typeof event !== "object") return event;
+  sanitizeProps(event.properties);
+  sanitizeProps(event.$set);
+  sanitizeProps(event.$set_once);
+  return event;
+}
 
 const CONFIG = {
   api_host: POSTHOG_HOST,
@@ -22,6 +55,7 @@ const CONFIG = {
   capture_pageleave: true,
   disable_surveys: true,
   person_profiles: "identified_only",
+  before_send: sanitizeEvent,
 };
 
 const loc = globalThis.location || { protocol: "file:", hostname: "", search: "", hash: "" };
@@ -29,6 +63,7 @@ const debug = /[?&]analytics=debug\b/.test(loc.search || "");
 const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0)$/;
 const blocked = () => loc.protocol === "file:" || LOCAL.test(loc.hostname || "") || !!globalThis.navigator?.webdriver;
 const enabled = !!POSTHOG_KEY && !blocked();
+const beaconEnabled = !!CF_BEACON_TOKEN && !blocked();
 const entryHash = String(loc.hash || "");
 let ph = null; // the PostHog stub (queues calls until the script arrives), then the real client
 let loading = false;
@@ -79,7 +114,20 @@ function stub() {
   return q;
 }
 
+// Cloudflare Web Analytics, under the same guard as PostHog. Its token lives in config.js only.
+let beaconLoaded = false;
+function loadBeacon() {
+  if (!beaconEnabled || beaconLoaded || typeof document === "undefined") return;
+  beaconLoaded = true;
+  const s = document.createElement("script");
+  s.src = CF_BEACON_SRC;
+  s.defer = true;
+  s.setAttribute("data-cf-beacon", JSON.stringify({ token: CF_BEACON_TOKEN }));
+  document.body.appendChild(s);
+}
+
 function load() {
+  loadBeacon();
   if (!enabled || loading) return;
   loading = true;
   stub();

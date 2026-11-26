@@ -13,7 +13,7 @@ from ..core.paths import WEB_DATA
 from ..core.store import load_interim, load_interim_payload, write_web
 from .infrastructure import STATE_ABBR
 
-REQUIRES = ["_world", "pl_geo_teryt", "pl_transport_freight", "infrastructure.json"]
+REQUIRES = ["_world", "pl_geo_teryt", "pl_transport_freight", "infrastructure.json", "states.json", "cities.json"]
 PRODUCES = ["trade.json"]
 
 TOP_N = 30
@@ -22,7 +22,7 @@ PARTNERS = 5
 STEP_COST = {"motorway": 1.0, "expressway": 1.25, "rail": 1.4, "land": 4.0, "water": 10.0}
 
 RULE = (
-    "The 30 largest published rail freight flows between Polish voivodeships whose map anchors are at least 100 km "
+    "The 30 largest published rail freight flows between Polish voivodeships whose capital-city anchors are at least 100 km "
     "apart, ranked by tonnes and summed in both directions. Eurostat publishes road freight loaded and unloaded by "
     "NUTS 3 region, but no road origin-destination matrix, so those road figures appear as regional totals and are "
     "not turned into routes."
@@ -33,9 +33,10 @@ PATH_NOTE = (
 )
 
 
-def build_zones(world: dict, teryt: dict) -> dict[str, dict]:
-    grid = HexGrid(**world["grid"])
+def build_zones(world: dict, teryt: dict, states: list[dict], cities: list[dict]) -> dict[str, dict]:
     names = {row["code"]: row["name"] for row in teryt["voivodeships"]}
+    state_by_code = {row["fips"]: row for row in states}
+    city_by_id = {str(row["id"]): row for row in cities}
     gmina_count = defaultdict(int)
     for code in world["counties"]:
         gmina_count[code[:2]] += 1
@@ -44,16 +45,18 @@ def build_zones(world: dict, teryt: dict) -> dict[str, dict]:
         cells = [cell for cell, owner in enumerate(world["owner"]) if owner == state_index]
         if not cells:
             continue
-        centers = [grid.center(*grid.col_row(cell)) for cell in cells]
-        mx = sum(x for x, _ in centers) / len(centers)
-        my = sum(y for _, y in centers) / len(centers)
-        cell = min(cells, key=lambda index: math.dist(grid.center(*grid.col_row(index)), (mx, my)))
-        x, y = grid.center(*grid.col_row(cell))
+        capitals = state_by_code.get(code, {}).get("capitals") or []
+        seat = next((row for row in capitals if row.get("role") in {"voivode", "both"}), None)
+        capital = city_by_id.get(str(seat.get("gmina"))) if seat else None
+        if capital is None:
+            raise ValueError(f"missing voivode capital for voivodeship {code}")
+        cell = int(capital["cell"])
+        x, y = float(capital["x"]), float(capital["y"])
         zones[code] = {
             "id": code, "name": names.get(code, code), "short": names.get(code, code),
-            "kind": "voivodeship", "states": [STATE_ABBR.get(code)], "cities": [],
+            "kind": "voivodeship", "states": [STATE_ABBR.get(code)], "cities": [capital["id"]],
             "counties": gmina_count[code],
-            "anchor": {"cell": cell, "x": round(x, 1), "y": round(y, 1), "city": None},
+            "anchor": {"cell": cell, "x": round(x, 1), "y": round(y, 1), "city": capital["name"]},
         }
     return zones
 
@@ -138,8 +141,10 @@ def build() -> None:
     freight = freight_payload["data"]
     infrastructure_path = WEB_DATA / "infrastructure.json"
     infrastructure = json.loads(infrastructure_path.read_text()) if infrastructure_path.exists() else None
+    states = json.loads((WEB_DATA / "states.json").read_text())
+    cities = json.loads((WEB_DATA / "cities.json").read_text())
     grid = HexGrid(**world["grid"])
-    zones = build_zones(world, teryt)
+    zones = build_zones(world, teryt, states, cities)
     pairs = aggregate_flows(freight.get("flows") or [], zones)
     candidates = []
     for (a, b), value in pairs.items():

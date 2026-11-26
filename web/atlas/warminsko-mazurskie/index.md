@@ -7,7 +7,7 @@ Warmińsko-Mazurskie has the highest registered unemployment of the 16 voivodesh
 
 Its capital is Olsztyn.
 
-It has 50 towns; 10 of them have 20,000 or more residents.
+It has 50 towns; 9 of them have 20,000 or more residents.
 
 [Open on the map](https://softonsofa.com/pol-civ/#state=WN)
 
@@ -15,9 +15,9 @@ It has 50 towns; 10 of them have 20,000 or more residents.
 
 | Figure | Value | Date | Publisher |
 |---|---|---|---|
-| Population | 1,339,498 | 31 December 2025 | Statistics Poland (GUS) |
+| Population | 1,334,345 | 30 June 2026 | Statistics Poland (GUS) |
 | Change since 2015 | -7.0% | 2015 to 2025 | Statistics Poland (GUS) |
-| GDP | 90.4 billion zł (2.5% of Poland) | 2024 | Eurostat and European Central Bank |
+| GDP | 90.4 billion zł (2.5% of Poland) | 2024 | Statistics Poland (GUS), Eurostat and European Central Bank |
 | Average gross wage | 8,029 zł a month | May 2026 | Statistics Poland (GUS) |
 | Registered unemployment | 9.3% | October 2026 | Statistics Poland (GUS) |
 | People working | 419,201 | 31 December 2025 | Statistics Poland (GUS) |
@@ -30,16 +30,16 @@ It has 50 towns; 10 of them have 20,000 or more residents.
 
 ## Largest towns
 
-- [Olsztyn](https://softonsofa.com/pol-civ/atlas/olsztyn/): 165,393 residents
-- [Elbląg](https://softonsofa.com/pol-civ/atlas/elblag/): 111,089 residents
-- [Ełk](https://softonsofa.com/pol-civ/atlas/elk/): 58,889 residents
-- [Iława](https://softonsofa.com/pol-civ/atlas/ilawa/): 31,798 residents
-- [Ostróda](https://softonsofa.com/pol-civ/atlas/ostroda/): 30,755 residents
-- [Giżycko](https://softonsofa.com/pol-civ/atlas/gizycko/): 26,482 residents
-- [Kętrzyn](https://softonsofa.com/pol-civ/atlas/ketrzyn/): 24,427 residents
-- [Szczytno](https://softonsofa.com/pol-civ/atlas/szczytno/): 21,323 residents
-- [Bartoszyce](https://softonsofa.com/pol-civ/atlas/bartoszyce/): 20,767 residents
-- [Mrągowo](https://softonsofa.com/pol-civ/atlas/mragowo/): 20,008 residents
+- [Olsztyn](https://softonsofa.com/pol-civ/atlas/olsztyn/): 164,999 residents
+- [Elbląg](https://softonsofa.com/pol-civ/atlas/elblag/): 110,647 residents
+- [Ełk](https://softonsofa.com/pol-civ/atlas/elk/): 58,732 residents
+- [Iława](https://softonsofa.com/pol-civ/atlas/ilawa/): 31,703 residents
+- [Ostróda](https://softonsofa.com/pol-civ/atlas/ostroda/): 30,612 residents
+- [Giżycko](https://softonsofa.com/pol-civ/atlas/gizycko/): 26,295 residents
+- [Kętrzyn](https://softonsofa.com/pol-civ/atlas/ketrzyn/): 24,263 residents
+- [Szczytno](https://softonsofa.com/pol-civ/atlas/szczytno/): 21,146 residents
+- [Bartoszyce](https://softonsofa.com/pol-civ/atlas/bartoszyce/): 20,599 residents
+- Mrągowo: 19,921 residents
 
 ## Energy and resources
 
@@ -56,7 +56,6 @@ It has 50 towns; 10 of them have 20,000 or more residents.
 - [Giżycko](https://softonsofa.com/pol-civ/atlas/gizycko/)
 - [Iława](https://softonsofa.com/pol-civ/atlas/ilawa/)
 - [Kętrzyn](https://softonsofa.com/pol-civ/atlas/ketrzyn/)
-- [Mrągowo](https://softonsofa.com/pol-civ/atlas/mragowo/)
 - [Olsztyn](https://softonsofa.com/pol-civ/atlas/olsztyn/)
 - [Ostróda](https://softonsofa.com/pol-civ/atlas/ostroda/)
 - [Szczytno](https://softonsofa.com/pol-civ/atlas/szczytno/)
@@ -64,9 +63,9 @@ It has 50 towns; 10 of them have 20,000 or more residents.
 ## Sources
 
 - [Statistics Poland (GUS): GUS labour publication tables (GUS, October 2026, May 2026, and December 2025)](https://stat.gov.pl/obszary-tematyczne/rynek-pracy/)
-- [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
-- [Eurostat and European Central Bank: Polish national and regional accounts (Eurostat national 2025; voivodeship GDP 2024; NUTS3 GDP 2023; GVA 2023)](https://ec.europa.eu/eurostat/web/national-accounts/data/database)
+- [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
+- [Statistics Poland (GUS), Eurostat and European Central Bank: Polish national and regional accounts (Eurostat national 2025; voivodeship GDP 2024 (GUS, revision of 30 September 2026); NUTS3 GDP 2023; GVA 2023)](https://ec.europa.eu/eurostat/web/national-accounts/data/database)
 - [Ministry of Finance and Statistics Poland (GUS): Polish local income, housing, and tourism statistics (Ministry of Finance 2026; GUS annual 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
 - [European Space Agency (ESA WorldCover consortium): ESA WorldCover 2021 (v200), 10 m land cover (ESA WorldCover 2021 v200, 1:32 overview (1/375 degree))](https://esa-worldcover.org/)
-- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 31 December 2025 and position (GUS towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
-- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 2026-11-26, curated figures as of 2026-11)](https://www.openstreetmap.org/)
+- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 30 June 2026 and position (GUS population 30 June 2026; towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
+- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 2026-11-26, PGE report 2025, other curated figures as of 2026-11)](https://www.openstreetmap.org/)

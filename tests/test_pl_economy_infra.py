@@ -170,6 +170,12 @@ class FreightTest(unittest.TestCase):
 
 
 class AirportTest(unittest.TestCase):
+    def test_cpk_uses_official_plan_and_wikidata_position(self):
+        self.assertEqual("Q48840381", airports.CPK["qid"])
+        self.assertEqual("planned", airports.CPK["status"])
+        self.assertEqual(2032, airports.CPK["opening_planned"])
+        self.assertEqual("https://www.gov.pl/web/priorytety/p32", airports.CPK["ref"])
+
     def test_values_by_year_and_icao(self):
         dims = {"unit": ["PAS"], "tra_meas": ["PAS_CRD"], "rep_airp": ["PL_EPWA", "DE_EDDF"],
                 "schedule": ["TOTAL"], "tra_cov": ["TOTAL"], "time": ["2024", "2025"]}
@@ -178,6 +184,21 @@ class AirportTest(unittest.TestCase):
         vals, labels = airports.airport_values(doc, "PAS_CRD", "PAS")
         self.assertEqual(vals, {2025: {"EPWA": 100.0}})
         self.assertIn("EPWA", labels)
+
+
+class EnergyPlantsTest(unittest.TestCase):
+    def test_belchatow_uses_pge_2025_capacity(self):
+        point = {
+            "id": "plant:way/592157961", "name": "Elektrownia Be\u0142chat\u00f3w", "kind": "lignite_plant",
+            "props": {"osm_id": "way/592157961", "mw": 5472.0, "fuel": "lignite", "status": "operating"},
+        }
+
+        missing = plants.apply_overrides([point], plants.OVERRIDES)
+
+        self.assertNotIn("way/592157961", missing)
+        self.assertEqual(5097.0, point["props"]["mw"])
+        self.assertEqual(2025, point["props"]["mw_year"])
+        self.assertEqual(plants.PGE_2025_REPORT, point["props"]["ref"])
 
 
 class ResTest(unittest.TestCase):

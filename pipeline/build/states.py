@@ -2,7 +2,7 @@
 and the economic profile.
 
 The economic profile (population, yields, GDP, ranks) has the shape of a city's (see yields.py): the sum of the
-voivodeship's powiaty, with the published voivodeship GDP (Eurostat NUTS 2, 2024) as Gold. A statistics interim
+voivodeship's powiaty, with the published voivodeship GDP (GUS regional accounts, 2024) as Gold. A statistics interim
 that is missing leaves its fields null.
 
 The label anchor is the voivodeship's
@@ -152,7 +152,7 @@ def land_shares(world: dict, s: int) -> dict | None:
 
 
 def economy(econ: Economy, units: Units, gdp_rows: dict, gdp_year, code: str) -> dict:
-    """The voivodeship's economic profile: its whole powiaty, with the published NUTS 2 GDP as Gold."""
+    """The voivodeship's economic profile: its whole powiaty, with the published GUS voivodeship GDP as Gold."""
     powiaty = [p for p in units.powiaty if p[:2] == code]
     gminas = [g for g in units.gminas if g[:2] == code]
     prof = econ.profile(gminas, powiaty=powiaty)

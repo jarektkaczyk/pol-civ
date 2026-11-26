@@ -3,7 +3,7 @@
 Source page: https://softonsofa.com/pol-civ/atlas/wieliczka/
 Last updated: 2026-11-26
 
-The gmina of Wieliczka has the 5th youngest population of the 204 Polish towns with 20,000 or more people: a median age of 40.8 years.
+The gmina of Wieliczka has the 5th youngest population of the 203 Polish towns with 20,000 or more people: a median age of 41.0 years.
 
 Wieliczka is a town in powiat wielicki, Małopolskie voivodeship.
 
@@ -13,9 +13,9 @@ Wieliczka is a town in powiat wielicki, Małopolskie voivodeship.
 
 | Figure | Value | Date | Publisher |
 |---|---|---|---|
-| Population | 28,485 | 31 December 2025 | Główny Urząd Statystyczny (GUS); OpenStreetMap contributors |
-| Median age (whole gmina of Wieliczka) | 40.8 years | 31 December 2025 | Statistics Poland (GUS) |
-| Residents aged 65 or more (whole gmina of Wieliczka) | 15.8% | 31 December 2025 | Statistics Poland (GUS) |
+| Population | 28,601 | 30 June 2026 | Główny Urząd Statystyczny (GUS); OpenStreetMap contributors |
+| Median age (whole gmina of Wieliczka) | 41.0 years | 30 June 2026 | Statistics Poland (GUS) |
+| Residents aged 65 or more (whole gmina of Wieliczka) | 15.9% | 30 June 2026 | Statistics Poland (GUS) |
 | Average gross wage (powiat wielicki) | 8,451 zł a month | May 2026 | Statistics Poland (GUS) |
 | Registered unemployment (powiat wielicki) | 4.6% | October 2026 | Statistics Poland (GUS) |
 | Personal income tax revenue per resident (whole gmina of Wieliczka) | 4,437 zł | 2026 plan | Ministry of Finance and Statistics Poland (GUS) |
@@ -43,7 +43,7 @@ The median of the 154 towns of 20,000+ with a station within 25 km was 16.4 µg/
 
 ## Metro area and places nearby
 
-Wieliczka belongs to the Kraków metro area, 1,465,000 residents in 40 gminas. Its core town is Kraków.
+Wieliczka belongs to the Kraków metro area, 1,468,599 residents in 40 gminas. Its core town is Kraków.
 
 - Wieliczka and Bochnia Royal Salt Mines: UNESCO World Heritage site since 1978, in the town
 - Historic Centre of Kraków: UNESCO World Heritage site since 1978, 12 km away
@@ -51,16 +51,16 @@ Wieliczka belongs to the Kraków metro area, 1,465,000 residents in 40 gminas. I
 
 ## Towns of a similar size
 
-- [Augustów](https://softonsofa.com/pol-civ/atlas/augustow/): 28,518 residents
-- [Nowy Dwór Mazowiecki](https://softonsofa.com/pol-civ/atlas/nowy-dwor-mazowiecki/): 28,422 residents
-- [Myszków](https://softonsofa.com/pol-civ/atlas/myszkow/): 28,660 residents
-- [Bochnia](https://softonsofa.com/pol-civ/atlas/bochnia/): 28,187 residents
-- [Kobyłka](https://softonsofa.com/pol-civ/atlas/kobylka/): 28,850 residents
+- [Myszków](https://softonsofa.com/pol-civ/atlas/myszkow/): 28,493 residents
+- [Police](https://softonsofa.com/pol-civ/atlas/police/): 28,739 residents
+- [Augustów](https://softonsofa.com/pol-civ/atlas/augustow/): 28,425 residents
+- [Nowy Dwór Mazowiecki](https://softonsofa.com/pol-civ/atlas/nowy-dwor-mazowiecki/): 28,344 residents
+- [Kobyłka](https://softonsofa.com/pol-civ/atlas/kobylka/): 28,948 residents
 
 ## Sources
 
-- [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
-- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 31 December 2025 and position (GUS towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
+- [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
+- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 30 June 2026 and position (GUS population 30 June 2026; towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
 - [Statistics Poland (GUS): GUS labour publication tables (GUS, October 2026, May 2026, and December 2025)](https://stat.gov.pl/obszary-tematyczne/rynek-pracy/)
 - [Ministry of Finance and Statistics Poland (GUS): Polish local income, housing, and tourism statistics (Ministry of Finance 2026; GUS annual 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
 - [Państwowa Komisja Wyborcza (PKW): Election results by gmina (presidential 2025, Sejm 2023) (PKW: presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 Oct 2023))](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach)

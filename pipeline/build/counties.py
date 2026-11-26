@@ -49,9 +49,9 @@ def M(key, label, fmt, unit, level, source, higher_is, description, group, **ext
 
 METRICS = [
     M("density", "Density", "float", "people / km²", "gmina", "pl_stats_population", "neutral",
-      "Residents per km² (GUS, 31 December 2025; area on 1 January 2026).", "people"),
+      "Residents per km² (GUS, 30 June 2026; area on 1 January 2026).", "people"),
     M("median_age", "Median age", "years", "years", "gmina", "pl_stats_population", "neutral",
-      "Median age of residents, worked out from the GUS five-year age groups of 31 December 2025 by linear "
+      "Median age of residents, worked out from the GUS five-year age groups of 30 June 2026 by linear "
       "interpolation inside the group that holds the middle resident.", "people"),
     M("growth", "Change 2015-2025", "pct", "population change", "gmina", "pl_stats_population", "neutral",
       "Population on 31 December 2025 ÷ population on 31 December 2015 - 1 (GUS). Each year is on its own "
@@ -61,7 +61,7 @@ METRICS = [
       "People who moved in minus people who moved out, within Poland and from abroad, per 1,000 residents (GUS, 2025).",
       "people"),
     M("elderly", "Aged 65+", "pct", "share of residents", "gmina", "pl_stats_population", "neutral",
-      "Residents aged 65 or more ÷ all residents (GUS, 31 December 2025).", "people"),
+      "Residents aged 65 or more ÷ all residents (GUS, 30 June 2026).", "people"),
     M("births", "Births", "float", "per 1,000 residents", "gmina", "pl_stats_population", "neutral",
       "Live births per 1,000 residents (GUS, 2025).", "people"),
     M("ukrainians", "Ukrainians (PESEL UKR)", "float", "per 1,000 residents", "powiat", "pl_foreigners", "neutral",
@@ -181,7 +181,7 @@ class Metrics:
         powiat_pop = {}
         for g in gms:
             p = econ.pop.get(g) or 0
-            voiv_pop[g[:2]] = voiv_pop.get(g[:2], 0) + p
+            voiv_pop[g[:2]] = voiv_pop.get(g[:2], 0) + (econ.pop2025.get(g) or 0)  # 2025 tourist nights
             powiat_pop[g[:4]] = powiat_pop.get(g[:4], 0) + p
 
         def col(key, f):
@@ -197,7 +197,7 @@ class Metrics:
         col("area_km2", lambda g: ratio(rec(pop, g).get("area_ha"), 100, 1, 2))
         col("density", lambda g: ratio(econ.pop.get(g), ratio(rec(pop, g).get("area_ha"), 100), 1, 1))
         col("median_age", lambda g: median_age(rec(pop, g)))
-        col("growth", lambda g: _growth(econ.pop.get(g), econ.pop2015.get(g)))
+        col("growth", lambda g: _growth(econ.pop2025.get(g), econ.pop2015.get(g)))
         col("net_migration", lambda g: _r(rec(vital, g).get("total_migration_net_per_1000"), 2))
         col("elderly", lambda g: ratio(rec(pop, g).get("age_65_plus"), econ.pop.get(g), 1, 4))
         col("births", lambda g: _r(rec(vital, g).get("births_per_1000"), 2))
@@ -207,7 +207,7 @@ class Metrics:
         col("unemployment", lambda g: pct(rec(lab, g[:4]).get("registered_unemployment_rate")))
         col("dwellings", lambda g: _r(rec(house, g[:2]).get("dwellings_completed_per_1000"), 2))
         col("higher_ed", lambda g: pct(rec(edu, g[:4]).get("higher_share")))
-        col("students", lambda g: ratio(rec(stud, g).get("students"), econ.pop.get(g), 1000, 1))
+        col("students", lambda g: ratio(rec(stud, g).get("students"), econ.pop2025.get(g), 1000, 1))
         col("tourism", lambda g: ratio(rec(tour, g[:2]).get("overnight_stays"), voiv_pop.get(g[:2]), 1, 2))
         col("doctors", lambda g: _r(rec(health, g[:4]).get("doctors_per_10k"), 1))
         col("life_f", lambda g: _r(rec(demo, g[:2]).get("life_expectancy_female"), 1))
@@ -321,7 +321,7 @@ def gmina_fields() -> list[dict]:
         _field("powiat", "Powiat", "text", source="pl_geo_teryt"),
         _field("state", "Voivodeship", "text", source="pl_geo_teryt"),
         _field("population", "Population", "int", "people", source="pl_stats_population",
-               description="Residents on 31 December 2025 (GUS)."),
+               description="Residents on 30 June 2026 (GUS)."),
         _field("area_km2", "Area", "km2", "km²", source="pl_stats_population",
                description="Area on 1 January 2026 (GUS)."),
     ]
@@ -383,7 +383,7 @@ def build() -> None:
         _field("code", "TERYT", "text"), _field("name", "Powiat", "text", source="pl_geo_teryt"),
         _field("state", "Voivodeship", "text", source="pl_geo_teryt"),
         _field("population", "Population", "int", "people", source="pl_stats_population",
-               description="Residents on 31 December 2025 (GUS)."),
+               description="Residents on 30 June 2026 (GUS)."),
         _field("area_km2", "Area", "km2", "km²", source="pl_stats_population"),
         *[_field(k, METRIC[k]["label"], METRIC[k]["format"], METRIC[k]["unit"], METRIC[k]["higher_is"],
                  METRIC[k]["source"], METRIC[k]["description"] + ("" if METRIC[k]["level"] in ("powiat", "voivodeship")
@@ -408,7 +408,7 @@ def build() -> None:
             if k == "density":
                 vals[k] = round(pop / area, 1) if pop and area else None
             elif k == "growth":
-                vals[k] = _growth(pop, total(econ.pop2015.get(g) for g in gms))
+                vals[k] = _growth(total(econ.pop2025.get(g) for g in gms), total(econ.pop2015.get(g) for g in gms))
             elif METRIC[k]["level"] in ("powiat", "voivodeship"):
                 vals[k] = m.values[k][ii[0]] if ii else None
             else:

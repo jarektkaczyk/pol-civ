@@ -19,15 +19,20 @@ export const tips = {
     return lines.join("<br>");
   },
   airport(a) {
-    const code = a.iata || a.icao || a.id;
-    const lines = [`<b>${esc(code)} &middot; ${esc(a.name)}</b> ${muted(join(a.state))}`];
+    const code = a.iata || a.icao;
+    const title = code ? `${esc(code)} &middot; ${esc(a.name)}` : esc(a.name);
+    const lines = [`<b>${title}</b> ${muted(join(a.state))}`];
     if (a.passengers != null) {
       let change = "";
       if (a.passengers_prev > 0) change = `, ${((a.passengers / a.passengers_prev - 1) * 100).toFixed(1)}% from the prior year`;
       lines.push(`<b>${num(a.passengers)}</b> passengers${a.year ? ` (${esc(a.year)})` : ""}${change}`);
     }
     if (a.freight_t != null) lines.push(`${num(a.freight_t)} tonnes of freight and mail`);
-    if (a.status && a.status !== "operating") lines.push(muted(esc(STATUS[a.status] || a.status)));
+    if (a.status && a.status !== "operating") {
+      let status = STATUS[a.status] || a.status;
+      if (a.status === "planned" && a.opening_planned) status += `, first stage by ${a.opening_planned}`;
+      lines.push(muted(esc(status)));
+    }
     return lines.join("<br>");
   },
   fort(f, m) {
@@ -57,6 +62,7 @@ export const tips = {
     const kind = memorial ? "Memorial site" : WONDER_KINDS[x.kind]?.name || x.kind_label || "Landmark";
     const lines = [`<b>${esc(x.name)}</b> ${muted(join(x.state))}`, esc(kind)];
     if (x.kind === "university" && mt.students != null) lines.push(`${int(mt.students)} students`);
+    if (mt.visits_latest != null) lines.push(`${num(mt.visits_latest)} visitors${mt.latest_year ? ` (${esc(mt.latest_year)})` : ""}`);
     if (mt.visits != null) lines.push(`${num(mt.visits)} visitors${mt.year ? ` (${esc(mt.year)})` : ""}`);
     if (mt.record) lines.push(esc(mt.record));
     if (mt.value != null) lines.push(`${num(mt.value)} ${esc(mt.unit || "")}`.trim());
@@ -71,7 +77,7 @@ export const tips = {
       `<b>${esc(a)} and ${esc(b)}</b> ${muted(`route ${esc(r.rank)}`)}`,
       `<b>${num((r.value_kt ?? r.tons_k) * 1000)}</b> tonnes by rail`,
     ];
-    if (r.dist_km != null) lines.push(`${int(r.dist_km)} km between the region anchors`);
+    if (r.dist_km != null) lines.push(`${int(r.dist_km)} km between the capital cities`);
     return lines.join("<br>");
   },
 };

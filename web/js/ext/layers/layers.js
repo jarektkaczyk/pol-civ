@@ -7,7 +7,7 @@
 // restricted ground 58 (hatching on hexes), ports & airports 65, forts 66, wonders 67 (above city tiles, under the fog),
 // name plates 68 (forts and wonders laid out together, clear of city banners and City View district plaques), trade
 // routes 85 (above resources, under voivodeship names). Everything is drawn into the cached static map; nothing animates.
-import { drawRoads, drawRail, drawPort, drawAirport, drawTradeRoutes, hitRoute, ROAD_MIN_RPX } from "../../render/art/improvements.js";
+import { drawRoads, drawRail, drawPort, drawAirport, drawTradeRoutes, hitRoute, ROAD_MIN_RPX, OVERVIEW_ROUTES } from "../../render/art/improvements.js";
 import { drawFort, drawRestricted, drawProtected, drawWonder, drawPlaque } from "../../render/art/sites.js";
 import { visibleSites, siteSize, hitSites } from "./model.js";
 
@@ -85,7 +85,7 @@ export function makeLayers(model, on, { tips = {}, app = null } = {}) {
     draw(ctx, vp, w, o) {
       drawSites(ctx, vp, o, hubs.list(o.Rpx), (it, size) => {
         if (it.kind === "port") drawPort(ctx, it.x, it.y, size, { tier: it.tier, type: it.data.type });
-        else drawAirport(ctx, it.x, it.y, size, { tier: it.tier });
+        else drawAirport(ctx, it.x, it.y, size, { tier: it.tier, planned: it.data.status === "planned" });
       });
     },
     warm(ctx, vp, w, o) { hubs.draw(ctx, vp, w, o); },
@@ -123,12 +123,15 @@ export function makeLayers(model, on, { tips = {}, app = null } = {}) {
   const trade = {
     id: "trade", z: 85, minRpx: 2,
     visible: () => !!on.trade && m.routes.length > 0,
-    sig: ver,
+    sig: () => `${ver()}|${app?.mode || ""}|${app?.advisors?.current || ""}`,
+    list: (Rpx) => (Rpx >= 8 || (app?.mode === "advisor" && app?.advisors?.current === "commerce"))
+      ? m.routes : m.routes.slice(0, OVERVIEW_ROUTES),
     draw(ctx, vp, w, o) {
-      drawTradeRoutes(ctx, m.routes, vp, o);
+      const routes = trade.list(o.Rpx);
+      drawTradeRoutes(ctx, routes, vp, o, { overview: routes.length < m.routes.length });
     },
     hit: (x, y, Rpx) => {
-      const rt = hitRoute(m.routes, x, y, Rpx, Rpx / grid().R);
+      const rt = hitRoute(trade.list(Rpx), x, y, Rpx, Rpx / grid().R);
       return rt ? { kind: "route", data: rt } : null;
     },
     tooltip: (it) => tips.route?.(it.data, m) ?? null,

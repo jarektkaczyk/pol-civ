@@ -287,6 +287,8 @@ def build_airports(locator: Locator, points: list[dict]) -> list[dict]:
             "passengers_prev": props.get("passengers_prev"), "freight_t": props.get("freight_t"),
             "year": props.get("passengers_year") or props.get("freight_year"),
             "status": props.get("status"), "status_note": props.get("status_note"),
+            "opening_planned": props.get("opening_planned"), "ref": props.get("ref"),
+            "wikidata": props.get("wikidata"),
             **at,
         })
     return out

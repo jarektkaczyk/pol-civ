@@ -105,7 +105,7 @@ export function prepareWorld(world, cities, extras = {}) {
   prepared.coverRGB = tables.cover.reduce((a, t) => ((a[t.id] = t.color ? parseHex(t.color) : null), a), []);
   prepared.waterRGB = tables.water.reduce((a, t) => ((a[t.id] = t.color ? parseHex(t.color) : null), a), []);
   prepared.terrainColors = terrainColors(prepared);
-  prepared.stateLabels = computeStateLabels(prepared);
+  prepared.stateLabels = computeStateLabels(prepared, bannerZones(cities, extras.capitals));
   prepared.resources = prepareResources(extras.resources);
   return prepared;
 }
@@ -213,7 +213,46 @@ export function applyLens(w, lens, band = null) {
 
 // For each state: anchor at the hex farthest from its border (BFS), angle from the PCA of the hex centres of
 // that part of the state (clamped to ±35°), and a font size (km) that fits the state's extent.
-function computeStateLabels(w) {
+// Where the big banners sit at the whole-country zoom, in map km: a plate centred over the town, above its point
+// (render/banners.js, about 120 x 22 css px at 1.26 px/km). Only the voivodeship capitals count.
+const BANNER_HALF_W = 50, BANNER_TOP = 27, BANNER_BOTTOM = 2;
+function bannerZones(cities, capitals) {
+  const caps = new Set(capitals || []);
+  return (cities || [])
+    .filter((c) => c && Number.isFinite(c.x) && Number.isFinite(c.y) && caps.has(c.gmina) && c.id === c.gmina)
+    .map((c) => [c.x - BANNER_HALF_W, c.y - BANNER_TOP, c.x + BANNER_HALF_W, c.y + BANNER_BOTTOM]);
+}
+
+/** True when a label (centre x, y, angle, size in km) covers any banner zone. Samples the text's outline. */
+function labelHitsBanner(lbl, zones) {
+  return zones.length > 0 && labelPoints(lbl).some(([x, y]) => zones.some((z) => x > z[0] && x < z[2] && y > z[1] && y < z[3]));
+}
+
+/** Points on the outline of a label's text box (km). */
+function labelPoints(lbl) {
+  const em = labelEm(lbl.text);
+  const ux = Math.cos(lbl.angle), uy = Math.sin(lbl.angle), nx = -uy, ny = ux;
+  const half = (lbl.size * em) / 2, h = lbl.size * 0.42;
+  const pts = [];
+  for (let t = -half; t <= half + 1e-6; t += Math.max(2, half / 12)) {
+    for (const o of [-h, 0, h]) pts.push([lbl.x + ux * t + nx * o, lbl.y + uy * t + ny * o]);
+  }
+  return pts;
+}
+
+/** True when two labels collide by the test map.js uses to drop a label (axis-aligned boxes of the rotated text). */
+function labelsOverlap(p, q) {
+  const box = (l) => {
+    const tw = l.size * (l.text.length * 0.78 + LABEL_SPACING * (l.text.length - 1)), th = l.size * 0.8;
+    const c = Math.abs(Math.cos(l.angle)), sn = Math.abs(Math.sin(l.angle));
+    const bw = (tw * c + th * sn) / 2, bh = (tw * sn + th * c) / 2;
+    return [l.x - bw, l.y - bh, l.x + bw, l.y + bh];
+  };
+  const a = box(p), b = box(q);
+  return a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+}
+
+function computeStateLabels(w, zones = []) {
   const { grid } = w;
   const { owner, states } = w.raw;
   const n = grid.size;
@@ -254,6 +293,7 @@ function computeStateLabels(w) {
   }
 
   const labels = [];
+  const retry = [];
   const seen = new Uint8Array(n);
   for (let s = 0; s < states.length; s++) {
     const a = best[s];
@@ -288,13 +328,16 @@ function computeStateLabels(w) {
       return 3.46 * Math.sqrt(Math.max(vxx * uy * uy - 2 * vxy * ux * uy + vyy * ux * ux, 0)) + grid.W;
     };
     const depth = (dist[a] + 0.7) * 2 * grid.H; // how thick the state is at the anchor
-    const name = states[s].name.toUpperCase();
+    // Keep the published Polish spelling. Uppercase display text made the accents and the
+    // stroke of uppercase L-with-stroke too easy to lose at the national overview scale.
+    const name = states[s].name;
     // Try the PCA angle (slightly preferred), horizontal and halfway; keep the largest text that stays inside.
     const tries = [angle, 0, angle / 2].filter((t, k, arr) => arr.findIndex((u) => Math.abs(u - t) < 0.03) === k);
-    const bestFit = (text) => {
+    const bestFit = (text, at = a) => {
       let pick = null;
+      const deep = (dist[at] + 0.7) * 2 * grid.H;
       for (const ang of tries) {
-        const f = fitAlong(w, s, a, ang, text, Math.min(0.62 * across(ang), 0.75 * depth, 150));
+        const f = fitAlong(w, s, at, ang, text, Math.min(0.62 * across(ang), 0.75 * deep, 150));
         const score = f.size * (ang === angle ? 1.1 : 1);
         if (!pick || score > pick.score) pick = { ...f, text, angle: ang, score };
       }
@@ -307,13 +350,31 @@ function computeStateLabels(w) {
       pick.size = Math.min(pick.size, 40);
     }
     labels.push({ state: s, text: pick.text, x: pick.x, y: pick.y, angle: pick.angle, size: pick.size, depth: dist[a] });
+    retry.push({ index: labels.length - 1, s, a, name, bestFit, full: pick.text === name });
+  }
+  // A full name that would cover a capital's banner (Lubelskie over Lublin) moves to the deepest other anchor that
+  // keeps it clear of every banner and every other name, if it stays readable there (18 km, 60% of its size).
+  for (const r of retry) {
+    const lbl = labels[r.index];
+    if (!r.full || !labelHitsBanner(lbl, zones)) continue;
+    const others = labels.filter((_, k) => k !== r.index);
+    const cands = [];
+    for (let i = 0; i < n; i++) if (owner[i] === r.s && dist[i] > 0 && i !== r.a) cands.push(i);
+    cands.sort((p, q) => score(q) - score(p));
+    let alt = null;
+    for (const c of cands) {
+      const f = r.bestFit(r.name, c);
+      if (labelHitsBanner(f, zones) || others.some((o) => labelsOverlap(f, o))) continue;
+      if (!alt || f.score > alt.score) alt = f;
+    }
+    if (alt && alt.size >= Math.max(18, 0.6 * lbl.size)) Object.assign(lbl, { x: alt.x, y: alt.y, angle: alt.angle, size: alt.size });
   }
   return labels;
 }
 
 // State-name letter spacing (fraction of the font size); map.js draws with the same values.
 export const LABEL_FONT = '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif';
-export const LABEL_SPACING = 0.32;
+export const LABEL_SPACING = 0.08;
 let measureCtx = null;
 /** Width of `text` in em at LABEL_FONT with LABEL_SPACING between letters (falls back to an estimate). */
 function labelEm(text) {

@@ -1,6 +1,8 @@
-"""Eurostat regional accounts for Polish GDP and GVA.
+"""Polish GDP and GVA: GUS regional accounts for voivodeships, Eurostat for NUTS 3 and GVA.
 
-The two regional files are small bulk TSV downloads. The national query is a
+The voivodeship GDP in zloty comes from the GUS regional accounts for 2024 (revision of
+30 September 2026), which are newer than the Eurostat NUTS 2 values of the same year.
+The Eurostat regional files are small bulk TSV downloads. The national query is a
 bounded JSON-stat request for Poland and GDP only. An ECB annual exchange rate
 converts the national euro value to US dollars.
 """
@@ -13,6 +15,7 @@ import json
 import re
 from collections import defaultdict
 
+from ..core.bdl import read_xlsx
 from ..core.source import Source, SourceInfo
 
 EUROSTAT = "https://ec.europa.eu/eurostat/api/dissemination"
@@ -36,6 +39,25 @@ ECB_URL = (
     "https://data-api.ecb.europa.eu/service/data/EXR/A.USD.EUR.SP00.A"
     "?startPeriod=2025&endPeriod=2025&format=csvdata"
 )
+
+GUS_REGIONAL_PAGE = (
+    "https://stat.gov.pl/obszary-tematyczne/rachunki-narodowe/rachunki-regionalne/"
+    "produkt-krajowy-brutto-i-wartosc-dodana-brutto-w-przekroju-regionow-w-2024-r-,7,9.html"
+)
+GUS_REGIONAL_URL = (
+    "https://stat.gov.pl/download/gfx/portalinformacyjny/pl/defaultaktualnosci/5482/7/9/1/"
+    "produkt_krajowy_brutto_i_wartosc_dodana_brutto_w_przekroju_regionow_w_2024_r._tablice.xlsx"
+)
+GUS_REGIONAL_FILE = "gus_regional_gdp_2024.xlsx"
+GUS_REGIONAL_YEAR = 2024
+GUS_REGIONAL_RELEASE = "30 September 2026"
+# GUS region names (ASCII-folded) to voivodeship TERYT. Mazowieckie is published as two NUTS 2 regions.
+GUS_REGION_TERYT = {
+    "dolnoslaskie": "02", "kujawsko-pomorskie": "04", "lubelskie": "06", "lubuskie": "08", "lodzkie": "10",
+    "malopolskie": "12", "mazowiecki regionalny": "14", "warszawski stoleczny": "14", "opolskie": "16",
+    "podkarpackie": "18", "podlaskie": "20", "pomorskie": "22", "slaskie": "24", "swietokrzyskie": "26",
+    "warminsko-mazurskie": "28", "wielkopolskie": "30", "zachodniopomorskie": "32",
+}
 
 # NUTS 2024 level 2 regions. Mazowieckie is split into PL91 and PL92.
 NUTS2_TERYT = {
@@ -75,6 +97,39 @@ def read_eurostat_tsv(path):
                     yield dims, int(year), value
 
 
+def _fold(text) -> str:
+    letters = "\u0105\u0107\u0119\u0142\u0144\u00f3\u015b\u017a\u017c"
+    folded = str(text or "").lower().translate(str.maketrans(letters, "acelnoszz"))
+    return " ".join(re.sub(r"\s*-\s*", "-", folded).split())
+
+
+def gus_regional_gdp(rows: list[list]) -> tuple[dict[str, dict], float | None]:
+    """{voivodeship TERYT: {gdp_pln, population}} and the Poland total in PLN from GUS Tabl. 1.
+
+    Columns: region, GDP in million PLN, share, index, GDP per capita in PLN. The implied population
+    (GDP / GDP per capita) weights the two Mazowieckie regions when their per-capita values are combined.
+    """
+    out: dict[str, dict] = {}
+    poland = None
+    for row in rows:
+        if len(row) < 5 or not isinstance(row[1], (int, float)):
+            continue
+        name = _fold(row[0])
+        if name.replace(" ", "").startswith("polskapoland"):
+            poland = float(row[1]) * 1_000_000
+            continue
+        code = GUS_REGION_TERYT.get(name)
+        if not code:
+            continue
+        gdp = float(row[1]) * 1_000_000
+        per = row[4] if isinstance(row[4], (int, float)) and row[4] else None
+        rec = out.setdefault(code, {"gdp_pln": 0.0, "population": 0.0, "parts": 0})
+        rec["gdp_pln"] += gdp
+        rec["population"] = (rec["population"] + gdp / per) if per and rec["population"] is not None else None
+        rec["parts"] += 1
+    return out, poland
+
+
 def jsonstat_rows(payload: dict):
     """Yield dimension dictionaries and values from a JSON-stat 2 response."""
     dim_ids = payload["id"]
@@ -110,10 +165,11 @@ class PolandGdp(Source):
     info = SourceInfo(
         id="pl_gdp",
         title="Polish national and regional accounts",
-        publisher="Eurostat and European Central Bank",
+        publisher="Statistics Poland (GUS), Eurostat and European Central Bank",
         homepage="https://ec.europa.eu/eurostat/web/national-accounts/data/database",
         license="Eurostat reuse policy; ECB data may be reused with attribution",
-        description="GDP for Polish voivodeships and NUTS 3 regions, regional GVA by NACE, and national GDP.",
+        description="GDP for Polish voivodeships (GUS regional accounts) and NUTS 3 regions (Eurostat), regional "
+        "GVA by NACE, and national GDP.",
         used_for=["Gold yield", "Economy advisor", "National headline GDP"],
     )
 
@@ -123,6 +179,7 @@ class PolandGdp(Source):
         self.download(NATIONAL_URL, NATIONAL_FILE, force=force)
         self.download(NATIONAL_PC_URL, NATIONAL_PC_FILE, force=force)
         self.download(ECB_URL, ECB_FILE, force=force)
+        self.download(GUS_REGIONAL_URL, GUS_REGIONAL_FILE, force=force, expect_binary=True)
 
     def process(self):
         nuts2_series = defaultdict(lambda: defaultdict(list))
@@ -153,6 +210,17 @@ class PolandGdp(Source):
             else:
                 row["gdp_pln"] = None
             voiv_rows[code] = row
+
+        gus_rows, gus_poland = gus_regional_gdp(read_xlsx(self.raw_dir / GUS_REGIONAL_FILE, "Tabl. 1."))
+        if len(gus_rows) != 16:
+            raise RuntimeError(f"GUS regional GDP: found {len(gus_rows)} voivodeships, expected 16")
+        eurostat_pln = {code: row.get("gdp_pln") for code, row in voiv_rows.items()}
+        for code, rec in gus_rows.items():
+            row = voiv_rows.setdefault(code, {"gdp_eur": None, "gdp_per_person_eur": None})
+            row["gdp_pln"] = rec["gdp_pln"]
+            row["gdp_per_person_pln"] = round(rec["gdp_pln"] / rec["population"]) if rec["population"] else None
+            row["gdp_pln_eurostat"] = eurostat_pln.get(code)
+        voiv_year = GUS_REGIONAL_YEAR
 
         nuts3_series = defaultdict(lambda: defaultdict(list))
         for dims, year, value in read_eurostat_tsv(self.raw_dir / "nuts3_gdp.tsv.gz"):
@@ -224,19 +292,30 @@ class PolandGdp(Source):
         }
 
         regional_note = "Eurostat dataset variable ids: nama_10r_2gdp and nama_10r_3gdp."
+        gus_note = (
+            f"GUS regional accounts {GUS_REGIONAL_YEAR}, Tabl. 1, revision of {GUS_REGIONAL_RELEASE} "
+            f"({GUS_REGIONAL_PAGE}). Mazowieckie is the sum of Warszawski stoleczny and Mazowiecki regionalny."
+        )
         gva_note = "Eurostat dataset variable id: nama_10r_3gva; NACE Rev. 2 A*6 breakdown."
         return {
             "vintage": (
-                f"Eurostat national {national_year}; voivodeship GDP {nuts2_year}; "
+                f"Eurostat national {national_year}; voivodeship GDP {voiv_year} (GUS, revision of "
+                f"{GUS_REGIONAL_RELEASE}); "
                 f"NUTS3 GDP {nuts3_year}; GVA {gva_year}"
             ),
             "tables": {
                 "gdp_voivodeship": {
                     "level": "voivodeship",
                     "fields": {
-                        "gdp_pln": _field("GDP", "PLN", nuts2_year, regional_note),
-                        "gdp_eur": _field("GDP", "EUR", nuts2_year, regional_note),
-                        "gdp_per_person_eur": _field("GDP per person", "EUR per person", nuts2_year, regional_note),
+                        "gdp_pln": _field("GDP", "PLN", voiv_year, gus_note),
+                        "gdp_per_person_pln": _field("GDP per person", "PLN per person", voiv_year, gus_note),
+                        "gdp_pln_eurostat": _field(
+                            "GDP, Eurostat", "PLN", nuts2_year, regional_note + " Earlier vintage, kept for comparison."
+                        ),
+                        "gdp_eur": _field("GDP", "EUR", nuts2_year, regional_note + " Earlier vintage than gdp_pln."),
+                        "gdp_per_person_eur": _field(
+                            "GDP per person", "EUR per person", nuts2_year, regional_note + " Earlier vintage than gdp_pln."
+                        ),
                     },
                     "rows": voiv_rows,
                 },
@@ -281,7 +360,9 @@ class PolandGdp(Source):
             },
             "notes": [
                 "Mazowieckie combines NUTS 2 regions PL91 and PL92; per-person GDP uses their implied populations.",
+                f"Voivodeship gdp_pln is GUS {GUS_REGIONAL_YEAR} (revision of {GUS_REGIONAL_RELEASE}); GUS total for "
+                f"Poland {GUS_REGIONAL_YEAR}: {gus_poland:,.0f} PLN. NUTS 3 GDP and GVA stay on Eurostat.",
                 f"National USD conversion uses the ECB {rate:g} USD per EUR annual average for 2025.",
             ],
-            "_files": list(REGIONAL_FILES) + [NATIONAL_FILE, NATIONAL_PC_FILE, ECB_FILE],
+            "_files": [GUS_REGIONAL_FILE] + list(REGIONAL_FILES) + [NATIONAL_FILE, NATIONAL_PC_FILE, ECB_FILE],
         }

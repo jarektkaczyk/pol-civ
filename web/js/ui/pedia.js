@@ -40,15 +40,15 @@ export function initPedia(data) {
       that holds it, not at its exact address. Rivers, coasts and borders follow the hexes.</p>
       <p><b>Missing data stays missing.</b> When a figure is not published for a place, the map shows a dash or leaves the
       place uncoloured. It never shows a zero or a guess.</p>
-      <p><b>Selections are rules.</b> Wonders, resources and badges are picked by a published rule (for example every
+      <p><b>Selections are rules.</b> Heritage sites and landmarks, resources and badges are picked by a published rule (for example every
       UNESCO World Heritage site, or every power station above a size), never by taste. Each rule is in this Almanac.</p>
       <h4>Controls</h4>
       <p>Drag, the arrow keys or WASD pan the map. Scroll, + and - or a double-click zoom. Click a town or a voivodeship to
       open it. Press / to search, L to change the lens, R to show or hide resources, ? for every shortcut and Esc to close.</p>
       <p>The address bar always holds a link to what you are looking at. Use <i>Share</i> to copy it or to download a picture.</p>
       <h4>Credits</h4>
-      <p>This map is a fork of <a href="https://karpathy.ai/usaciv/" target="_blank" rel="noopener">usaciv</a>, which draws
-      the United States the same way, and is shared under the same MIT licence.
+      <p>This map is a fork of <a href="https://karpathy.ai/usaciv/" target="_blank" rel="noopener">usaciv</a>
+      and is shared under the same MIT licence.
       <a href="https://github.com/jarektkaczyk/pol-civ" target="_blank" rel="noopener">Source code</a>.</p>`,
     Yields: () => {
       // The rule behind each yield (docs/BLUEPRINT.md section 8; the builder records the exact rule in yields.py).

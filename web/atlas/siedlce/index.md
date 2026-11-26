@@ -3,7 +3,7 @@
 Source page: https://softonsofa.com/pol-civ/atlas/siedlce/
 Last updated: 2026-11-26
 
-Siedlce had 74,251 residents on 31 December 2025, 3.5% fewer than in 2015.
+Siedlce had 73,966 residents on 30 June 2026. Between 2015 and 2025 it lost 3.5% of its residents.
 
 Siedlce is a city with powiat rights in Mazowieckie voivodeship.
 
@@ -13,10 +13,10 @@ Siedlce is a city with powiat rights in Mazowieckie voivodeship.
 
 | Figure | Value | Date | Publisher |
 |---|---|---|---|
-| Population | 74,251 | 31 December 2025 | Główny Urząd Statystyczny (GUS); OpenStreetMap contributors |
+| Population | 73,966 | 30 June 2026 | Główny Urząd Statystyczny (GUS); OpenStreetMap contributors |
 | Change since 2015 | -3.5% (from 76,942) | 2015 to 2025 | Statistics Poland (GUS) |
-| Median age | 43.5 years | 31 December 2025 | Statistics Poland (GUS) |
-| Residents aged 65 or more | 22.5% | 31 December 2025 | Statistics Poland (GUS) |
+| Median age | 43.7 years | 30 June 2026 | Statistics Poland (GUS) |
+| Residents aged 65 or more | 22.6% | 30 June 2026 | Statistics Poland (GUS) |
 | Average gross wage | 8,540 zł a month | May 2026 | Statistics Poland (GUS) |
 | Registered unemployment | 4.8% | October 2026 | Statistics Poland (GUS) |
 | Personal income tax revenue per resident | 5,490 zł | 2026 plan | Ministry of Finance and Statistics Poland (GUS) |
@@ -45,20 +45,20 @@ The median of the 154 towns of 20,000+ with a station within 25 km was 16.4 µg/
 
 ## Metro area and places nearby
 
-Siedlce belongs to the Siedlce metro area, 146,687 residents in 13 gminas.
+Siedlce belongs to the Siedlce metro area, 146,357 residents in 13 gminas.
 
 ## Towns of a similar size
 
-- [Jelenia Góra](https://softonsofa.com/pol-civ/atlas/jelenia-gora/): 73,470 residents
-- [Mysłowice](https://softonsofa.com/pol-civ/atlas/myslowice/): 70,160 residents
-- [Nowy Sącz](https://softonsofa.com/pol-civ/atlas/nowy-sacz/): 79,416 residents
-- [Piła](https://softonsofa.com/pol-civ/atlas/pila/): 68,762 residents
-- [Jastrzębie-Zdrój](https://softonsofa.com/pol-civ/atlas/jastrzebie-zdroj/): 80,527 residents
+- [Jelenia Góra](https://softonsofa.com/pol-civ/atlas/jelenia-gora/): 73,029 residents
+- [Mysłowice](https://softonsofa.com/pol-civ/atlas/myslowice/): 69,864 residents
+- [Nowy Sącz](https://softonsofa.com/pol-civ/atlas/nowy-sacz/): 79,139 residents
+- [Piła](https://softonsofa.com/pol-civ/atlas/pila/): 68,432 residents
+- [Jastrzębie-Zdrój](https://softonsofa.com/pol-civ/atlas/jastrzebie-zdroj/): 80,119 residents
 
 ## Sources
 
-- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 31 December 2025 and position (GUS towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
-- [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
+- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 30 June 2026 and position (GUS population 30 June 2026; towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
+- [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
 - [Statistics Poland (GUS): GUS labour publication tables (GUS, October 2026, May 2026, and December 2025)](https://stat.gov.pl/obszary-tematyczne/rynek-pracy/)
 - [Ministry of Finance and Statistics Poland (GUS): Polish local income, housing, and tourism statistics (Ministry of Finance 2026; GUS annual 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
 - [Państwowa Komisja Wyborcza (PKW): Election results by gmina (presidential 2025, Sejm 2023) (PKW: presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 Oct 2023))](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach)

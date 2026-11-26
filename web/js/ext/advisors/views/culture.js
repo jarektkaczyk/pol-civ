@@ -38,12 +38,15 @@ export async function mount(ctx) {
   const rulesBody = section(el, { title: "What appears on the map" });
   rulesBody.insertAdjacentHTML("beforeend", [...rules.values()].map((rule) => `<p class="adv-note"><b>${esc(ruleTitle(rule.id))}:</b> ${esc(ruleSummary(rule))}</p>`).join(""));
 
-  const siteBody = section(el, { title: "Heritage and landmarks" });
+  // Memorial sites are never grouped with heritage sites and landmarks: they get their own quiet line below the table.
+  const memorials = all.filter((site) => site.kind === "memorial");
+  const sites = all.filter((site) => site.kind !== "memorial");
+  const siteBody = section(el, { title: "Heritage sites and landmarks" });
   let kind = "all";
   segmented(siteBody, {
     label: "Show",
     value: kind,
-    options: [{ value: "all", label: "All" }, ...Object.entries(KIND).map(([value, item]) => ({ value, label: item.label }))],
+    options: [{ value: "all", label: "All" }, ...Object.entries(KIND).filter(([value]) => value !== "memorial").map(([value, item]) => ({ value, label: item.label }))],
     onChange: (value) => { kind = value; drawSites(); },
   });
   const siteTable = createTable(siteBody, {
@@ -59,9 +62,12 @@ export async function mount(ctx) {
     onClick: (r) => focusPoint(app, r.x, r.y, Math.min(app.cam.maxScale, Math.max(app.cam.scale, (app.cam.fitScale || 1) * 3.2))),
   });
   function drawSites() {
-    siteTable.setRows(kind === "all" ? all : all.filter((site) => site.kind === kind));
+    siteTable.setRows(kind === "all" ? sites : sites.filter((site) => site.kind === kind));
   }
   drawSites();
+  if (memorials.length) {
+    siteBody.insertAdjacentHTML("beforeend", memorials.map((site) => `<p class="adv-note">Memorial site: ${esc(site.name)}${site.metrics?.inscribed ? `, UNESCO World Heritage since ${esc(site.metrics.inscribed)}` : ""}.</p>`).join(""));
+  }
 
   for (const [id, title, metric, label] of [
     ["national_park", "Most visited national parks", (site) => site.metrics?.visits, (site) => count3(site.metrics?.visits)],

@@ -33,7 +33,18 @@ POPULATION_2015_URL = (
     "5468/6/19/1/stan_i_struktura_ludnosci_oraz_ruch_naturalny_w_przekroju_terytorialnym_31-12-2015_-_tabele.zip"
 )
 
+POPULATION_JUNE_URL = (
+    "https://stat.gov.pl/download/gfx/portalinformacyjny/pl/defaultaktualnosci/"
+    "5468/6/41/1/ludnosc_stan_i_struktura_30.06.2026.zip"
+)
+POPULATION_JUNE_PAGE = (
+    "https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/"
+    "ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2026-r-"
+    "stan-w-dniu-30-czerwca,6,41.html"
+)
+
 POPULATION_FILE = "population-2025-12-31.zip"
+POPULATION_JUNE_FILE = "population-2026-06-30.zip"
 AREA_FILE = "area-population-2026.xlsx"
 POPULATION_2020_FILE = "population-2020-12-31.zip"
 POPULATION_2015_FILE = "population-2015-12-31.zip"
@@ -390,6 +401,27 @@ def _sex(zip_path: Path) -> dict[str, dict[str, int | float | None]]:
     return result
 
 
+def _sex_xlsx(zip_path: Path) -> dict[str, dict[str, int | float | None]]:
+    """Read population by sex for whole gminas from table 11 (XLSX in the June 2026 edition).
+
+    For an urban-rural gmina (type 3) the urban total, column 5, is the population of its town (type 4).
+    """
+    with zipfile.ZipFile(zip_path) as archive:
+        member = next(name for name in archive.namelist() if name.lower() == "tabela11.xlsx")
+        rows = read_xlsx(io.BytesIO(archive.read(member)), 0)
+    result = {}
+    for row in rows:
+        code = _teryt(_row_value(row, 1))
+        if code:
+            result[code] = {
+                "population": _number(_row_value(row, 2)),
+                "male": _number(_row_value(row, 3)),
+                "female": _number(_row_value(row, 4)),
+                "urban": _number(_row_value(row, 5)),
+            }
+    return result
+
+
 def _vital(zip_path: Path) -> tuple[dict[str, dict[str, int | float | None]], dict[str, int | float | None]]:
     rows = {}
     country = {}
@@ -549,6 +581,7 @@ class PlStatsPopulation(Source):
     def fetch(self, force: bool = False) -> None:
         for url, filename in (
             (POPULATION_URL, POPULATION_FILE),
+            (POPULATION_JUNE_URL, POPULATION_JUNE_FILE),
             (AREA_URL, AREA_FILE),
             (POPULATION_2020_URL, POPULATION_2020_FILE),
             (POPULATION_2015_URL, POPULATION_2015_FILE),
@@ -566,9 +599,10 @@ class PlStatsPopulation(Source):
 
     def process(self) -> dict:
         current_zip = self.raw_dir / POPULATION_FILE
+        june_zip = self.raw_dir / POPULATION_JUNE_FILE
         area = _area(self.raw_dir / AREA_FILE)
-        sex = _sex(current_zip)
-        ages = _ages(current_zip)
+        june_sex = _sex_xlsx(june_zip)
+        june_ages = _ages(june_zip)
         vital, country_vital = _vital(current_zip)
         population_2020 = _best_population_table(self.raw_dir / POPULATION_2020_FILE)
         population_2015 = _best_population_table(self.raw_dir / POPULATION_2015_FILE)
@@ -577,31 +611,52 @@ class PlStatsPopulation(Source):
         )
         gmina_rows = {}
         for code, base in area.items():
+            sex = dict(june_sex.get(code) or {})
+            sex.pop("urban", None)
             record = {
                 **base,
-                **(_on_current_code(sex, code) or {}),
-                **(_on_current_code(ages, code) or {}),
+                "population": None,
+                "male": None,
+                "female": None,
+                **sex,
+                **(june_ages.get(code) or {}),
             }
+            # Table 19 population and density are the 31 December 2025 balance.
+            record["population_2025"] = base.get("population")
             record["population_2015"] = _on_current_code(population_2015, code)
             record["population_2020"] = _on_current_code(population_2020, code)
             gmina_rows[code] = record
+        missing = [code for code, row in gmina_rows.items() if row["population"] is None]
+        if len(missing) > 0:
+            raise RuntimeError(f"{len(missing)} gminas have no 30 June 2026 population: {missing[:5]}")
         current_vital = {code: _on_current_code(vital, code) or {} for code in area}
         age_fields = {}
         for start in range(0, 85, 5):
             age_fields[f"age_{start}_{start + 4}"] = _field(
-                f"Population age {start}-{start + 4}", "persons", 2025, "GUS table 12"
+                f"Population age {start}-{start + 4}", "persons", 2026, "30 June 2026, GUS table 12"
             )
-        age_fields["age_85_plus"] = _field("Population age 85+", "persons", 2025, "GUS table 12")
+        age_fields["age_85_plus"] = _field("Population age 85+", "persons", 2026, "30 June 2026, GUS table 12")
         population_fields = {
-            "population": _field("Population", "persons", 2025, "GUS area and population table 19"),
-            "male": _field("Male population", "persons", 2025, "GUS table 11"),
-            "female": _field("Female population", "persons", 2025, "GUS table 11"),
-            "age_0_14": _field("Population age 0-14", "persons", 2025, "Sum of GUS table 12 five-year groups"),
-            "age_15_64": _field("Population age 15-64", "persons", 2025, "Sum of GUS table 12 five-year groups"),
-            "age_65_plus": _field("Population age 65+", "persons", 2025, "Sum of GUS table 12 five-year groups"),
+            "population": _field("Population", "persons", 2026, "30 June 2026, GUS half-year balance table 11"),
+            "male": _field("Male population", "persons", 2026, "30 June 2026, GUS table 11"),
+            "female": _field("Female population", "persons", 2026, "30 June 2026, GUS table 11"),
+            "age_0_14": _field(
+                "Population age 0-14", "persons", 2026, "30 June 2026, sum of GUS table 12 five-year groups"
+            ),
+            "age_15_64": _field(
+                "Population age 15-64", "persons", 2026, "30 June 2026, sum of GUS table 12 five-year groups"
+            ),
+            "age_65_plus": _field(
+                "Population age 65+", "persons", 2026, "30 June 2026, sum of GUS table 12 five-year groups"
+            ),
+            "population_2025": _field(
+                "Population", "persons", 2025, "31 December 2025, GUS area and population table 19"
+            ),
             "area_ha": _field("Area", "ha", 2026, "Area on 1 January 2026, GUS table 19"),
             "area_km2": _field("Area", "km2", 2026, "Area on 1 January 2026, GUS table 19"),
-            "density": _field("Population density", "persons per km2", 2025, "GUS table 19"),
+            "density": _field(
+                "Population density", "persons per km2", 2025, "31 December 2025, GUS table 19"
+            ),
             "population_2015": _field("Population", "persons", 2015, "GUS 2015 bulk publication"),
             "population_2020": _field("Population", "persons", 2020, "GUS 2020 bulk publication"),
             **age_fields,
@@ -665,9 +720,13 @@ class PlStatsPopulation(Source):
             ),
         }
         national_population = sum(row["population"] for row in gmina_rows.values() if row["population"] is not None)
+        national_population_2025 = sum(
+            row["population_2025"] for row in gmina_rows.values() if row["population_2025"] is not None
+        )
         return {
             "vintage": (
-                "GUS population 31 December 2025; demographic rates and life expectancy 2025; "
+                "GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, "
+                "births, deaths and migration; demographic rates and life expectancy 2025; "
                 "university students 31 December 2025; territorial division 1 January 2026"
             ),
             "tables": {
@@ -687,14 +746,27 @@ class PlStatsPopulation(Source):
                 "headline": {
                     "level": "country",
                     "fields": {
-                        "population": _field("Population", "persons", 2025, "Sum of whole gminas; GUS table 19"),
+                        "population": _field(
+                            "Population", "persons", 2026, "30 June 2026, sum of whole gminas; GUS table 11"
+                        ),
+                        "population_2025": _field(
+                            "Population", "persons", 2025, "31 December 2025, sum of whole gminas; GUS table 19"
+                        ),
                         **vital_fields,
                     },
-                    "rows": {"PL": {"population": national_population, **country_vital}},
+                    "rows": {"PL": {
+                        "population": national_population,
+                        "population_2025": national_population_2025,
+                        **country_vital,
+                    }},
                 },
             },
             "notes": [
-                "Population is the official balance at 31 December 2025, recalculated to the 1 January 2026 division.",
+                "Population, sex and five-year age groups are the GUS half-year balance at 30 June 2026 "
+                "(" + POPULATION_JUNE_PAGE + ").",
+                "population_2025 and density are the balance at 31 December 2025, recalculated to the "
+                "1 January 2026 division; change since 2015 compares 31 December with 31 December.",
+                "Births, deaths and migration are full-year 2025 flows; the June 2026 edition has only half-year flows.",
                 "The 2026 territorial division contains 2,479 whole gminas; the blueprint's provisional count is 2,477.",
                 "A gmina whose type digit changed is matched across vintages by its unchanged first six TERYT digits.",
                 "Population in 2015 and 2020 is null for 1207132 and 2002162 because those gminas were created in 2025.",
@@ -704,7 +776,7 @@ class PlStatsPopulation(Source):
                 "University students are counted once for every course studied, as specified by GUS.",
             ],
             "_files": [
-                POPULATION_FILE, AREA_FILE, POPULATION_2020_FILE, POPULATION_2015_FILE,
+                POPULATION_JUNE_FILE, POPULATION_FILE, AREA_FILE, POPULATION_2020_FILE, POPULATION_2015_FILE,
                 DEMOGRAPHY_FILE, LIFE_EXPECTANCY_FILE, UNIVERSITY_FILE,
             ],
         }

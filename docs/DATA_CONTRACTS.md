@@ -32,14 +32,12 @@ Per-cell arrays have length `grid.cols * grid.rows`, with index `row * cols + co
   tests run every discovered check against a dataset without your files); a check that raises is reported as a FAIL.
   Validate your file's shape against this document (keys, types, null rules, cell ranges against world.json) and add a
   short data-quality summary (counts, coverage) as PASS/NOTE lines.
-* **ACS interims.** `acs_1yr` keeps every estimate line (`<TABLE>_<line>`, e.g. `C24010_007`) of its tables for the nation
-  (`geos["0100000US"]`), the states (`geos["0400000USss"]`) and every CBSA (`cbsa["<5-digit code>"]`): `b01003 c24030 b19025
-  b19013 b25064 b25077 b23025` plus, for citizens, `c24010` (occupation; male lines 002-037, female = male + 36), `b01001`
-  (age; male 003-025, female = male + 24), `b01002` (median age), `c08301` (commute), `c15003` (education 25+) and `b05002`
-  (place of birth). Sexes are **not** summed in the interim: builders add male + female lines. Census leaves some small
-  CBSAs out of a table entirely (C24010 has 520 of 536 CBSAs, C08301 525, B05002 535): the CBSA's record then simply lacks
-  those keys (treat as null). `acs_5yr` (`geos["0500000USsscc"]`, counties) adds `b21001` (veterans: `B21001_001` civilian
-  population 18+, `_002` veterans) and `b23025` (`B23025_001` population 16+, `_006` in the armed forces, by residence).
+* **Interim shape.** A source's interim is `{"vintage", "tables": {name: {"level", "fields", "rows"}}, "points"?,
+  "notes"?}`. `level` is `country`, `voivodeship`, `powiat`, `gmina`, `town`, `nuts3` or `diocese`. Rows are keyed by
+  the TERYT code of the level (2 digits voivodeship, 4 digits powiat, 7 digits gmina or town with the type digit), by
+  the NUTS 3 code (`PL213`) or by `PL` for the country. Each field is `{label, unit, year, note}`; `note` starts with
+  the reference date when the figure is a stock (`"30 June 2026, ..."`), and `year` is that date's year. Money fields
+  are in złoty (`unit: "PLN"`) unless the key ends in `_eur` or `_usd`.
 
 ## world.json
 
@@ -124,7 +122,7 @@ Every town with town rights on 1 January 2026 (1,026), sorted by population, des
   "capital": false,               // Warszawa only
   "x": 407.6, "y": 565.7, "cell": 6279,   // true position (map km); banner cell (Polish land, unique where possible)
   "scope": "city",                // what the economic fields describe: "city" | "gmina" | "urban-rural gmina"
-  "gmina_population": 816614,     // the gmina's population (differs from population for "urban-rural gmina")
+  "gmina_population": 819493,     // the gmina's population (differs from population for "urban-rural gmina")
   /* the economic shape below */
   "footprint": [6196, 6197, "..."],  // cells where 4 of 7 samples are the town's own gmina (type 1), plus `cell`
   "ranks": {"population": 2, "gdp": 2, "gdp_per_capita": 19, "growth": 10, "food": 2, "...": 1},  // among all towns;
@@ -136,7 +134,8 @@ Every town with town rights on 1 January 2026 (1,026), sorted by population, des
 **Economic shape** (a town, a metro, a voivodeship and nation.json `nation`; built by `pipeline/build/yields.py`):
 
 ```jsonc
-"population": 816614,                 // residents, GUS 31 Dec 2025 (a town: the town itself, GUS Tabl. 20)
+"population": 819493,                 // residents, GUS 30 June 2026 (a town: the town itself; in an urban-rural
+                                      // gmina, the gmina's urban total of GUS table 11)
 "employed": 535510,                   // workers by employer seat, GUS 31 Dec 2025 (PKD table for whole powiaty)
 "yields": {"food": 2343, "production": 75800, "gold": 1.19e11, "science": 142498, "culture": 23519},  // any may be null
 "jobs": {"agriculture": 2343, "...": null},  // PKD sections A-S (keys in nation.json industries); {} below the powiat
@@ -144,8 +143,8 @@ Every town with town rights on 1 January 2026 (1,026), sorted by population, des
 "unemployment": 0.028, "unemployment_exact": true,  // registered rate, 0..1 fraction (exact for whole powiaty)
 "pit_per_person": 6787.05,            // PLN: planned 2026 PIT revenue of the gminas / their residents
 "gdp": 1.19e11, "gdp_year": 2023, "gdp_estimated": true,  // PLN; estimated = a share of a published total
-"growth": 0.073, "growth_years": [2015, 2025],  // population change, see pipeline/build/growth.py
-"pop_series": {"2015": 761069, "2020": 779966, "2025": 816614}  // or null
+"growth": 0.073, "growth_years": [2015, 2025],  // change 31 Dec 2015 to 31 Dec 2025, see pipeline/build/growth.py
+"pop_series": {"2015": 761069, "2020": 779966, "2025": 816614}  // 31 December of each year, or null
 ```
 
 * **Yield rules** are in `yields.py` and in nation.json `yields[].description`: Food = PKD A, Production = B-F,
@@ -153,7 +152,8 @@ Every town with town rights on 1 January 2026 (1,026), sorted by population, des
   GDP 2023 shared by wage bill, gminas their powiat's GDP shared by workers). Whole powiaty use the PKD sections;
   other gminas use the GUS three-sector gmina table and get Science and Culture as a share of their powiat's by
   service workers.
-* **Growth**: `population(2025) / population(2015) - 1` for the same gmina code (both GUS, each on its own year's
+* **Growth**: `population(31 Dec 2025) / population(31 Dec 2015) - 1` for the same gmina code (`population` itself is
+  the newer 30 June 2026 balance, so growth and `pop_series` stay on 31 December of each year) (both GUS, each on its own year's
   borders: Opole 2017 and the 2025 splits of Kamienica and Supraśl show their border change). Null for a town inside an
   urban-rural gmina (no town series) and for the two gminas created in 2025. |growth| above 2.0 is nulled as an error.
 
@@ -197,18 +197,19 @@ Also, per voivodeship:
   items in the voivodeship, for every resource type with unit `MW`; it counts only the mapped sites, so it is not the
   voivodeship's total generating capacity, and `note` says so.
 * **Economic fields** (`pipeline/build/states.py`): the economic shape of cities.json over the voivodeship's whole
-  powiaty (PKD jobs, exact unemployment from the powiat counts), with Gold = the published GDP 2024 (Eurostat NUTS 2;
-  Mazowieckie = PL91 + PL92, `gdp_estimated: false`). `wage` is the worker-weighted mean of its powiaty (`wage_exact:
+  powiaty (PKD jobs, exact unemployment from the powiat counts), with Gold = the published GDP 2024 (GUS regional
+  accounts, revision of 30 September 2026; Mazowieckie = its two NUTS 2 regions, `gdp_estimated: false`). `wage` is the worker-weighted mean of its powiaty (`wage_exact:
   false`). `ranks`: {yield key: 1..16}, 1 = largest.
 
 ## nation.json
 
 ```jsonc
 {
-  "vintage": "GUS population 31 December 2025; ...", "year": 2025,
-  "gdp_vintage": "Eurostat national 2025; ...",
-  "years": {"population": 2025, "workers": 2025, "gdp_nuts3": 2023, "gdp_voiv": 2024, "gdp_nation": 2025,
-            "wage": 2026, "unemployment": 2026, "pit": 2026},   // the year of each figure (shown in the Almanac)
+  "vintage": "GUS population 30 June 2026; ...", "year": 2026,
+  "population_date": "30 June 2026",   // reference date of every `population` figure
+  "gdp_vintage": "Eurostat national 2025; voivodeship GDP 2024 (GUS, revision of 30 September 2026); ...",
+  "years": {"population": 2026, "population_2025": 2025, "workers": 2025, "gdp_nuts3": 2023, "gdp_voiv": 2024,
+            "gdp_nation": 2025, "wage": 2026, "unemployment": 2026, "pit": 2026},   // the year of each figure
   "nation": { /* economic shape: population, GDP 2025, unemployment and wage are the published national figures */ },
   "yields": [{"key": "food", "icon": "y-food", "emoji": "🌾", "label": "Food", "color": "#7fbf3f",
               "unit": "workers|pln", "industries": ["agriculture"], "description": "..."}],
@@ -326,10 +327,11 @@ a `check(web_dir)` (see Pipeline conventions). Shared rules:
 
 * Top level always has `"version": 1`, `"vintage"` (a human string, or `{part: string}`), and `"sources": [source ids]`
   (sources.json ids, so the Almanac can cite them).
-* `cell` = a world.json cell index (pointy-top odd-r, `row * cols + col`); a site's `cell` is a US land cell (`owner >= 0`)
-  unless stated. `x`, `y` = map km. `county` = 5-digit GEOID from world.json `counties` (or null), `cbsa` = a cities.json
-  `id` (or null), `state` = postal abbr.
-* Money is **US dollars** (not thousands or millions) unless the key says otherwise (`_musd`); shares are 0..1 fractions;
+* `cell` = a world.json cell index (pointy-top odd-r, `row * cols + col`); a site's `cell` is a Polish land cell
+  (`owner >= 0`) unless stated. `x`, `y` = map km. `county` = the TERYT 7-digit gmina code from world.json `counties`
+  (or null), `cbsa` = a metros.json `id` (or null), `state` = the voivodeship's two-letter abbr (`MA`, `MZ`).
+* Money is **złoty (PLN)**, in whole złoty (not thousands or millions), unless the key says otherwise (`_eur`, or a
+  thousand-tonne quantity such as `value_kt`); shares are 0..1 fractions;
   `null` = unknown, never `0`. A value that is a **lower bound** (suppressed parts left out) says so (`lower_bound: true`
   or a `suppressed` count).
 * Rules that pick things (districts, wonders, routes) are published inside the file as text (`rule` / `rules`) so the UI
@@ -572,6 +574,32 @@ Built from `pl_soc_disasters`. It maps the administrative area declared after th
 `gminas.rows` follows `world.json` gmina order. `declared` is 1 for the 198 named gminas and 0 elsewhere. `partial` is 1
 only for Małomice. `cells` is `null` outside Polish land, 1 in declared gminas and 0 in other Polish gminas.
 
+## data/index.json
+
+The public catalogue of `web/data/`, built by `pipeline/build/seo.py` (served at `/pol-civ/data/index.json`):
+
+```jsonc
+{
+  "version": 1, "name": "Polska data catalogue", "site": "https://softonsofa.com/pol-civ/",
+  "generated": "2026-11-26",            // build date (UTC), or POLCIV_BUILD_DATE when set
+  "description": "...", "contracts": "<URL of this document>",
+  "license": {"code": "MIT ...", "data": "each publisher's terms, see sources.json"},
+  "creator": {"@type": "Person", "name": "...", "url": "..."},
+  "text_pages": "https://softonsofa.com/pol-civ/atlas/", "llms": "https://softonsofa.com/pol-civ/llms.txt",
+  "files": [{
+    "path": "data/cities.json", "url": "https://softonsofa.com/pol-civ/data/cities.json",
+    "bytes": 123456,                    // size of the file as built
+    "description": "...",               // one sentence: what one row is
+    "fields": ["id", "name", "..."],    // the main keys, or "key (label)" for a file with a fields list
+    "rows": 1026,                       // rows, items or cells in the file's main list; null when it has none
+    "vintage": "..." | {"<source id>": "..."}
+  }]
+}
+```
+
+Every file in `files` exists next to the page (`pipeline check` fails otherwise). A consumer reads `index.json` first,
+then the files it needs, and cites `sources.json` for each figure.
+
 ## sources.json
 
 A list of `{id, title, publisher, homepage, license, description, used_for, vintage, files: [{file, url, retrieved, sha256, bytes}]}`.
@@ -656,9 +684,10 @@ added after load are set from it, and ids whose extension has not loaded yet sta
 `[{id, label, on}]`. `app.ui.setMapToggle(id, on) → bool` switches one from code exactly as the menu would (redraw,
 hash), e.g. an advisor's "show roads, rail and forts" button; false if no toggle has that id (yet).
 
-**URL.** Core keys: `lens`, `city` (CBSA id), `state`, `at`, plus extension keys (`advisor`, `layers`, ...).
-* `#state=` accepts a FIPS code (`48`, `6`), a postal code (`TX`, `tx`) or a state name; a link keeps the form it
-  was opened with.
+**URL.** Core keys: `lens`, `city` (the town's TERYT 7-digit code, cities.json `id`), `state`, `at`, plus extension
+keys (`advisor`, `layers`, ...).
+* `#state=` accepts the TERYT 2-digit voivodeship code (`12`, `2`), its two-letter abbr (`MA`, `ma`) or its name
+  (`malopolskie` folded or `Małopolskie`); a link keeps the form it was opened with.
 * `at=x,y,z`: `x`, `y` = the map-km point at the centre of the screen (rounded), and `z` = **log2(camera scale ÷
   home-fit scale)**, the zoom relative to the "whole country fits" view: `0` = home framing, `1` = twice as close,
   negative = zoomed out past it. It is relative so a link frames the same area on any screen size; it is *not* the
@@ -683,5 +712,5 @@ hash), e.g. an advisor's "show roads, rail and forts" button; false if no toggle
 `cities`, trade.json zones and infrastructure.json `cbsa`. Update `web/js/ext/advisors` and `web/js/ext/cityView`
 when renaming a field in those files.
 
-**Lenses.** Legend ticks print numbers only (plus short units: %, $, min, /km²); a longer `unit` is printed once under
+**Lenses.** Legend ticks print numbers only (plus short units: %, zł, min, /km²); a longer `unit` is printed once under
 the ticks, so keep `unit` a plain phrase ("adherents per 100 residents"), not part of the number. `lens.note` is shown in the legend; `format: "category"` lenses get a swatch legend (see lenses.json).

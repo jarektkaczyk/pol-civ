@@ -3,7 +3,7 @@
 Source page: https://softonsofa.com/pol-civ/atlas/bytom/
 Last updated: 2026-11-26
 
-Bytom lost 15.3% of its residents between 2015 and 2025, the 3rd steepest fall of the 204 Polish towns with 20,000 or more people.
+Bytom lost 15.3% of its residents between 2015 and 2025, the 3rd steepest fall of the 203 Polish towns with 20,000 or more people.
 
 Bytom is a city with powiat rights in Śląskie voivodeship.
 
@@ -13,10 +13,10 @@ Bytom is a city with powiat rights in Śląskie voivodeship.
 
 | Figure | Value | Date | Publisher |
 |---|---|---|---|
-| Population | 144,598 | 31 December 2025 | Główny Urząd Statystyczny (GUS); OpenStreetMap contributors |
+| Population | 143,853 | 30 June 2026 | Główny Urząd Statystyczny (GUS); OpenStreetMap contributors |
 | Change since 2015 | -15.3% (from 170,761) | 2015 to 2025 | Statistics Poland (GUS) |
-| Median age | 45.6 years | 31 December 2025 | Statistics Poland (GUS) |
-| Residents aged 65 or more | 22.4% | 31 December 2025 | Statistics Poland (GUS) |
+| Median age | 45.8 years | 30 June 2026 | Statistics Poland (GUS) |
+| Residents aged 65 or more | 22.6% | 30 June 2026 | Statistics Poland (GUS) |
 | Average gross wage | 8,421 zł a month | May 2026 | Statistics Poland (GUS) |
 | Registered unemployment | 10.5% | October 2026 | Statistics Poland (GUS) |
 | Personal income tax revenue per resident | 4,710 zł | 2026 plan | Ministry of Finance and Statistics Poland (GUS) |
@@ -45,22 +45,22 @@ The median of the 154 towns of 20,000+ with a station within 25 km was 16.4 µg/
 
 ## Metro area and places nearby
 
-Bytom belongs to the Górnośląsko-Zagłębiowska metro area (PL010F, PL055F, PL061F, PL070F), 2,021,558 residents in 39 gminas. Its core town is Katowice.
+Bytom belongs to the Górnośląsko-Zagłębiowska metro area (PL010F, PL055F, PL061F, PL070F), 2,013,732 residents in 39 gminas. Its core town is Katowice.
 
 - Tarnowskie Góry Lead-Silver-Zinc Mine and its Underground Water Management System: UNESCO World Heritage site since 2017, 12 km away
 
 ## Towns of a similar size
 
-- [Zabrze](https://softonsofa.com/pol-civ/atlas/zabrze/): 150,780 residents
-- [Zielona Góra](https://softonsofa.com/pol-civ/atlas/zielona-gora/): 138,476 residents
-- [Rybnik](https://softonsofa.com/pol-civ/atlas/rybnik/): 128,788 residents
-- [Bielsko-Biała](https://softonsofa.com/pol-civ/atlas/bielsko-biala/): 163,164 residents
-- [Ruda Śląska](https://softonsofa.com/pol-civ/atlas/ruda-slaska/): 127,601 residents
+- [Zielona Góra](https://softonsofa.com/pol-civ/atlas/zielona-gora/): 138,312 residents
+- [Zabrze](https://softonsofa.com/pol-civ/atlas/zabrze/): 150,108 residents
+- [Rybnik](https://softonsofa.com/pol-civ/atlas/rybnik/): 128,360 residents
+- [Bielsko-Biała](https://softonsofa.com/pol-civ/atlas/bielsko-biala/): 162,517 residents
+- [Ruda Śląska](https://softonsofa.com/pol-civ/atlas/ruda-slaska/): 126,922 residents
 
 ## Sources
 
-- [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
-- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 31 December 2025 and position (GUS towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
+- [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
+- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 30 June 2026 and position (GUS population 30 June 2026; towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
 - [Statistics Poland (GUS): GUS labour publication tables (GUS, October 2026, May 2026, and December 2025)](https://stat.gov.pl/obszary-tematyczne/rynek-pracy/)
 - [Ministry of Finance and Statistics Poland (GUS): Polish local income, housing, and tourism statistics (Ministry of Finance 2026; GUS annual 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
 - [Państwowa Komisja Wyborcza (PKW): Election results by gmina (presidential 2025, Sejm 2023) (PKW: presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 Oct 2023))](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach)

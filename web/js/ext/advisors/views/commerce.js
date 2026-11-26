@@ -39,7 +39,7 @@ export async function mount(ctx) {
       value: route.value_kt ?? route.tons_k,
     }));
     const routesBody = section(el, { title: "Largest regional freight flows" });
-    routesBody.insertAdjacentHTML("beforeend", `<p class="adv-callout">The map shows the 30 largest published rail-freight pairs whose region anchors are at least 100 km apart.</p>`);
+    routesBody.insertAdjacentHTML("beforeend", `<p class="adv-callout">This advisor shows all 30 published rail-freight pairs whose voivodeship capital cities are at least 100 km apart.</p>`);
     routeBars = barList(routesBody, {
       rows: routes.slice(0, 12).map((route) => ({ key: route.key, label: `${route.fromName} - ${route.toName}`, sub: `${count3(route.value * 1000)} tonnes`, value: route.value, color: "#d2402f", route })),
       rank: true, ariaLabel: "Largest regional rail-freight flows",
@@ -118,7 +118,9 @@ export async function mount(ctx) {
         columns: [
           { key: "name", label: "Airport", align: "l", width: "minmax(0,1.5fr)", value: (r) => r.name, text: (r) => r.name },
           { key: "passengers", label: "Passengers", value: (r) => r.passengers, text: (r) => fin(r.passengers) ? count3(r.passengers) : "-" },
-          { key: "freight", label: "Freight", value: (r) => r.freight_t, text: (r) => fin(r.freight_t) ? `${count3(r.freight_t)} t` : "-", hideBelow: 400 },
+          { key: "status", label: "Status", align: "l", value: (r) => r.status,
+            text: (r) => r.status === "planned" ? `Planned ${r.opening_planned || ""}`.trim() : "Operating" },
+          { key: "freight", label: "Freight", value: (r) => r.freight_t, text: (r) => fin(r.freight_t) ? `${count3(r.freight_t)} t` : "-", hideBelow: 600 },
         ],
         sort: { key: "passengers", dir: "desc" },
         onHover: (r) => link.hover(r ? { cells: new Set([r.cell]), dimOthers: true, label: r.name } : null),

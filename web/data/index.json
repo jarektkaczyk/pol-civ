@@ -68,7 +68,7 @@
   {
    "path": "data/cities.json",
    "url": "https://softonsofa.com/pol-civ/data/cities.json",
-   "bytes": 899415,
+   "bytes": 899361,
    "description": "Every town with town rights (1 January 2026), with population, growth, wage, unemployment, GDP share, yields and ranks.",
    "fields": [
     "id (TERYT7)",
@@ -84,11 +84,11 @@
    ],
    "rows": 1026,
    "vintage": {
-    "pl_geo_places": "GUS towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched",
-    "pl_stats_population": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026",
+    "pl_geo_places": "GUS population 30 June 2026; towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched",
+    "pl_stats_population": "GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026",
     "pl_stats_labour": "GUS, October 2026, May 2026, and December 2025",
     "pl_stats_prosperity": "Ministry of Finance 2026; GUS annual 2025",
-    "pl_gdp": "Eurostat national 2025; voivodeship GDP 2024; NUTS3 GDP 2023; GVA 2023",
+    "pl_gdp": "Eurostat national 2025; voivodeship GDP 2024 (GUS, revision of 30 September 2026); NUTS3 GDP 2023; GVA 2023",
     "pl_geo_fua": "LAU 2025 (NUTS 2024) correspondence"
    },
    "sources": [
@@ -103,14 +103,14 @@
     "Główny Urząd Statystyczny (GUS); OpenStreetMap contributors",
     "Statistics Poland (GUS)",
     "Ministry of Finance and Statistics Poland (GUS)",
-    "Eurostat and European Central Bank",
+    "Statistics Poland (GUS), Eurostat and European Central Bank",
     "Eurostat"
    ]
   },
   {
    "path": "data/metros.json",
    "url": "https://softonsofa.com/pol-civ/data/metros.json",
-   "bytes": 59131,
+   "bytes": 59132,
    "description": "Metro areas: Eurostat functional urban areas of Poland, with their member gminas and economic figures.",
    "fields": [
     "id (FUA code)",
@@ -132,7 +132,7 @@
    "publishers": [
     "Eurostat",
     "Statistics Poland (GUS)",
-    "Eurostat and European Central Bank"
+    "Statistics Poland (GUS), Eurostat and European Central Bank"
    ]
   },
   {
@@ -153,10 +153,10 @@
    ],
    "rows": 16,
    "vintage": {
-    "pl_stats_population": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026",
+    "pl_stats_population": "GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026",
     "pl_stats_labour": "GUS, October 2026, May 2026, and December 2025",
     "pl_stats_prosperity": "Ministry of Finance 2026; GUS annual 2025",
-    "pl_gdp": "Eurostat national 2025; voivodeship GDP 2024; NUTS3 GDP 2023; GVA 2023",
+    "pl_gdp": "Eurostat national 2025; voivodeship GDP 2024 (GUS, revision of 30 September 2026); NUTS3 GDP 2023; GVA 2023",
     "pl_geo_worldcover": "ESA WorldCover 2021 v200, 1:32 overview (1/375 degree)"
    },
    "sources": [
@@ -169,14 +169,14 @@
    "publishers": [
     "Statistics Poland (GUS)",
     "Ministry of Finance and Statistics Poland (GUS)",
-    "Eurostat and European Central Bank",
+    "Statistics Poland (GUS), Eurostat and European Central Bank",
     "European Space Agency (ESA WorldCover consortium)"
    ]
   },
   {
    "path": "data/nation.json",
    "url": "https://softonsofa.com/pol-civ/data/nation.json",
-   "bytes": 4197,
+   "bytes": 4382,
    "description": "National figures of Poland and the yield definitions.",
    "fields": [
     "nation.population",
@@ -187,7 +187,7 @@
     "yields"
    ],
    "rows": 1,
-   "vintage": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026",
+   "vintage": "GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026",
    "sources": [
     "pl_stats_population",
     "pl_stats_labour",
@@ -197,13 +197,13 @@
    "publishers": [
     "Statistics Poland (GUS)",
     "Ministry of Finance and Statistics Poland (GUS)",
-    "Eurostat and European Central Bank"
+    "Statistics Poland (GUS), Eurostat and European Central Bank"
    ]
   },
   {
    "path": "data/counties.json",
    "url": "https://softonsofa.com/pol-civ/data/counties.json",
-   "bytes": 728936,
+   "bytes": 729008,
    "description": "Every gmina (TERYT7) with about 30 metrics: density, age, migration, PIT, wage, unemployment, education, faith, vote, air, flood, land cover.",
    "fields": [
     "geoid (TERYT)",
@@ -248,7 +248,7 @@
     "cell (Cell)"
    ],
    "rows": 2479,
-   "vintage": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026; GUS, October 2026, May 2026, and December 2025",
+   "vintage": "GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026; GUS, October 2026, May 2026, and December 2025",
    "sources": [
     "pl_census_2021",
     "pl_foreigners",
@@ -268,7 +268,7 @@
    "publishers": [
     "Statistics Poland (GUS), regional statistical offices",
     "Statistics Poland (GUS) and dane.gov.pl",
-    "Eurostat and European Central Bank",
+    "Statistics Poland (GUS), Eurostat and European Central Bank",
     "Eurostat",
     "Statistics Poland (GUS), Local Data Bank (BDL) API",
     "European Space Agency (ESA WorldCover consortium)",
@@ -284,7 +284,7 @@
   {
    "path": "data/powiaty.json",
    "url": "https://softonsofa.com/pol-civ/data/powiaty.json",
-   "bytes": 87151,
+   "bytes": 87206,
    "description": "Every powiat (TERYT4) with the same metrics, summed or weighted from its gminas.",
    "fields": [
     "code (TERYT)",
@@ -319,7 +319,7 @@
     "cell (Cell)"
    ],
    "rows": 380,
-   "vintage": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026; GUS, October 2026, May 2026, and December 2025",
+   "vintage": "GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026; GUS, October 2026, May 2026, and December 2025",
    "sources": [
     "pl_census_2021",
     "pl_foreigners",
@@ -336,7 +336,7 @@
    "publishers": [
     "Statistics Poland (GUS), regional statistical offices",
     "Statistics Poland (GUS) and dane.gov.pl",
-    "Eurostat and European Central Bank",
+    "Statistics Poland (GUS), Eurostat and European Central Bank",
     "Statistics Poland (GUS), Local Data Bank (BDL) API",
     "European Space Agency (ESA WorldCover consortium)",
     "Państwowa Komisja Wyborcza (PKW)",
@@ -349,7 +349,7 @@
   {
    "path": "data/lenses.json",
    "url": "https://softonsofa.com/pol-civ/data/lenses.json",
-   "bytes": 1168713,
+   "bytes": 1168764,
    "description": "The map lenses: one value per hex for each metric, with legend domains and notes.",
    "fields": [
     "density (Density)",
@@ -382,7 +382,7 @@
     "developed (Built-up)"
    ],
    "rows": 28,
-   "vintage": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026; PKW: presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 Oct 2023)",
+   "vintage": "GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026; PKW: presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 Oct 2023)",
    "sources": [
     "pl_census_2021",
     "pl_foreigners",
@@ -412,7 +412,7 @@
   {
    "path": "data/resources.json",
    "url": "https://softonsofa.com/pol-civ/data/resources.json",
-   "bytes": 91717,
+   "bytes": 91873,
    "description": "Power plants, mines, oil and gas sites, offshore wind and renewables by powiat.",
    "fields": [
     "types",
@@ -422,7 +422,7 @@
    ],
    "rows": 142,
    "vintage": {
-    "plants": "OpenStreetMap extract 2026-11-26, curated figures as of 2026-11",
+    "plants": "OpenStreetMap extract 2026-11-26, PGE report 2025, other curated figures as of 2026-11",
     "renewables": "URE Mapa OZE 2026-09-30",
     "oil_gas": "Curated as of 2026-11 (ORLEN, Gaz-System)",
     "mines": "Mining output 2025 (WUG reports, EC hard coal report, KGHM); sulphur 2024"
@@ -443,7 +443,7 @@
   {
    "path": "data/infrastructure.json",
    "url": "https://softonsofa.com/pol-civ/data/infrastructure.json",
-   "bytes": 48444,
+   "bytes": 49704,
    "description": "Motorways, expressways and main railway lines on hex links, plus seaports and airports.",
    "fields": [
     "roads",
@@ -458,7 +458,7 @@
     "rail": "OpenStreetMap extract 2026-11-26",
     "network": "Eurostat tran_r_net motorway_km 2024, navigable_canal_km 2024, navigable_river_km 2024, rail_double_track_km 2024, rail_electrified_km 2024, rail_line_km 2024",
     "ports": "GUS maritime economy 2025 (preliminary); Eurostat ports 2025; TEU 2025",
-    "airports": "Eurostat airport traffic 2025"
+    "airports": "Eurostat airport traffic 2025; Port Polska plan status 2026-06-30"
    },
    "sources": [
     "pl_transport_osm",
@@ -470,7 +470,7 @@
     "OpenStreetMap contributors (via the Overpass API)",
     "Eurostat (data from Statistics Poland, GUS)",
     "Statistics Poland (GUS); Eurostat; port authorities and Gaz-System (curated items)",
-    "Eurostat (air transport statistics reported by Poland); OpenStreetMap contributors"
+    "Eurostat; OpenStreetMap contributors; Wikidata; Government of Poland"
    ]
   },
   {
@@ -496,7 +496,7 @@
   {
    "path": "data/wonders.json",
    "url": "https://softonsofa.com/pol-civ/data/wonders.json",
-   "bytes": 16648,
+   "bytes": 17309,
    "description": "Heritage and landmark sites chosen by published rules: UNESCO properties, national parks, research universities, record landmarks.",
    "fields": [
     "wonders (name, kind, metrics, ref, x, y)",
@@ -506,10 +506,10 @@
    "rows": 34,
    "vintage": {
     "heritage": "UNESCO whc001 (2026-11-22); NID Pomniki Historii 2026-09-30 + Dz.U. 2026 poz. 1334",
-    "parks": "GUS Ochrona srodowiska 2025 (data for 2024); Wikidata centre points",
+    "parks": "GUS Ochrona srodowiska 2025 (data for 2024); Tatra National Park report for 2025; Wikidata centre points",
     "universities": "GUS academic year 2025/26 (31 Dec 2025); RAD-on evaluations 2017-2021 and 2022-2025; Wikidata positions",
-    "transport": "GUS maritime economy 2025 (preliminary); Eurostat ports 2025; TEU 2025; Eurostat airport traffic 2025",
-    "energy": "OpenStreetMap extract 2026-11-26, curated figures as of 2026-11"
+    "transport": "GUS maritime economy 2025 (preliminary); Eurostat ports 2025; TEU 2025; Eurostat airport traffic 2025; Port Polska plan status 2026-06-30",
+    "energy": "OpenStreetMap extract 2026-11-26, PGE report 2025, other curated figures as of 2026-11"
    },
    "sources": [
     "pl_soc_heritage",
@@ -524,14 +524,14 @@
     "Główny Urząd Statystyczny (GUS); Wikidata",
     "Główny Urząd Statystyczny (GUS); Ministry of Science (RAD-on / POL-on); Wikidata",
     "Statistics Poland (GUS); Eurostat; port authorities and Gaz-System (curated items)",
-    "Eurostat (air transport statistics reported by Poland); OpenStreetMap contributors",
+    "Eurostat; OpenStreetMap contributors; Wikidata; Government of Poland",
     "OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE"
    ]
   },
   {
    "path": "data/trade.json",
    "url": "https://softonsofa.com/pol-civ/data/trade.json",
-   "bytes": 17946,
+   "bytes": 18001,
    "description": "Road and rail freight routes between regions.",
    "fields": [
     "zones",
@@ -550,7 +550,7 @@
   {
    "path": "data/citizens.json",
    "url": "https://softonsofa.com/pol-civ/data/citizens.json",
-   "bytes": 302473,
+   "bytes": 300639,
    "description": "Citizen mix of each town of 20,000+: workers by sector, age, sex, education, origin.",
    "fields": [
     "cities",
@@ -558,7 +558,7 @@
     "groups"
    ],
    "rows": 5,
-   "vintage": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026; GUS, October 2026, May 2026, and December 2025; NSP 2021 final regional results with December 2022 preliminary map fallback; PESEL UKR 2026-11-11; GUS resident stock 2025-12-31",
+   "vintage": "GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026; GUS, October 2026, May 2026, and December 2025; NSP 2021 final regional results with December 2022 preliminary map fallback; PESEL UKR 2026-11-11; GUS resident stock 2025-12-31",
    "sources": [
     "pl_stats_population",
     "pl_stats_labour",
@@ -574,7 +574,7 @@
   {
    "path": "data/districts.json",
    "url": "https://softonsofa.com/pol-civ/data/districts.json",
-   "bytes": 143644,
+   "bytes": 143059,
    "description": "Districts and city types of each town of 20,000+, from location quotients of jobs by PKD section.",
    "fields": [
     "cities",
@@ -582,7 +582,7 @@
     "badges",
     "rule"
    ],
-   "rows": 204,
+   "rows": 203,
    "vintage": "GUS, October 2026, May 2026, and December 2025",
    "sources": [
     "pl_stats_labour",
@@ -618,7 +618,7 @@
   {
    "path": "data/sources.json",
    "url": "https://softonsofa.com/pol-civ/data/sources.json",
-   "bytes": 119559,
+   "bytes": 121451,
    "description": "The bibliography: every source with publisher, licence, vintage and the exact files used.",
    "fields": [
     "id",

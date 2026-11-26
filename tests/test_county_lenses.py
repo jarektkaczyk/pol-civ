@@ -79,9 +79,10 @@ class EconomyTest(unittest.TestCase):
                                        "workers_I": i, "workers_R": r}
         tables = {
             "pl_stats_population": {"population": {"rows": {
-                "1261011": {"population": 800, "population_2015": 700},
-                "1201011": {"population": 100, "population_2015": 200},  # 2015 covers 1201022 too
-                "1201022": {"population": 100, "population_2015": None}}}},
+                # population is the newest balance (30 June 2026); growth compares population_2025 with 2015
+                "1261011": {"population": 820, "population_2025": 800, "population_2015": 700},
+                "1201011": {"population": 100, "population_2025": 100, "population_2015": 200},  # 2015 covers 1201022
+                "1201022": {"population": 100, "population_2025": 100, "population_2015": None}}}},
             "pl_stats_labour": {
                 "employment_sectors_gmina": {"rows": {
                     "1261011": {"workers_total": 500, "workers_agriculture": 1, "workers_industry": 50, "workers_services": 449},
@@ -115,6 +116,8 @@ class EconomyTest(unittest.TestCase):
         self.assertEqual(city["yields"]["production"], 100)  # PKD B-F, not the sector table
         self.assertEqual(city["unemployment"], 0.025)
         self.assertAlmostEqual(city["growth"], 800 / 700 - 1, places=4)
+        self.assertEqual(city["population"], 820)
+        self.assertEqual(city["pop_series"]["2025"], 800)
         land = self.econ.profile(["1201011", "1201022"], powiaty=["1201"])
         self.assertAlmostEqual(land["growth"], 0.0)  # the new gmina is covered by its parent's 2015 figure
         self.assertIsNone(self.econ.profile(["1201022"])["growth"])

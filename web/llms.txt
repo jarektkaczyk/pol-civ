@@ -1,8 +1,8 @@
 # Polska: Poland as a strategy map built from real data
 
-> Polska draws real Poland as a hex strategy map: terrain, towns, yields, lenses and resources, every figure from a public source (GUS, Eurostat, PKW, GIOŚ, UNESCO and others). The atlas has a text page with dated, sourced figures for Poland, each of the 16 voivodeships and each of the 204 towns of 20,000 or more people.
+> Polska draws real Poland as a hex strategy map: terrain, towns, yields, lenses and resources, every figure from a public source (GUS, Eurostat, PKW, GIOŚ, UNESCO and others). The atlas has a text page with dated, sourced figures for Poland, each of the 16 voivodeships and each of the 203 towns of 20,000 or more people.
 
-Poland had 37,332,510 residents on 31 December 2025. Pages are in English; place names keep their Polish spelling.
+Poland had 37,242,958 residents on 30 June 2026. Pages are in English; place names keep their Polish spelling.
 
 ## App
 
@@ -18,12 +18,12 @@ Poland had 37,332,510 residents on 31 December 2025. Pages are in English; place
 - [Lubuskie](https://softonsofa.com/pol-civ/atlas/lubuskie/index.md): Lubuskie has the most tree cover of the 16 voivodeships: 60% of its land.
 - [Łódzkie](https://softonsofa.com/pol-civ/atlas/lodzkie/index.md): Women in Łódzkie have the shortest life expectancy of the 16 voivodeships: 81.4 years at birth in 2025.
 - [Małopolskie](https://softonsofa.com/pol-civ/atlas/malopolskie/index.md): Małopolskie has the 2nd most tourist nights per resident of the 16 voivodeships: 5.0 in 2025.
-- [Mazowieckie](https://softonsofa.com/pol-civ/atlas/mazowieckie/index.md): Mazowieckie is the most populous voivodeship, with 5,505,857 residents on 31 December 2025.
-- [Opolskie](https://softonsofa.com/pol-civ/atlas/opolskie/index.md): Opolskie is the least populous voivodeship, with 923,536 residents on 31 December 2025.
+- [Mazowieckie](https://softonsofa.com/pol-civ/atlas/mazowieckie/index.md): Mazowieckie is the most populous voivodeship, with 5,502,043 residents on 30 June 2026.
+- [Opolskie](https://softonsofa.com/pol-civ/atlas/opolskie/index.md): Opolskie is the least populous voivodeship, with 919,766 residents on 30 June 2026.
 - [Podkarpackie](https://softonsofa.com/pol-civ/atlas/podkarpackie/index.md): Podkarpackie has the lowest personal income tax revenue per resident of the 16 voivodeships: 3,368 zł planned for 2026.
 - [Podlaskie](https://softonsofa.com/pol-civ/atlas/podlaskie/index.md): Women in Podlaskie have the 2nd longest life expectancy of the 16 voivodeships: 83.7 years at birth in 2025.
 - [Pomorskie](https://softonsofa.com/pol-civ/atlas/pomorskie/index.md): Pomorskie grew by 2.2% between 2015 and 2025, the 2nd fastest growth of the 16 voivodeships.
-- [Śląskie](https://softonsofa.com/pol-civ/atlas/slaskie/index.md): Śląskie is the 2nd most populous voivodeship, with 4,261,792 residents on 31 December 2025.
+- [Śląskie](https://softonsofa.com/pol-civ/atlas/slaskie/index.md): Śląskie is the 2nd most populous voivodeship, with 4,246,702 residents on 30 June 2026.
 - [Świętokrzyskie](https://softonsofa.com/pol-civ/atlas/swietokrzyskie/index.md): Świętokrzyskie lost 8.7% of its residents between 2015 and 2025, the steepest fall of the 16 voivodeships.
 - [Warmińsko-Mazurskie](https://softonsofa.com/pol-civ/atlas/warminsko-mazurskie/index.md): Warmińsko-Mazurskie has the highest registered unemployment of the 16 voivodeships: 9.3% in October 2026.
 - [Wielkopolskie](https://softonsofa.com/pol-civ/atlas/wielkopolskie/index.md): Wielkopolskie has the lowest registered unemployment of the 16 voivodeships: 3.8% in October 2026.
@@ -57,14 +57,14 @@ Poland had 37,332,510 residents on 31 December 2025. Pages are in English; place
 - [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE](https://www.openstreetmap.org/): Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear
 - [Urząd Regulacji Energetyki (Energy Regulatory Office); powiat codes from GUS BDL](https://www.ure.gov.pl/pl/oze/potencjal-krajowy-oze/8108,Instalacje-odnawialnych-zrodel-energii-stan-na-30-wrzesnia-2026-r.html): Installed renewable capacity by powiat (URE Mapa OZE)
 - [Statistics Poland (GUS) and dane.gov.pl](https://stat.gov.pl/obszary-tematyczne/ludnosc/migracje-zagraniczne-ludnosci/): Temporary protection and PESEL UKR status
-- [Eurostat and European Central Bank](https://ec.europa.eu/eurostat/web/national-accounts/data/database): Polish national and regional accounts
+- [Statistics Poland (GUS), Eurostat and European Central Bank](https://ec.europa.eu/eurostat/web/national-accounts/data/database): Polish national and regional accounts
 - [NOAA National Centers for Environmental Information (served by the NOAA PIFSC ERDDAP)](https://www.ncei.noaa.gov/products/etopo-global-relief-model): ETOPO 2022 global relief model (15 arc-second)
 - [Copernicus Global Land Service (VITO), distributed on Zenodo](https://zenodo.org/records/3939050): Copernicus Global Land Cover 100 m, forest type layer (epoch 2019)
 - [Eurostat](https://ec.europa.eu/eurostat/web/nuts/local-administrative-units): Functional urban areas: LAU 2025 to city and FUA correspondence
 - [WWF HydroSHEDS (Lehner and Grill 2013)](https://www.hydrosheds.org/products/hydrorivers): HydroRIVERS v1.0, Europe
 - [Eurostat GISCO](https://ec.europa.eu/eurostat/web/gisco/geodata/statistical-units/local-administrative-units): Local Administrative Units (LAU) 2024, 1:1 million
 - [Natural Earth](https://www.naturalearthdata.com/): Natural Earth 1:10m (countries, lakes, rivers, Europe supplements)
-- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html): Towns of Poland: population on 31 December 2025 and position
+- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html): Towns of Poland: population on 30 June 2026 and position
 - [Statistics Poland (GUS), Local Data Bank (BDL) API](https://bdl.stat.gov.pl/bdl/start): Territorial units of Poland in 2026 (TERYT codes)
 - [European Space Agency (ESA WorldCover consortium)](https://esa-worldcover.org/): ESA WorldCover 2021 (v200), 10 m land cover
 - [Ministry of Industry (report on hard coal mining 2025), State Mining Authority (WUG), KGHM, Sejm; positions from Wikidata and OpenStreetMap](https://www.gov.pl/web/wug/kwk): Mines of Poland: coal, lignite, copper and silver, salt, sulphur (curated)
@@ -79,7 +79,7 @@ Poland had 37,332,510 residents on 31 December 2025. Pages are in English; place
 - [Główny Urząd Statystyczny (GUS); Ministry of Science (RAD-on / POL-on); Wikidata](https://radon.nauka.gov.pl/dane): Universities: students, research categories, main campus
 - [Statistics Poland (GUS)](https://stat.gov.pl/obszary-tematyczne/rynek-pracy/): GUS labour publication tables
 - [Ministry of Finance and Statistics Poland (GUS)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia): Polish local income, housing, and tourism statistics
-- [Eurostat (air transport statistics reported by Poland); OpenStreetMap contributors](https://ec.europa.eu/eurostat/web/transport/database): Airports of Poland: passengers and freight (Eurostat), positions (OpenStreetMap)
+- [Eurostat; OpenStreetMap contributors; Wikidata; Government of Poland](https://ec.europa.eu/eurostat/web/transport/database): Airports of Poland: traffic, positions and planned Port Polska
 - [Eurostat (data from Statistics Poland, GUS)](https://ec.europa.eu/eurostat/web/transport/database): Road freight by NUTS 3 region and rail freight between regions (Eurostat)
 - [OpenStreetMap contributors (via the Overpass API)](https://www.openstreetmap.org/): Motorways, expressways and main railway lines of Poland (OpenStreetMap)
 - [Statistics Poland (GUS); Eurostat; port authorities and Gaz-System (curated items)](https://stat.gov.pl/obszary-tematyczne/transport-i-lacznosc/transport/gospodarka-morska-w-polsce-w-2025-r-,7,23.html): Seaports of Poland: cargo tonnage and containers, LNG terminals
@@ -142,31 +142,31 @@ Poland had 37,332,510 residents on 31 December 2025. Pages are in English; place
 - [Piła](https://softonsofa.com/pol-civ/atlas/pila/index.md): Piła, powiat pilski, Wielkopolskie
 - [Ostrów Wielkopolski](https://softonsofa.com/pol-civ/atlas/ostrow-wielkopolski/index.md): Ostrów Wielkopolski, powiat ostrowski, Wielkopolskie
 - [Suwałki](https://softonsofa.com/pol-civ/atlas/suwalki/index.md): Suwałki, Podlaskie
-- [Lubin](https://softonsofa.com/pol-civ/atlas/lubin/index.md): Lubin, powiat lubiński, Dolnośląskie
 - [Pruszków](https://softonsofa.com/pol-civ/atlas/pruszkow/index.md): Pruszków, powiat pruszkowski, Mazowieckie
-- [Inowrocław](https://softonsofa.com/pol-civ/atlas/inowroclaw/index.md): Inowrocław, powiat inowrocławski, Kujawsko-Pomorskie
 - [Stargard](https://softonsofa.com/pol-civ/atlas/stargard/index.md): Stargard, powiat stargardzki, Zachodniopomorskie
+- [Lubin](https://softonsofa.com/pol-civ/atlas/lubin/index.md): Lubin, powiat lubiński, Dolnośląskie
+- [Inowrocław](https://softonsofa.com/pol-civ/atlas/inowroclaw/index.md): Inowrocław, powiat inowrocławski, Kujawsko-Pomorskie
 - [Piotrków Trybunalski](https://softonsofa.com/pol-civ/atlas/piotrkow-trybunalski/index.md): Piotrków Trybunalski, Łódzkie
 - [Konin](https://softonsofa.com/pol-civ/atlas/konin/index.md): Konin, Wielkopolskie
 - [Siemianowice Śląskie](https://softonsofa.com/pol-civ/atlas/siemianowice-slaskie/index.md): Siemianowice Śląskie, Śląskie
-- [Gniezno](https://softonsofa.com/pol-civ/atlas/gniezno/index.md): Gniezno, powiat gnieźnieński, Wielkopolskie
 - [Żory](https://softonsofa.com/pol-civ/atlas/zory/index.md): Żory, Śląskie
+- [Gniezno](https://softonsofa.com/pol-civ/atlas/gniezno/index.md): Gniezno, powiat gnieźnieński, Wielkopolskie
 - [Tarnowskie Góry](https://softonsofa.com/pol-civ/atlas/tarnowskie-gory/index.md): Tarnowskie Góry, powiat tarnogórski, Śląskie
 - [Głogów](https://softonsofa.com/pol-civ/atlas/glogow/index.md): Głogów, powiat głogowski, Dolnośląskie
 - [Ostrowiec Świętokrzyski](https://softonsofa.com/pol-civ/atlas/ostrowiec-swietokrzyski/index.md): Ostrowiec Świętokrzyski, powiat ostrowiecki, Świętokrzyskie
 - [Pabianice](https://softonsofa.com/pol-civ/atlas/pabianice/index.md): Pabianice, powiat pabianicki, Łódzkie
-- [Łomża](https://softonsofa.com/pol-civ/atlas/lomza/index.md): Łomża, Podlaskie
 - [Ełk](https://softonsofa.com/pol-civ/atlas/elk/index.md): Ełk, powiat ełcki, Warmińsko-Mazurskie
+- [Łomża](https://softonsofa.com/pol-civ/atlas/lomza/index.md): Łomża, Podlaskie
 - [Leszno](https://softonsofa.com/pol-civ/atlas/leszno/index.md): Leszno, Wielkopolskie
 - [Zamość](https://softonsofa.com/pol-civ/atlas/zamosc/index.md): Zamość, Lubelskie
-- [Tomaszów Mazowiecki](https://softonsofa.com/pol-civ/atlas/tomaszow-mazowiecki/index.md): Tomaszów Mazowiecki, powiat tomaszowski, Łódzkie
 - [Mielec](https://softonsofa.com/pol-civ/atlas/mielec/index.md): Mielec, powiat mielecki, Podkarpackie
+- [Tomaszów Mazowiecki](https://softonsofa.com/pol-civ/atlas/tomaszow-mazowiecki/index.md): Tomaszów Mazowiecki, powiat tomaszowski, Łódzkie
 - [Tczew](https://softonsofa.com/pol-civ/atlas/tczew/index.md): Tczew, powiat tczewski, Pomorskie
 - [Chełm](https://softonsofa.com/pol-civ/atlas/chelm/index.md): Chełm, Lubelskie
-- [Przemyśl](https://softonsofa.com/pol-civ/atlas/przemysl/index.md): Przemyśl, Podkarpackie
 - [Rumia](https://softonsofa.com/pol-civ/atlas/rumia/index.md): Rumia, powiat wejherowski, Pomorskie
-- [Stalowa Wola](https://softonsofa.com/pol-civ/atlas/stalowa-wola/index.md): Stalowa Wola, powiat stalowowolski, Podkarpackie
+- [Przemyśl](https://softonsofa.com/pol-civ/atlas/przemysl/index.md): Przemyśl, Podkarpackie
 - [Biała Podlaska](https://softonsofa.com/pol-civ/atlas/biala-podlaska/index.md): Biała Podlaska, Lubelskie
+- [Stalowa Wola](https://softonsofa.com/pol-civ/atlas/stalowa-wola/index.md): Stalowa Wola, powiat stalowowolski, Podkarpackie
 - [Kędzierzyn-Koźle](https://softonsofa.com/pol-civ/atlas/kedzierzyn-kozle/index.md): Kędzierzyn-Koźle, powiat kędzierzyńsko-kozielski, Opolskie
 - [Będzin](https://softonsofa.com/pol-civ/atlas/bedzin/index.md): Będzin, powiat będziński, Śląskie
 - [Zgierz](https://softonsofa.com/pol-civ/atlas/zgierz/index.md): Zgierz, powiat zgierski, Łódzkie
@@ -176,18 +176,18 @@ Poland had 37,332,510 residents on 31 December 2025. Pages are in English; place
 - [Piekary Śląskie](https://softonsofa.com/pol-civ/atlas/piekary-slaskie/index.md): Piekary Śląskie, Śląskie
 - [Bełchatów](https://softonsofa.com/pol-civ/atlas/belchatow/index.md): Bełchatów, powiat bełchatowski, Łódzkie
 - [Racibórz](https://softonsofa.com/pol-civ/atlas/raciborz/index.md): Racibórz, powiat raciborski, Śląskie
-- [Ostrołęka](https://softonsofa.com/pol-civ/atlas/ostroleka/index.md): Ostrołęka, Mazowieckie
 - [Marki](https://softonsofa.com/pol-civ/atlas/marki/index.md): Marki, powiat wołomiński, Mazowieckie
+- [Ostrołęka](https://softonsofa.com/pol-civ/atlas/ostroleka/index.md): Ostrołęka, Mazowieckie
 - [Ząbki](https://softonsofa.com/pol-civ/atlas/zabki/index.md): Ząbki, powiat wołomiński, Mazowieckie
 - [Wejherowo](https://softonsofa.com/pol-civ/atlas/wejherowo/index.md): Wejherowo, powiat wejherowski, Pomorskie
-- [Zawiercie](https://softonsofa.com/pol-civ/atlas/zawiercie/index.md): Zawiercie, powiat zawierciański, Śląskie
 - [Skierniewice](https://softonsofa.com/pol-civ/atlas/skierniewice/index.md): Skierniewice, Łódzkie
+- [Zawiercie](https://softonsofa.com/pol-civ/atlas/zawiercie/index.md): Zawiercie, powiat zawierciański, Śląskie
 - [Starogard Gdański](https://softonsofa.com/pol-civ/atlas/starogard-gdanski/index.md): Starogard Gdański, powiat starogardzki, Pomorskie
 - [Świętochłowice](https://softonsofa.com/pol-civ/atlas/swietochlowice/index.md): Świętochłowice, Śląskie
 - [Wodzisław Śląski](https://softonsofa.com/pol-civ/atlas/wodzislaw-slaski/index.md): Wodzisław Śląski, powiat wodzisławski, Śląskie
 - [Kołobrzeg](https://softonsofa.com/pol-civ/atlas/kolobrzeg/index.md): Kołobrzeg, powiat kołobrzeski, Zachodniopomorskie
-- [Starachowice](https://softonsofa.com/pol-civ/atlas/starachowice/index.md): Starachowice, powiat starachowicki, Świętokrzyskie
 - [Krosno](https://softonsofa.com/pol-civ/atlas/krosno/index.md): Krosno, Podkarpackie
+- [Starachowice](https://softonsofa.com/pol-civ/atlas/starachowice/index.md): Starachowice, powiat starachowicki, Świętokrzyskie
 - [Otwock](https://softonsofa.com/pol-civ/atlas/otwock/index.md): Otwock, powiat otwocki, Mazowieckie
 - [Puławy](https://softonsofa.com/pol-civ/atlas/pulawy/index.md): Puławy, powiat puławski, Lubelskie
 - [Tarnobrzeg](https://softonsofa.com/pol-civ/atlas/tarnobrzeg/index.md): Tarnobrzeg, Podkarpackie
@@ -195,8 +195,8 @@ Poland had 37,332,510 residents on 31 December 2025. Pages are in English; place
 - [Radomsko](https://softonsofa.com/pol-civ/atlas/radomsko/index.md): Radomsko, powiat radomszczański, Łódzkie
 - [Mikołów](https://softonsofa.com/pol-civ/atlas/mikolow/index.md): Mikołów, powiat mikołowski, Śląskie
 - [Ciechanów](https://softonsofa.com/pol-civ/atlas/ciechanow/index.md): Ciechanów, powiat ciechanowski, Mazowieckie
-- [Skarżysko-Kamienna](https://softonsofa.com/pol-civ/atlas/skarzysko-kamienna/index.md): Skarżysko-Kamienna, powiat skarżyski, Świętokrzyskie
 - [Kutno](https://softonsofa.com/pol-civ/atlas/kutno/index.md): Kutno, powiat kutnowski, Łódzkie
+- [Skarżysko-Kamienna](https://softonsofa.com/pol-civ/atlas/skarzysko-kamienna/index.md): Skarżysko-Kamienna, powiat skarżyski, Świętokrzyskie
 - [Nysa](https://softonsofa.com/pol-civ/atlas/nysa/index.md): Nysa, powiat nyski, Opolskie
 - [Mińsk Mazowiecki](https://softonsofa.com/pol-civ/atlas/minsk-mazowiecki/index.md): Mińsk Mazowiecki, powiat miński, Mazowieckie
 - [Żyrardów](https://softonsofa.com/pol-civ/atlas/zyrardow/index.md): Żyrardów, powiat żyrardowski, Mazowieckie
@@ -214,17 +214,17 @@ Poland had 37,332,510 residents on 31 December 2025. Pages are in English; place
 - [Wołomin](https://softonsofa.com/pol-civ/atlas/wolomin/index.md): Wołomin, powiat wołomiński, Mazowieckie
 - [Oświęcim](https://softonsofa.com/pol-civ/atlas/oswiecim/index.md): Oświęcim, powiat oświęcimski, Małopolskie
 - [Knurów](https://softonsofa.com/pol-civ/atlas/knurow/index.md): Knurów, powiat gliwicki, Śląskie
-- [Jarosław](https://softonsofa.com/pol-civ/atlas/jaroslaw/index.md): Jarosław, powiat jarosławski, Podkarpackie
-- [Oleśnica](https://softonsofa.com/pol-civ/atlas/olesnica/index.md): Oleśnica, powiat oleśnicki, Dolnośląskie
 - [Czechowice-Dziedzice](https://softonsofa.com/pol-civ/atlas/czechowice-dziedzice/index.md): Czechowice-Dziedzice, powiat bielski, Śląskie
+- [Oleśnica](https://softonsofa.com/pol-civ/atlas/olesnica/index.md): Oleśnica, powiat oleśnicki, Dolnośląskie
+- [Jarosław](https://softonsofa.com/pol-civ/atlas/jaroslaw/index.md): Jarosław, powiat jarosławski, Podkarpackie
 - [Żary](https://softonsofa.com/pol-civ/atlas/zary/index.md): Żary, powiat żarski, Lubuskie
 - [Lębork](https://softonsofa.com/pol-civ/atlas/lebork/index.md): Lębork, powiat lęborski, Pomorskie
 - [Sanok](https://softonsofa.com/pol-civ/atlas/sanok/index.md): Sanok, powiat sanocki, Podkarpackie
 - [Chrzanów](https://softonsofa.com/pol-civ/atlas/chrzanow/index.md): Chrzanów, powiat chrzanowski, Małopolskie
 - [Nowy Targ](https://softonsofa.com/pol-civ/atlas/nowy-targ/index.md): Nowy Targ, powiat nowotarski, Małopolskie
 - [Oława](https://softonsofa.com/pol-civ/atlas/olawa/index.md): Oława, powiat oławski, Dolnośląskie
-- [Sochaczew](https://softonsofa.com/pol-civ/atlas/sochaczew/index.md): Sochaczew, powiat sochaczewski, Mazowieckie
 - [Luboń](https://softonsofa.com/pol-civ/atlas/lubon/index.md): Luboń, powiat poznański, Wielkopolskie
+- [Sochaczew](https://softonsofa.com/pol-civ/atlas/sochaczew/index.md): Sochaczew, powiat sochaczewski, Mazowieckie
 - [Brzeg](https://softonsofa.com/pol-civ/atlas/brzeg/index.md): Brzeg, powiat brzeski, Opolskie
 - [Pruszcz Gdański](https://softonsofa.com/pol-civ/atlas/pruszcz-gdanski/index.md): Pruszcz Gdański, powiat gdański, Pomorskie
 - [Cieszyn](https://softonsofa.com/pol-civ/atlas/cieszyn/index.md): Cieszyn, powiat cieszyński, Śląskie
@@ -238,13 +238,13 @@ Poland had 37,332,510 residents on 31 December 2025. Pages are in English; place
 - [Kraśnik](https://softonsofa.com/pol-civ/atlas/krasnik/index.md): Kraśnik, powiat kraśnicki, Lubelskie
 - [Dzierżoniów](https://softonsofa.com/pol-civ/atlas/dzierzoniow/index.md): Dzierżoniów, powiat dzierżoniowski, Dolnośląskie
 - [Czeladź](https://softonsofa.com/pol-civ/atlas/czeladz/index.md): Czeladź, powiat będziński, Śląskie
-- [Żywiec](https://softonsofa.com/pol-civ/atlas/zywiec/index.md): Żywiec, powiat żywiecki, Śląskie
 - [Reda](https://softonsofa.com/pol-civ/atlas/reda/index.md): Reda, powiat wejherowski, Pomorskie
-- [Police](https://softonsofa.com/pol-civ/atlas/police/index.md): Police, powiat policki, Zachodniopomorskie
+- [Żywiec](https://softonsofa.com/pol-civ/atlas/zywiec/index.md): Żywiec, powiat żywiecki, Śląskie
 - [Kobyłka](https://softonsofa.com/pol-civ/atlas/kobylka/index.md): Kobyłka, powiat wołomiński, Mazowieckie
+- [Police](https://softonsofa.com/pol-civ/atlas/police/index.md): Police, powiat policki, Zachodniopomorskie
+- [Wieliczka](https://softonsofa.com/pol-civ/atlas/wieliczka/index.md): Wieliczka, powiat wielicki, Małopolskie
 - [Myszków](https://softonsofa.com/pol-civ/atlas/myszkow/index.md): Myszków, powiat myszkowski, Śląskie
 - [Augustów](https://softonsofa.com/pol-civ/atlas/augustow/index.md): Augustów, powiat augustowski, Podlaskie
-- [Wieliczka](https://softonsofa.com/pol-civ/atlas/wieliczka/index.md): Wieliczka, powiat wielicki, Małopolskie
 - [Nowy Dwór Mazowiecki](https://softonsofa.com/pol-civ/atlas/nowy-dwor-mazowiecki/index.md): Nowy Dwór Mazowiecki, powiat nowodworski, Mazowieckie
 - [Bochnia](https://softonsofa.com/pol-civ/atlas/bochnia/index.md): Bochnia, powiat bocheński, Małopolskie
 - [Zgorzelec](https://softonsofa.com/pol-civ/atlas/zgorzelec/index.md): Zgorzelec, powiat zgorzelecki, Dolnośląskie
@@ -264,16 +264,16 @@ Poland had 37,332,510 residents on 31 December 2025. Pages are in English; place
 - [Gorlice](https://softonsofa.com/pol-civ/atlas/gorlice/index.md): Gorlice, powiat gorlicki, Małopolskie
 - [Pszczyna](https://softonsofa.com/pol-civ/atlas/pszczyna/index.md): Pszczyna, powiat pszczyński, Śląskie
 - [Świecie](https://softonsofa.com/pol-civ/atlas/swiecie/index.md): Świecie, powiat świecki, Kujawsko-Pomorskie
+- [Środa Wielkopolska](https://softonsofa.com/pol-civ/atlas/sroda-wielkopolska/index.md): Środa Wielkopolska, powiat średzki, Wielkopolskie
 - [Kętrzyn](https://softonsofa.com/pol-civ/atlas/ketrzyn/index.md): Kętrzyn, powiat kętrzyński, Warmińsko-Mazurskie
 - [Biłgoraj](https://softonsofa.com/pol-civ/atlas/bilgoraj/index.md): Biłgoraj, powiat biłgorajski, Lubelskie
-- [Środa Wielkopolska](https://softonsofa.com/pol-civ/atlas/sroda-wielkopolska/index.md): Środa Wielkopolska, powiat średzki, Wielkopolskie
 - [Kłodzko](https://softonsofa.com/pol-civ/atlas/klodzko/index.md): Kłodzko, powiat kłodzki, Dolnośląskie
-- [Turek](https://softonsofa.com/pol-civ/atlas/turek/index.md): Turek, powiat turecki, Wielkopolskie
 - [Skawina](https://softonsofa.com/pol-civ/atlas/skawina/index.md): Skawina, powiat krakowski, Małopolskie
-- [Bielsk Podlaski](https://softonsofa.com/pol-civ/atlas/bielsk-podlaski/index.md): Bielsk Podlaski, powiat bielski, Podlaskie
+- [Turek](https://softonsofa.com/pol-civ/atlas/turek/index.md): Turek, powiat turecki, Wielkopolskie
 - [Kościerzyna](https://softonsofa.com/pol-civ/atlas/koscierzyna/index.md): Kościerzyna, powiat kościerski, Pomorskie
-- [Wałcz](https://softonsofa.com/pol-civ/atlas/walcz/index.md): Wałcz, powiat wałecki, Zachodniopomorskie
+- [Bielsk Podlaski](https://softonsofa.com/pol-civ/atlas/bielsk-podlaski/index.md): Bielsk Podlaski, powiat bielski, Podlaskie
 - [Kościan](https://softonsofa.com/pol-civ/atlas/koscian/index.md): Kościan, powiat kościański, Wielkopolskie
+- [Wałcz](https://softonsofa.com/pol-civ/atlas/walcz/index.md): Wałcz, powiat wałecki, Zachodniopomorskie
 - [Lubliniec](https://softonsofa.com/pol-civ/atlas/lubliniec/index.md): Lubliniec, powiat lubliniecki, Śląskie
 - [Żagań](https://softonsofa.com/pol-civ/atlas/zagan/index.md): Żagań, powiat żagański, Lubuskie
 - [Piastów](https://softonsofa.com/pol-civ/atlas/piastow/index.md): Piastów, powiat pruszkowski, Mazowieckie
@@ -282,17 +282,16 @@ Poland had 37,332,510 residents on 31 December 2025. Pages are in English; place
 - [Białogard](https://softonsofa.com/pol-civ/atlas/bialogard/index.md): Białogard, powiat białogardzki, Zachodniopomorskie
 - [Sulejówek](https://softonsofa.com/pol-civ/atlas/sulejowek/index.md): Sulejówek, powiat miński, Mazowieckie
 - [Świebodzice](https://softonsofa.com/pol-civ/atlas/swiebodzice/index.md): Świebodzice, powiat świdnicki, Dolnośląskie
-- [Szczytno](https://softonsofa.com/pol-civ/atlas/szczytno/index.md): Szczytno, powiat szczycieński, Warmińsko-Mazurskie
 - [Płońsk](https://softonsofa.com/pol-civ/atlas/plonsk/index.md): Płońsk, powiat płoński, Mazowieckie
 - [Ostrów Mazowiecka](https://softonsofa.com/pol-civ/atlas/ostrow-mazowiecka/index.md): Ostrów Mazowiecka, powiat ostrowski, Mazowieckie
 - [Goleniów](https://softonsofa.com/pol-civ/atlas/goleniow/index.md): Goleniów, powiat goleniowski, Zachodniopomorskie
-- [Kluczbork](https://softonsofa.com/pol-civ/atlas/kluczbork/index.md): Kluczbork, powiat kluczborski, Opolskie
+- [Szczytno](https://softonsofa.com/pol-civ/atlas/szczytno/index.md): Szczytno, powiat szczycieński, Warmińsko-Mazurskie
 - [Józefów](https://softonsofa.com/pol-civ/atlas/jozefow/index.md): Józefów, powiat otwocki, Mazowieckie
-- [Polkowice](https://softonsofa.com/pol-civ/atlas/polkowice/index.md): Polkowice, powiat polkowicki, Dolnośląskie
+- [Kluczbork](https://softonsofa.com/pol-civ/atlas/kluczbork/index.md): Kluczbork, powiat kluczborski, Opolskie
 - [Łaziska Górne](https://softonsofa.com/pol-civ/atlas/laziska-gorne/index.md): Łaziska Górne, powiat mikołowski, Śląskie
+- [Polkowice](https://softonsofa.com/pol-civ/atlas/polkowice/index.md): Polkowice, powiat polkowicki, Dolnośląskie
 - [Bartoszyce](https://softonsofa.com/pol-civ/atlas/bartoszyce/index.md): Bartoszyce, powiat bartoszycki, Warmińsko-Mazurskie
 - [Sandomierz](https://softonsofa.com/pol-civ/atlas/sandomierz/index.md): Sandomierz, powiat sandomierski, Świętokrzyskie
 - [Grajewo](https://softonsofa.com/pol-civ/atlas/grajewo/index.md): Grajewo, powiat grajewski, Podlaskie
-- [Zambrów](https://softonsofa.com/pol-civ/atlas/zambrow/index.md): Zambrów, powiat zambrowski, Podlaskie
 - [Świebodzin](https://softonsofa.com/pol-civ/atlas/swiebodzin/index.md): Świebodzin, powiat świebodziński, Lubuskie
-- [Mrągowo](https://softonsofa.com/pol-civ/atlas/mragowo/index.md): Mrągowo, powiat mrągowski, Warmińsko-Mazurskie
+- [Zambrów](https://softonsofa.com/pol-civ/atlas/zambrow/index.md): Zambrów, powiat zambrowski, Podlaskie

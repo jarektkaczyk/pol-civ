@@ -73,6 +73,14 @@ class Stats:
     def field_year(self, source: str, name: str, field: str):
         return ((self.table(source, name).get("fields") or {}).get(field) or {}).get("year")
 
+    def field_date(self, source: str, name: str, field: str) -> str | None:
+        """The '30 June 2026' phrase at the start of a field's note, if any."""
+        import re
+
+        note = ((self.table(source, name).get("fields") or {}).get(field) or {}).get("note") or ""
+        m = re.match(r"(\d{1,2} [A-Z][a-z]+ \d{4})", note)
+        return m.group(1) if m else None
+
     def vintage(self, source: str) -> str | None:
         p = self.payload.get(source)
         return (p or {}).get("vintage") or (p or {}).get("data", {}).get("vintage")

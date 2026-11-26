@@ -267,7 +267,7 @@ def _check_econ(r: Report, what: str, obj: dict, yield_keys) -> None:
 
 
 def check_growth(r: Report, docs: dict) -> None:
-    """Growth invariants across files: one growth window everywhere, ending at nation.json's year,
+    """Growth invariants across files: one growth window everywhere, ending at nation.json's year-end population year,
     and every state and the nation have a rate whenever the window is set (their borders are fixed)."""
     nat = docs.get("nation.json") if isinstance(docs.get("nation.json"), dict) else None
     nation = nat.get("nation") if nat and isinstance(nat.get("nation"), dict) else None
@@ -281,10 +281,12 @@ def check_growth(r: Report, docs: dict) -> None:
     if len(windows) > 1:
         r.fail(f"growth_years differ between rows: {sorted(windows)}")
         bad += 1
+    # Growth ends at the year-end balance (years.population_2025) when the shown population is a newer mid-year one.
     year = nat.get("year") if nat else None
+    end = ((nat.get("years") or {}).get("population_2025") if nat else None) or year
     for w in windows:
-        if is_int(year) and len(w) == 2 and w[1] != year:
-            r.fail(f"growth_years end in {w[1]} but nation.json year is {year} (growth must end at the year shown)")
+        if is_int(end) and len(w) == 2 and w[1] != end:
+            r.fail(f"growth_years end in {w[1]} but nation.json growth year is {end} (growth must end at the year shown)")
             bad += 1
     for what, o in fixed:
         if o.get("growth_years") is not None and o.get("growth") is None:

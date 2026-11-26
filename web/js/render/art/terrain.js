@@ -2004,56 +2004,44 @@ function paintDune(g, upx, v) {
 
 function paintBarn(g, upx, v) {
   const px = 1 / upx;
-  const roofs = ["#4b4a4f", "#5a3b2e", "#3f4b57", "#6b6a66"];
   softShadow(g, 0.1, 0.01, 0.28, 0.07, 0.34);
-  // Silo behind.
-  const sx = -0.2, sw = 0.055, sh = 0.24;
-  let gr = g.createLinearGradient(sx - sw, 0, sx + sw, 0);
-  gr.addColorStop(0, "#f2f0e8");
-  gr.addColorStop(0.5, "#c9c7bd");
-  gr.addColorStop(1, "#86857e");
-  g.fillStyle = gr;
-  g.fillRect(sx - sw, -0.02 - sh, sw * 2, sh);
-  g.beginPath();
-  g.ellipse(sx, -0.02 - sh, sw, sw * 0.9, 0, Math.PI, 0);
-  g.fillStyle = "#9aa7b3";
-  g.fill();
-  g.strokeStyle = "rgba(40,40,40,.6)";
-  g.lineWidth = px;
-  g.strokeRect(sx - sw, -0.02 - sh, sw * 2, sh);
-  // Barn: gable end facing the viewer (lit), long side going back to the right (shade), roof on top.
-  const d = [0.15, -0.06];
-  const A = [-0.13, 0], B = [0.03, 0], Cc = [0.03, -0.12], P = [-0.05, -0.2], D = [-0.13, -0.12];
-  const add = (p) => [p[0] + d[0], p[1] + d[1]];
-  const outline = (pts) => {
+  const outline = (pts, fill) => {
     poly(g, pts);
+    g.fillStyle = fill;
+    g.fill();
     g.strokeStyle = "rgba(30,14,8,.85)";
     g.lineWidth = px * 1.6;
     g.stroke();
   };
-  outline([B, add(B), add(Cc), Cc]);
-  g.fillStyle = "#7e2a1f";
-  g.fill();
-  outline([Cc, P, add(P), add(Cc)]);
-  g.fillStyle = roofs[v % roofs.length];
-  g.fill();
-  gr = g.createLinearGradient(-0.13, -0.2, 0.03, 0);
-  gr.addColorStop(0, "#d0563c");
-  gr.addColorStop(1, "#a63a28");
-  outline([A, B, Cc, P, D]);
-  g.fillStyle = gr;
-  g.fill();
+  // A wooden barn stands behind the house.
+  outline([[0.06, 0.01], [0.35, 0.01], [0.35, -0.13], [0.21, -0.25], [0.06, -0.13]], "#745038");
+  outline([[0.04, -0.13], [0.21, -0.27], [0.37, -0.13], [0.32, -0.1], [0.21, -0.2], [0.08, -0.1]], "#8c3f2c");
+  g.fillStyle = "#493321";
+  g.fillRect(0.16, -0.09, 0.1, 0.1);
+  // A whitewashed or brick house with the steep red-tiled roof common in Polish villages.
+  const wall = v % 3 === 1 ? "#b66d4d" : "#eee5cf";
+  outline([[-0.22, 0.03], [0.08, 0.03], [0.08, -0.13], [-0.07, -0.27], [-0.22, -0.13]], wall);
+  outline([[-0.24, -0.13], [-0.07, -0.3], [0.11, -0.13], [0.07, -0.09], [-0.07, -0.23], [-0.2, -0.09]], "#a64b32");
+  g.fillStyle = "#543421";
+  g.fillRect(-0.13, -0.07, 0.07, 0.1);
+  g.fillStyle = "#78a4b7";
+  g.fillRect(-0.01, -0.08, 0.055, 0.05);
+  g.fillStyle = "#d8d0ba";
+  g.fillRect(0.005, -0.31, 0.035, 0.11);
+  g.fillStyle = "#6f3c2a";
+  g.fillRect(0, -0.325, 0.045, 0.025);
   if (upx > 40) {
-    g.strokeStyle = "rgba(255,245,230,.85)";
+    g.strokeStyle = "rgba(54,28,18,.45)";
     g.lineWidth = Math.max(px, 0.008);
-    g.strokeRect(-0.085, -0.075, 0.07, 0.075);
-    g.beginPath();
-    g.moveTo(-0.085, -0.075); g.lineTo(-0.015, 0);
-    g.moveTo(-0.015, -0.075); g.lineTo(-0.085, 0);
-    g.moveTo(D[0], D[1]); g.lineTo(P[0], P[1]); g.lineTo(Cc[0], Cc[1]);
-    g.stroke();
+    for (const x of [0.11, 0.16, 0.21, 0.26, 0.31]) {
+      g.beginPath(); g.moveTo(x, -0.11); g.lineTo(x, 0); g.stroke();
+    }
+    g.strokeStyle = "rgba(245,190,150,.45)";
+    for (const y of [-0.13, -0.17, -0.21]) {
+      g.beginPath(); g.moveTo(-0.18 + (y + 0.13) * 0.5, y); g.lineTo(0.04 - (y + 0.13) * 0.5, y); g.stroke();
+    }
   }
-  decidTree(g, 0.22, 0.03, 0.2, DECID[v % 3], px);
+  decidTree(g, 0.38, 0.04, 0.17, DECID[v % 3], px);
 }
 
 // --- ground sprites (whole hex) -------------------------------------------------------------------------------------

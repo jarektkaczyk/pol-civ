@@ -5,6 +5,21 @@ from pipeline.core.hexgrid import HexGrid
 
 
 class InfrastructureBuilderTests(unittest.TestCase):
+    def test_planned_airport_keeps_status_year_and_refs(self):
+        class Locator:
+            def place(self, lon, lat):
+                return {"x": lon, "y": lat, "cell": 1, "state": "MZ"}
+
+        airports = infrastructure.build_airports(Locator(), [{
+            "id": "airport:CPK", "name": "Port Polska (CPK)", "lon": 20.4, "lat": 52.1,
+            "props": {"status": "planned", "opening_planned": 2032, "ref": "https://www.gov.pl/web/priorytety/p32",
+                      "wikidata": "Q48840381", "passengers": None},
+        }])
+
+        self.assertEqual("planned", airports[0]["status"])
+        self.assertEqual(2032, airports[0]["opening_planned"])
+        self.assertEqual("Q48840381", airports[0]["wikidata"])
+
     def test_motorway_wins_when_classes_share_a_link(self):
         grid = HexGrid(radius=5, cols=5, rows=4)
         a, b = grid.index(1, 1), grid.index(2, 1)
@@ -107,6 +122,31 @@ class ResourcesBuilderTests(unittest.TestCase):
 
 
 class TradeBuilderTests(unittest.TestCase):
+    def test_zone_anchor_uses_voivode_seat(self):
+        grid = HexGrid(radius=5, cols=4, rows=3)
+        gorzow_cell = grid.index(1, 1)
+        zielona_cell = grid.index(2, 1)
+        world = {
+            "grid": {"radius": 5, "cols": 4, "rows": 3},
+            "states": ["08"],
+            "owner": [0] * grid.size,
+            "counties": ["0801"],
+        }
+        teryt = {"voivodeships": [{"code": "08", "name": "Lubuskie"}]}
+        states = [{"fips": "08", "capitals": [
+            {"gmina": "0861011", "name": "Gorz\u00f3w Wielkopolski", "role": "voivode"},
+            {"gmina": "0862011", "name": "Zielona G\u00f3ra", "role": "sejmik"},
+        ]}]
+        cities = [
+            {"id": "0861011", "name": "Gorz\u00f3w Wielkopolski", "cell": gorzow_cell, "x": 11.2, "y": 12.3},
+            {"id": "0862011", "name": "Zielona G\u00f3ra", "cell": zielona_cell, "x": 21.2, "y": 12.3},
+        ]
+
+        zones = trade.build_zones(world, teryt, states, cities)
+
+        self.assertEqual("Gorz\u00f3w Wielkopolski", zones["08"]["anchor"]["city"])
+        self.assertEqual(gorzow_cell, zones["08"]["anchor"]["cell"])
+
     def test_flow_directions_are_summed_once(self):
         zones = {"02": {}, "04": {}}
         flows = [

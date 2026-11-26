@@ -3,7 +3,7 @@
 Source page: https://softonsofa.com/pol-civ/atlas/krakow/
 Last updated: 2026-11-26
 
-Kraków is the 2nd largest town in Poland, with 816,614 residents on 31 December 2025.
+Kraków is the 2nd largest city in Poland, with 819,493 residents on 30 June 2026.
 
 Kraków is a city with powiat rights in Małopolskie voivodeship. It is the capital of Małopolskie.
 
@@ -13,10 +13,10 @@ Kraków is a city with powiat rights in Małopolskie voivodeship. It is the capi
 
 | Figure | Value | Date | Publisher |
 |---|---|---|---|
-| Population | 816,614 | 31 December 2025 | Główny Urząd Statystyczny (GUS); OpenStreetMap contributors |
+| Population | 819,493 | 30 June 2026 | Główny Urząd Statystyczny (GUS); OpenStreetMap contributors |
 | Change since 2015 | +7.3% (from 761,069) | 2015 to 2025 | Statistics Poland (GUS) |
-| Median age | 41.3 years | 31 December 2025 | Statistics Poland (GUS) |
-| Residents aged 65 or more | 20.0% | 31 December 2025 | Statistics Poland (GUS) |
+| Median age | 41.5 years | 30 June 2026 | Statistics Poland (GUS) |
+| Residents aged 65 or more | 20.0% | 30 June 2026 | Statistics Poland (GUS) |
 | Average gross wage | 11,297 zł a month | May 2026 | Statistics Poland (GUS) |
 | Registered unemployment | 2.8% | October 2026 | Statistics Poland (GUS) |
 | Personal income tax revenue per resident | 6,787 zł | 2026 plan | Ministry of Finance and Statistics Poland (GUS) |
@@ -47,7 +47,7 @@ The median of the 154 towns of 20,000+ with a station within 25 km was 16.4 µg/
 
 ## Metro area and places nearby
 
-Kraków belongs to the Kraków metro area, 1,465,000 residents in 40 gminas.
+Kraków belongs to the Kraków metro area, 1,468,599 residents in 40 gminas.
 
 - Historic Centre of Kraków: UNESCO World Heritage site since 1978, in the town
 - Uniwersytet Jagielloński w Krakowie: University, 33,369 students on 31 December 2025, in the town
@@ -56,16 +56,16 @@ Kraków belongs to the Kraków metro area, 1,465,000 residents in 40 gminas.
 
 ## Towns of a similar size
 
-- [Wrocław](https://softonsofa.com/pol-civ/atlas/wroclaw/): 672,601 residents
-- [Łódź](https://softonsofa.com/pol-civ/atlas/lodz/): 639,890 residents
-- [Poznań](https://softonsofa.com/pol-civ/atlas/poznan/): 534,239 residents
-- [Gdańsk](https://softonsofa.com/pol-civ/atlas/gdansk/): 489,328 residents
-- [Szczecin](https://softonsofa.com/pol-civ/atlas/szczecin/): 383,786 residents
+- [Wrocław](https://softonsofa.com/pol-civ/atlas/wroclaw/): 672,579 residents
+- [Łódź](https://softonsofa.com/pol-civ/atlas/lodz/): 636,753 residents
+- [Poznań](https://softonsofa.com/pol-civ/atlas/poznan/): 533,110 residents
+- [Gdańsk](https://softonsofa.com/pol-civ/atlas/gdansk/): 489,050 residents
+- [Szczecin](https://softonsofa.com/pol-civ/atlas/szczecin/): 382,271 residents
 
 ## Sources
 
-- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 31 December 2025 and position (GUS towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
-- [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
+- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 30 June 2026 and position (GUS population 30 June 2026; towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
+- [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
 - [Statistics Poland (GUS): GUS labour publication tables (GUS, October 2026, May 2026, and December 2025)](https://stat.gov.pl/obszary-tematyczne/rynek-pracy/)
 - [Ministry of Finance and Statistics Poland (GUS): Polish local income, housing, and tourism statistics (Ministry of Finance 2026; GUS annual 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
 - [Państwowa Komisja Wyborcza (PKW): Election results by gmina (presidential 2025, Sejm 2023) (PKW: presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 Oct 2023))](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach)

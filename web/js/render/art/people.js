@@ -289,7 +289,10 @@ export const CITIZEN_KINDS = {
   // nativity (B05002)
   born_in_state: {
     label: "Born in this voivodeship", row: "nativity", cloth: "#5a7a3a", accent: "#f2d27a",
-    shapes: () => [...person(), ...badge([{ d: "M18.6 15.8l2.6 2.4h-.8v2.8h-3.6v-2.8h-.8Z", fill: "#3a2a14" }])],
+    shapes: () => [...person(), ...badge([
+      { d: "M15.8 18.4l2.8-2.5 2.8 2.5v3.1h-5.6Z", fill: "#f2ead6", stroke: "#3a2a14", w: 0.75 },
+      { d: "M17.9 21.5v-2h1.4v2", fill: "#3a2a14" },
+    ])],
   },
   other_state: {
     label: "Born in another voivodeship", row: "nativity", cloth: "#3a6a8a", accent: "#a8743a",

@@ -141,7 +141,7 @@ class SeoTest(unittest.TestCase):
         (ld,) = seo.jsonld_of(html)
         types = {n["@type"] for n in ld["@graph"]}
         self.assertEqual(types, {"WebSite", "WebApplication", "Dataset"})
-        self.assertIn(seo.CF_BEACON, html)
+        self.assertNotIn(seo.CF_BEACON_HOST, html)
 
     def test_check_passes_on_built_site_and_notes_missing(self):
         lines = seo.check(self.web / "data")

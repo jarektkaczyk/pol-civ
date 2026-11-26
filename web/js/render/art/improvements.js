@@ -365,8 +365,9 @@ function paintPort(g, upx, tier, river) {
 
 // --- airports -------------------------------------------------------------------------------------------------------
 
-/** Airport tier by national passenger rank. Planned airports use the smallest current glyph. */
+/** Airport tier by national passenger rank. Planned airports stay visible at the closest supported zoom. */
 export const airportTier = (a) => {
+  if (a?.status === "planned") return 2;
   if (a?.rank <= 2) return 0;
   if (a?.rank <= 5) return 1;
   if (a?.rank <= 10) return 2;
@@ -377,8 +378,9 @@ export const airportTier = (a) => {
  * An airfield: a diagonal runway with threshold bars and centre dashes, a terminal and tower for hubs, a hangar for
  * small and cargo fields, a parked plane for large and medium hubs.
  */
-export function drawAirport(ctx, x, y, size, { tier = 2 } = {}) {
-  stamp(ctx, `imp:air:${tier}`, x, y, size, BOX, (g, upx) => paintAirport(g, upx, tier));
+export function drawAirport(ctx, x, y, size, { tier = 2, planned = false } = {}) {
+  stamp(ctx, `imp:air:${tier}:${planned ? "planned" : "open"}`, x, y, size, BOX,
+    (g, upx) => paintAirport(g, upx, tier, planned));
 }
 
 function plane(g, upx, x, y, k, rot, col = "#f4f1ea") {
@@ -402,10 +404,10 @@ function plane(g, upx, x, y, k, rot, col = "#f4f1ea") {
   g.restore();
 }
 
-function paintAirport(g, upx, tier) {
+function paintAirport(g, upx, tier, planned) {
   shadow(g, 0.7, 1.0, 0.26, 0.22);
   // grass apron
-  g.fillStyle = "rgba(120,140,80,.55)";
+  g.fillStyle = planned ? "rgba(91,126,148,.38)" : "rgba(120,140,80,.55)";
   g.beginPath();
   g.ellipse(0, 0.25, 1.08, 0.62, -0.42, 0, Math.PI * 2);
   g.fill();
@@ -414,7 +416,7 @@ function paintAirport(g, upx, tier) {
   g.save();
   g.translate(0, 0.25);
   g.rotate(-0.42);
-  g.fillStyle = "#4a4a4e";
+  g.fillStyle = planned ? "#6f7d86" : "#4a4a4e";
   g.beginPath();
   g.rect(-len, -wid / 2, 2 * len, wid);
   g.fill();
@@ -442,7 +444,22 @@ function paintAirport(g, upx, tier) {
     inkStroke(g, upx, 0.8, "rgba(20,20,24,.7)");
   }
   g.restore();
-  if (tier <= 2) {
+  if (planned) {
+    // Blueprint outline. A planned airport has no terminal or parked aircraft yet.
+    g.strokeStyle = "#8ddcf4";
+    g.lineWidth = Math.max(1.5 / upx, 0.08);
+    g.setLineDash([0.1, 0.07]);
+    g.strokeRect(-0.9, -0.62, 0.62, 0.3);
+    g.beginPath();
+    g.moveTo(-0.76, -0.62); g.lineTo(-0.76, -0.84);
+    g.moveTo(-0.43, -0.62); g.lineTo(-0.43, -0.84);
+    g.stroke();
+    g.setLineDash([]);
+    g.fillStyle = "#d9f4fb";
+    for (const x of [-0.76, -0.43]) {
+      g.beginPath(); g.arc(x, -0.86, 0.06, 0, Math.PI * 2); g.fill();
+    }
+  } else if (tier <= 2) {
     // terminal block with blue glazing and a control tower
     const tw = tier === 0 ? 0.95 : tier === 1 ? 0.75 : 0.5;
     g.fillStyle = "#e7e2d6";
@@ -479,7 +496,21 @@ function paintAirport(g, upx, tier) {
       inkStroke(g, upx, 0.9);
     }
   }
-  if (tier <= 1 || tier === 4) plane(g, upx, 0.55, -0.35, tier === 0 ? 0.48 : 0.4, 0.55, tier === 4 ? "#d9dee6" : "#f4f1ea");
+  if (!planned && (tier <= 1 || tier === 4)) plane(g, upx, 0.55, -0.35, tier === 0 ? 0.48 : 0.4, 0.55, tier === 4 ? "#d9dee6" : "#f4f1ea");
+  if (planned) {
+    g.strokeStyle = "#64d6ff";
+    g.lineWidth = Math.max(2.2 / upx, 0.12);
+    g.setLineDash([0.16, 0.11]);
+    g.beginPath();
+    g.ellipse(0, 0.08, 1.1, 0.86, -0.18, 0, Math.PI * 2);
+    g.stroke();
+    g.setLineDash([]);
+    g.fillStyle = "#d9eef5";
+    g.beginPath();
+    g.arc(0.82, -0.72, 0.13, 0, Math.PI * 2);
+    g.fill();
+    inkStroke(g, upx, 0.9, "#31586a");
+  }
 }
 
 // --- trade routes ---------------------------------------------------------------------------------------------------
@@ -497,6 +528,7 @@ export const MODE_STYLE = {
 };
 
 export const TOP_ROUTES = 10; // drawn wider and fully opaque; the rest thinner and lighter
+export const OVERVIEW_ROUTES = 15;
 
 /**
  * The arc between two hexes as the map draws it (world km): a quadratic curve from the west end, bowing by `bow`
@@ -603,16 +635,21 @@ export function drawTradeRoutes(ctx, routes, vp, o, opts = {}) {
   }
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  const alphaOf = (rt) => (opts.highlight && opts.highlight !== rt ? 0.3 : rt.top || opts.highlight === rt ? 1 : 0.72);
+  const alphaOf = (rt) => {
+    if (opts.highlight && opts.highlight !== rt) return 0.3;
+    if (opts.highlight === rt) return 1;
+    if (opts.overview) return rt.top ? 0.58 : 0.42;
+    return rt.top ? 1 : 0.72;
+  };
   for (const rt of shown) {
-    const wpx = routeWidth(rt, Rpx);
+    const wpx = routeWidth(rt, Rpx) * (opts.overview ? 0.82 : 1);
     const path = rt.path;
     ctx.globalAlpha = alphaOf(rt);
     const halo = wpx * 1.5 + 2;
-    ctx.strokeStyle = "rgba(30,20,8,.35)";
+    ctx.strokeStyle = opts.overview ? "rgba(30,20,8,.18)" : "rgba(30,20,8,.35)";
     ctx.lineWidth = (halo + 1.4) / s;
     ctx.stroke(path);
-    ctx.strokeStyle = "rgba(250,241,214,.9)";
+    ctx.strokeStyle = opts.overview ? "rgba(250,241,214,.55)" : "rgba(250,241,214,.9)";
     ctx.lineWidth = halo / s;
     ctx.stroke(path);
     const st = rt.style;
@@ -648,6 +685,11 @@ export function drawTradeRoutes(ctx, routes, vp, o, opts = {}) {
     ctx.arc(rt.ends[k], rt.ends[k + 1], clamp(2 + Rpx * 0.06, 2.4, 4.5) / s, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
+  }
+  // Country-view routes stay light. Detailed views use medallions along each route.
+  if (opts.overview) {
+    for (const rt of shown) rt._markers = [];
+    return;
   }
   // markers in screen space, spaced along each route
   const sizeFor = (rt) => clamp(10 + Rpx * 0.22, 11, 19) * (rt.top ? 0.95 + 0.25 * rt.weight : 0.78);

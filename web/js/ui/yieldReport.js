@@ -69,7 +69,7 @@ export function statDefs(nation) {
   return [
     {
       key: "population", label: "Population", name: "Population", color: "#e8dcc0", iconId: "pop", emoji: "👥", unit: "people",
-      description: "Residents on 31 December 2025 (GUS).", source: nation?.vintage || "", value: n.population ?? null,
+      description: `Residents on ${nation?.population_date || "31 December 2025"} (GUS).`, source: nation?.vintage || "", value: n.population ?? null,
     },
     ...yields,
     {
@@ -163,7 +163,7 @@ export function buildReport(key, { nation, states, cities, lenses, lensVintage }
 
   if (key === "population") reportPopulation(rep, n, st, metros);
   else if (key === "unemployment") reportUnemployment(rep, n, st, metros);
-  else if (def.unit === "usd") reportGold(rep, nation, n, st, metros);
+  else if (def.unit === "pln" || def.unit === "usd") reportGold(rep, nation, n, st, metros);
   else reportJobs(rep, def, nation, n, st, metros);
   return rep;
 }
@@ -228,7 +228,7 @@ function reportUnemployment(rep, n, st, metros) {
 function reportGold(rep, nation, n, st, metros) {
   const gdp = (o) => o.gdp ?? o.yields?.gold ?? null;
   const pp = ratio(rep.total, n.population);
-  // GDP and population can come from different years (GDP 2025 vs population at the end of 2025): say which.
+  // GDP and population can come from different years (GDP 2025 vs population in mid-2026): say which.
   const popYear = fin(nation.year) ? nation.year : null;
   const years = n.gdp_year && popYear && n.gdp_year !== popYear ? `${n.gdp_year} GDP ÷ ${popYear} residents` : "GDP ÷ residents";
   if (pp != null) rep.context.push(`${money(pp)} per person (${years})`);

@@ -3,7 +3,7 @@
 Source page: https://softonsofa.com/pol-civ/atlas/zakopane/
 Last updated: 2026-11-26
 
-Zakopane had 24,921 residents on 31 December 2025, 9.2% fewer than in 2015.
+Zakopane had 24,805 residents on 30 June 2026. Between 2015 and 2025 it lost 9.2% of its residents.
 
 Zakopane is a town in powiat tatrzański, Małopolskie voivodeship.
 
@@ -13,10 +13,10 @@ Zakopane is a town in powiat tatrzański, Małopolskie voivodeship.
 
 | Figure | Value | Date | Publisher |
 |---|---|---|---|
-| Population | 24,921 | 31 December 2025 | Główny Urząd Statystyczny (GUS); OpenStreetMap contributors |
+| Population | 24,805 | 30 June 2026 | Główny Urząd Statystyczny (GUS); OpenStreetMap contributors |
 | Change since 2015 | -9.2% (from 27,442) | 2015 to 2025 | Statistics Poland (GUS) |
-| Median age | 46.6 years | 31 December 2025 | Statistics Poland (GUS) |
-| Residents aged 65 or more | 25.1% | 31 December 2025 | Statistics Poland (GUS) |
+| Median age | 46.8 years | 30 June 2026 | Statistics Poland (GUS) |
+| Residents aged 65 or more | 25.3% | 30 June 2026 | Statistics Poland (GUS) |
 | Average gross wage (powiat tatrzański) | 7,461 zł a month | May 2026 | Statistics Poland (GUS) |
 | Registered unemployment (powiat tatrzański) | 9.6% | October 2026 | Statistics Poland (GUS) |
 | Personal income tax revenue per resident | 3,749 zł | 2026 plan | Ministry of Finance and Statistics Poland (GUS) |
@@ -44,24 +44,24 @@ The median of the 154 towns of 20,000+ with a station within 25 km was 16.4 µg/
 
 ## Metro area and places nearby
 
-- Tatrzański Park Narodowy: National park, 5,091,772 visits in 2024, 5 km away
+- Tatrzański Park Narodowy: National park, 5,266,672 visits in 2025 (5,091,772 in 2024), 5 km away
 - Wooden Churches of Southern Małopolska: UNESCO World Heritage site since 2003, 27 km away
 
 ## Towns of a similar size
 
-- [Gorlice](https://softonsofa.com/pol-civ/atlas/gorlice/): 24,825 residents
-- [Wągrowiec](https://softonsofa.com/pol-civ/atlas/wagrowiec/): 25,223 residents
-- [Łowicz](https://softonsofa.com/pol-civ/atlas/lowicz/): 25,313 residents
-- [Pszczyna](https://softonsofa.com/pol-civ/atlas/pszczyna/): 24,478 residents
-- [Świecie](https://softonsofa.com/pol-civ/atlas/swiecie/): 24,472 residents
+- [Gorlice](https://softonsofa.com/pol-civ/atlas/gorlice/): 24,670 residents
+- [Wągrowiec](https://softonsofa.com/pol-civ/atlas/wagrowiec/): 25,137 residents
+- [Łowicz](https://softonsofa.com/pol-civ/atlas/lowicz/): 25,141 residents
+- [Pszczyna](https://softonsofa.com/pol-civ/atlas/pszczyna/): 24,426 residents
+- [Świecie](https://softonsofa.com/pol-civ/atlas/swiecie/): 24,385 residents
 
 ## Sources
 
-- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 31 December 2025 and position (GUS towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
-- [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
+- [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 30 June 2026 and position (GUS population 30 June 2026; towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
+- [Statistics Poland (GUS): Population, demography, life expectancy, and university students (GUS population 30 June 2026; population 31 December 2025 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-stan-i-struktura-oraz-ruch-naturalny-w-przekroju-terytorialnym-w-2025-r-stan-w-dniu-31-grudnia,6,40.html)
 - [Statistics Poland (GUS): GUS labour publication tables (GUS, October 2026, May 2026, and December 2025)](https://stat.gov.pl/obszary-tematyczne/rynek-pracy/)
 - [Ministry of Finance and Statistics Poland (GUS): Polish local income, housing, and tourism statistics (Ministry of Finance 2026; GUS annual 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
 - [Państwowa Komisja Wyborcza (PKW): Election results by gmina (presidential 2025, Sejm 2023) (PKW: presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 Oct 2023))](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach)
 - [Główny Inspektorat Ochrony Środowiska (GIOŚ): Air quality: annual means of PM2.5, PM10 and benzo(a)pyrene by station (GIOS annual statistics 2025)](https://powietrze.gios.gov.pl/pjp/archives)
-- [Główny Urząd Statystyczny (GUS); Wikidata: National parks: area and visitors (GUS Ochrona srodowiska 2025 (data for 2024); Wikidata centre points)](https://stat.gov.pl/obszary-tematyczne/srodowisko-energia/srodowisko/ochrona-srodowiska-2025,1,26.html)
+- [Główny Urząd Statystyczny (GUS); Wikidata: National parks: area and visitors (GUS Ochrona srodowiska 2025 (data for 2024); Tatra National Park report for 2025; Wikidata centre points)](https://stat.gov.pl/obszary-tematyczne/srodowisko-energia/srodowisko/ochrona-srodowiska-2025,1,26.html)
 - [UNESCO World Heritage Centre (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl): UNESCO World Heritage in Poland and Pomniki Historii (UNESCO whc001 (2026-11-22); NID Pomniki Historii 2026-09-30 + Dz.U. 2026 poz. 1334)](https://data.unesco.org/explore/dataset/whc001/)

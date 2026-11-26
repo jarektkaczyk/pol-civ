@@ -31,7 +31,7 @@ RULES = [
     {"id": "unesco_property", "kind": "unesco", "text":
      "Every UNESCO World Heritage property with Poland among its states, one marker per property. Serial properties "
      "use the named, best-known Polish component in this file. Memorial properties are kept separate, never ranked, "
-     "and never described as wonders."},
+     "and shown with a quiet marker."},
     {"id": "national_park", "kind": "natural", "year": 2024, "text":
      "The six Polish national parks with the most visitors in 2024, ranked by the GUS visitor count."},
     {"id": "research_university", "kind": "university", "year": 2025, "text":
@@ -94,6 +94,8 @@ def _parks(points: list[dict], loc: Locator) -> list[dict]:
             "id": point.get("id"), "name": point.get("name"), "short": point.get("name"),
             "kind": "natural", "rule": "national_park", "rank": rank, "curated": False,
             "metrics": {"visits": props.get("visitors"), "year": props.get("visitors_year"),
+                        "visits_latest": props.get("visitors_latest"), "latest_year": props.get("visitors_latest_year"),
+                        "latest_ref": props.get("visitors_latest_ref"),
                         "area_km2": round(props["area_ha"] / 100, 2) if props.get("area_ha") is not None else None,
                         "unit_type": "National park"},
             "ref": props.get("ref"), **at,

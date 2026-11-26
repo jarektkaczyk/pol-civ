@@ -39,10 +39,11 @@ AIRPORTS = {
     "EPRA": "Warszawa-Radom",
 }
 
-# The planned hub. Status text is quoted from the official site; position from Wikidata (P625).
+# The planned hub. Status follows the official site; position comes from Wikidata (P625).
 CPK = {
-    "id": "cpk", "name": "Port Polska (CPK) hub airport", "qid": None, "status": "planned",
-    "status_note": None, "opening_planned": None, "ref": None,
+    "id": "cpk", "name": "Port Polska (CPK)", "qid": "Q48840381", "status": "planned",
+    "status_note": "First stage planned to open by 2032 (government priority status as of 30 June 2026).",
+    "opening_planned": 2032, "ref": "https://www.gov.pl/web/priorytety/p32",
 }
 
 SINCE = 2023  # first year requested; the newest year in the answer is used
@@ -74,10 +75,11 @@ def airport_values(doc: dict, measure: str, unit: str) -> tuple[dict[int, dict[s
 class PlTransportAirports(Source):
     info = SourceInfo(
         id="pl_transport_airports",
-        title="Airports of Poland: passengers and freight (Eurostat), positions (OpenStreetMap)",
-        publisher="Eurostat (air transport statistics reported by Poland); OpenStreetMap contributors",
+        title="Airports of Poland: traffic, positions and planned Port Polska",
+        publisher="Eurostat; OpenStreetMap contributors; Wikidata; Government of Poland",
         homepage="https://ec.europa.eu/eurostat/web/transport/database",
-        license="Eurostat: free re-use with attribution. OSM positions: ODbL 1.0. " + ODBL_NOTE,
+        license="Eurostat: free re-use with attribution. OSM positions: ODbL 1.0. Wikidata: CC0. "
+        "Government plan: public information. " + ODBL_NOTE,
         description="Passengers carried and freight and mail handled at Poland's airports in the newest full "
         "year, and the planned Port Polska (CPK) hub.",
         used_for=["Airports on the map (sized by passengers)", "Commerce advisor"],
@@ -144,7 +146,7 @@ class PlTransportAirports(Source):
         total = sum(v for v in pax.get(year, {}).values() if v)
         files = [self.PAX, self.FRT, self.OSM] + ([self.WD] if CPK["qid"] else [])
         return {
-            "vintage": f"Eurostat airport traffic {year}",
+            "vintage": f"Eurostat airport traffic {year}; Port Polska plan status 2026-06-30",
             "tables": {"airports_country": {
                 "level": "country",
                 "fields": {"passengers": {"label": "Passengers carried at Polish airports in Eurostat", "unit": "persons",
@@ -161,6 +163,8 @@ class PlTransportAirports(Source):
                 "airport data Poland reports under Regulation (EC) 437/2003. Small airports below Eurostat's reporting "
                 "threshold have null traffic.",
                 "Olsztyn-Mazury airport is at Szymany near Szczytno (ICAO EPSY); the brief's 'Szczytno' is this airport.",
+                "Port Polska position: Wikidata Q48840381. Status and first-stage year: Government of Poland priority "
+                "P32, status as of 30 June 2026; first stage planned by 2032.",
                 f"Positions: OSM aerodrome centres (extract {stamp}). {ODBL_NOTE}",
             ] + notes,
             "_files": files,

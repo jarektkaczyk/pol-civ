@@ -4,7 +4,7 @@ Rows and their units (`scope` in each row says which one a town's row describes)
 
 * workforce: workers by PKD section group, the town's powiat (a city with powiat rights is its own powiat),
   GUS 31 December 2025, by employer seat. A section GUS withholds counts as absent.
-* age, sex: residents of the town's gmina (GUS 31 December 2025): the whole urban-rural gmina for a town inside one.
+* age, sex: residents of the town's gmina (GUS 30 June 2026): the whole urban-rural gmina for a town inside one.
 * education: per 1,000 residents aged 13+, with or without a higher-education diploma, the town's powiat (NSP 2021
   census share; the row's total is 1,000, not a head count).
 * nativity: Ukrainian citizens with a PESEL UKR number registered in the powiat, per powiat residents.

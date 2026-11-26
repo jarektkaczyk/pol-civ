@@ -48,11 +48,9 @@ _CSP_COMMON = ("default-src 'self'; script-src 'self' https://eu-assets.i.postho
 ATLAS_CSP = _CSP_COMMON + "; style-src 'self'"
 APP_CSP = _CSP_COMMON + "; style-src 'self' 'unsafe-inline'"  # the app sets inline styles from JS
 MAIN_OG = "og-image.jpg"
-# Cloudflare Web Analytics (set up by hand, not injected by the zone): the beacon goes at the end of <body> of
-# web/index.html (between the seo:beacon markers) and of every atlas page. The token is public by design.
-CF_BEACON_TOKEN = "fc15ccf0412446f9b7f0edf2e2123dc7"
-CF_BEACON = ('<script defer src="https://static.cloudflareinsights.com/beacon.min.js" '
-             f"data-cf-beacon='{{\"token\": \"{CF_BEACON_TOKEN}\"}}'></script>")
+# Cloudflare Web Analytics is injected by js/app/analytics.js (token in js/app/config.js) under the PostHog guard.
+# No page may load the beacon directly: check() fails a page that does.
+CF_BEACON_HOST = "static.cloudflareinsights.com/beacon"
 NEARBY_KM = 30  # heritage sites listed on a town page: within this distance of the town
 # Local paths and private names must never reach a public page (the pieces are joined so this file passes the
 # release leak gate itself).
@@ -216,6 +214,8 @@ class Data:
         if key == "population":
             v = (self.source_by_id.get("pl_stats_population") or {}).get("vintage") or self.nation_doc.get("vintage")
             return _when(v, years.get("population"))
+        if key == "workers":
+            return f"31 December {years['workers']}" if years.get("workers") else ""
         if key in ("wage", "unemployment"):
             return _when((self.field.get(key) or {}).get("description"), years.get(key))
         if key == "pit":
@@ -309,6 +309,10 @@ def heritage_items(d: Data, src: Sources, wonders) -> list[tuple[str, str | None
         elif kind == "natural":
             vis = num(m.get("visits"))
             note = "National park" + (f", {fmt_int(vis)} visits in {m.get('year')}" if vis and m.get("year") else "")
+            latest = num(m.get("visits_latest"))
+            if latest and m.get("latest_year"):
+                note = (f"National park, {fmt_int(latest)} visits in {m['latest_year']}"
+                        + (f" ({fmt_int(vis)} in {m.get('year')})" if vis and m.get("year") else ""))
         elif kind == "university":
             st = num(m.get("students"))
             note = "University" + (f", {fmt_int(st)} students on 31 December {m.get('students_year')}" if st and m.get("students_year") else f", {fmt_int(st)} students" if st else "")
@@ -417,6 +421,11 @@ def _town_metrics(d: Data):
     ]
 
 
+def town_word(c: dict) -> str:
+    """'city' for a city with powiat rights or a town of 100,000 or more residents, else 'town'."""
+    return "city" if c.get("kind") == "city" or (num(c.get("population")) or 0) >= 100_000 else "town"
+
+
 def town_headline(d: Data, c: dict) -> tuple[str, str | None]:
     """(sentence, source id): the town's most striking true fact.
 
@@ -429,9 +438,9 @@ def town_headline(d: Data, c: dict) -> tuple[str, str | None]:
     best = None
     if pr and pop:
         if c.get("capital"):
-            text = f"{c['name']} is the capital and the largest town of Poland, with {fmt_int(pop)} residents on {when}."
+            text = f"{c['name']} is the capital and the largest city of Poland, with {fmt_int(pop)} residents on {when}."
         else:
-            text = f"{c['name']} is {the_nth(pr, 'largest town')} in Poland, with {fmt_int(pop)} residents on {when}."
+            text = f"{c['name']} is {the_nth(pr, 'largest ' + town_word(c))} in Poland, with {fmt_int(pop)} residents on {when}."
         best = (pr, 0, text, "pl_geo_places")
     for order, (key, get, hi, lo, sentence, sid, needs_n) in enumerate(_town_metrics(d), start=1):
         v = get(c)
@@ -451,9 +460,10 @@ def town_headline(d: Data, c: dict) -> tuple[str, str | None]:
                 best = (r, order, text, sid)
     if best and best[1] == 0 and best[0] > 20 and pop:
         g = num(c.get("growth"))
-        tail = (f", {fmt_pct(g)} more than in 2015" if g and g > 0 else f", {fmt_pct(-g)} fewer than in 2015" if g and g < 0 else "")
-        return f"{c['name']} had {fmt_int(pop)} residents on {when}{tail}.", "pl_geo_places"
-    return (best[2], best[3]) if best else (f"{c['name']} is a town in Poland.", None)
+        tail = (f" Between 2015 and 2025 it grew by {fmt_pct(g)}." if g and g > 0
+                else f" Between 2015 and 2025 it lost {fmt_pct(-g)} of its residents." if g and g < 0 else "")
+        return f"{c['name']} had {fmt_int(pop)} residents on {when}.{tail}", "pl_geo_places"
+    return (best[2], best[3]) if best else (f"{c['name']} is a {town_word(c)} in Poland.", None)
 
 
 def _state_metrics(d: Data):
@@ -641,7 +651,7 @@ def index_page(d: Data, web: Path, st_slug: dict, tw_slug: dict) -> dict:
     if num(n.get("unemployment")) is not None:
         rows.append(_row(src, "Registered unemployment", fmt_pct(n["unemployment"]), d.when("unemployment"), "pl_stats_labour"))
     if num(n.get("employed")):
-        rows.append(_row(src, "People working", fmt_int(n["employed"]), "31 December 2025" if "2025" in when_pop else "", "pl_stats_labour"))
+        rows.append(_row(src, "People working", fmt_int(n["employed"]), d.when("workers"), "pl_stats_labour"))
     if num(n.get("pit_per_person")):
         rows.append(_row(src, "Personal income tax revenue of the gminas per resident", fmt_pln(n["pit_per_person"]), d.when("pit"), "pl_stats_prosperity"))
     wn = d.wonders_doc.get("national") or {}
@@ -685,8 +695,8 @@ def index_page(d: Data, web: Path, st_slug: dict, tw_slug: dict) -> dict:
         towns_by_state.append({"h3": s["name"], "items": items})
 
     largest = max(d.states, key=lambda s: num(s.get("population")) or 0) if d.states else None
-    lede = (f"Poland had {fmt_int(pop)} residents on {when_pop}" + (f", {fmt_pct(-growth)} fewer than in 2015." if growth and growth < 0
-            else f", {fmt_pct(growth)} more than in 2015." if growth else ".")) if pop else "Poland in numbers."
+    lede = (f"Poland had {fmt_int(pop)} residents on {when_pop}." + (f" Between 2015 and 2025 the population fell by {fmt_pct(-growth)}." if growth and growth < 0
+            else f" Between 2015 and 2025 the population grew by {fmt_pct(growth)}." if growth else "")) if pop else "Poland in numbers."
     paras = []
     if counts:
         paras.append(f"The country has 16 voivodeships, {', '.join(counts[:-1])} and {counts[-1]}." if len(counts) > 1 else f"The country has 16 voivodeships and {counts[0]}.")
@@ -735,7 +745,7 @@ def state_page(d: Data, web: Path, idx: int, s: dict, st_slug: dict, tw_slug: di
     if num(s.get("unemployment")) is not None:
         rows.append(_row(src, "Registered unemployment", fmt_pct(s["unemployment"]), d.when("unemployment"), "pl_stats_labour"))
     if num(s.get("employed")):
-        rows.append(_row(src, "People working", fmt_int(s["employed"]), "31 December 2025" if "2025" in when_pop else "", "pl_stats_labour"))
+        rows.append(_row(src, "People working", fmt_int(s["employed"]), d.when("workers"), "pl_stats_labour"))
     if num(s.get("pit_per_person")):
         rows.append(_row(src, "Personal income tax revenue of the gminas per resident", fmt_pln(s["pit_per_person"]), d.when("pit"), "pl_stats_prosperity"))
     for key, label, fmt in (("life_f", "Life expectancy at birth, women", lambda v: f"{v:.1f} years"),
@@ -852,7 +862,7 @@ def town_page(d: Data, web: Path, c: dict, st_slug: dict, tw_slug: dict) -> dict
     if num(g.get("students")) is not None:
         rows.append(_row(src, "University students per 1,000 residents", fmt_int(g["students"]), _when((d.field.get("students") or {}).get("description"), None), "pl_stats_population"))
     if c.get("kind") == "city" and num(c.get("employed")):
-        rows.append(_row(src, "People working in the city", fmt_int(c["employed"]), "31 December 2025" if "2025" in when_pop else "", "pl_stats_labour"))
+        rows.append(_row(src, "People working in the city", fmt_int(c["employed"]), d.when("workers"), "pl_stats_labour"))
 
     # city type and districts
     dist = (d.districts.get("cities") or {}).get(c["id"]) or None
@@ -961,7 +971,7 @@ def town_page(d: Data, web: Path, c: dict, st_slug: dict, tw_slug: dict) -> dict
 
     title = f"{name}, Poland: population, wages, vote and air quality"
     bits = [f"{fmt_int(pop)} residents ({when_pop})" if pop else None,
-            f"{fmt_pct(c['growth'], 1, True)} since 2015" if num(c.get("growth")) is not None else None,
+            f"{fmt_pct(c['growth'], 1, True)} from 2015 to 2025" if num(c.get("growth")) is not None else None,
             f"average wage {fmt_pln(c['wage'])}" if num(c.get("wage")) else None,
             f"unemployment {fmt_pct(c['unemployment'])}" if num(c.get("unemployment")) is not None else None,
             f"PM2.5 {pm:.1f} µg/m³" if pm is not None else None]
@@ -1093,7 +1103,6 @@ def render_html(page: dict, date: str) -> str:
     a(f'<footer><p>Last updated {human_date(date)}. Part of <a href="{root}">Polska</a>, a map of Poland built from public data. '
       f'<a href="index.md">Markdown version</a>. <a href="{root}llms.txt">llms.txt</a>. '
       f'Code: <a href="{REPO_URL}" rel="noopener">MIT licence</a>; data: the publishers above, under their own terms.</p></footer>')
-    a(CF_BEACON)
     a("</body>")
     a("</html>")
     return "\n".join(h) + "\n"
@@ -1386,9 +1395,6 @@ def fill_index_html(web: Path, ld: dict) -> bool:
         return False
     body = json.dumps(ld, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     new = text[:m.start(2)] + f'<script type="application/ld+json">{body}</script>' + text[m.end(2):]
-    b = re.search(r"(<!-- seo:beacon[^>]*-->)(.*?)(<!-- /seo:beacon -->)", new, re.S)
-    if b:
-        new = new[:b.start(2)] + CF_BEACON + new[b.end(2):]
     if new != text:
         _write(p, new)
     return True
@@ -1500,8 +1506,10 @@ def check(web_dir: Path) -> list[tuple[str, str]]:
                 bad.append(f"{rel}: JSON-LD lacks WebPage or BreadcrumbList")
         except ValueError as exc:
             bad.append(f"{rel}: JSON-LD does not parse ({exc})")
-        if CF_BEACON_TOKEN not in text:
-            bad.append(f"{rel}: no Cloudflare beacon")
+        if CF_BEACON_HOST in text:
+            bad.append(f"{rel}: loads the Cloudflare beacon directly (analytics.js injects it)")
+        if "js/app/analytics.js" not in text:
+            bad.append(f"{rel}: no analytics.js")
         if not (p.parent / "index.md").exists():
             bad.append(f"{rel}: no index.md")
         if LEAK.search(text):
@@ -1557,8 +1565,8 @@ def check(web_dir: Path) -> list[tuple[str, str]]:
         csp = _head(idx.read_text()).get("Content-Security-Policy")
         if csp != APP_CSP:
             out.append(("WARN", "web/index.html CSP differs from seo.APP_CSP (keep them equal)"))
-        if CF_BEACON not in idx.read_text():
-            out.append(("WARN", "web/index.html has no Cloudflare beacon (rebuild: pipeline build seo)"))
+        if CF_BEACON_HOST in idx.read_text():
+            out.append(("FAIL", "web/index.html loads the Cloudflare beacon directly (analytics.js injects it)"))
     for name in ("llms.txt", "llms-full.txt", "sitemap.xml"):
         f = web / name
         if f.exists() and LEAK.search(f.read_text()):
