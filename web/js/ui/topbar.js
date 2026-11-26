@@ -20,7 +20,7 @@ export function renderTopbar(nation) {
   if (typeof ResizeObserver === "function") new ResizeObserver(check).observe(el);
   check();
   watchBarOverflow(document.getElementById("topbar"));
-  document.getElementById("turn").innerHTML = `Turn <b>${esc(nation.year ?? "")}</b> · ${esc(nation.vintage || "")}`;
+  document.getElementById("turn").innerHTML = nation.year != null ? `Turn <b>${esc(nation.year)}</b>` : "";
 }
 
 // Phones scroll the whole bar sideways. Mark which ends have more to show (.more-l / .more-r) so CSS can fade

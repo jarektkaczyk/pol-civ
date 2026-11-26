@@ -1,15 +1,15 @@
 // Citizen figures: little strategy-game person icons for the City View's citizen rows (citizens.json), in one shared
 // drawing language so canvas and HTML (SVG) look identical. All original art.
 //
-// Every figure is a list of shapes in a 24×24 box (ground line at y ≈ 23): {d: SVG path, fill: role|colour,
+// Every figure is a list of shapes in a 24x24 box (ground line at y ~ 23): {d: SVG path, fill: role|colour,
 // stroke?: role|colour, w?: stroke width, ink?: true = gets the dark outline}. Roles resolve per figure and variant:
 // skin, hair, cloth (the category colour), accent, light, dark, metal, gold.
 //
 //   CITIZEN_KINDS                          every kind id with its label and category colour
-//   citizenKind(keyOrIcon) → kind | null   accepts citizens.json keys (executive, drove_alone, less_than_hs, …) and the
-//                                          suggested icon ids (c-executive, c-car, c-edu0, …)
+//   citizenKind(keyOrIcon) -> kind | null   accepts citizens.json keys (executive, drove_alone, less_than_hs, ...) and the
+//                                          suggested icon ids (c-executive, c-car, c-edu0, ...)
 //   drawCitizen(ctx, kind, x, y, size, opts)   canvas, centred at (x, y), `size` user units tall; sprite-cached
-//   citizenSVG(kind, opts) → "<svg …>"       the same figure as an inline SVG string (for HTML)
+//   citizenSVG(kind, opts) -> "<svg ...>"       the same figure as an inline SVG string (for HTML)
 //   opts: {variant = 0 (hair colour and a slight clothing shade, any integer: never the skin), dim = false (greyed, for
 //          a figure that is "not there"), disk = null | colour (a round backing), title = "" (SVG only: accessible
 //          name), shadow = true}
@@ -25,7 +25,7 @@ const ellipse = (cx, cy, rx, ry) => `M${f(cx - rx)} ${f(cy)}a${f(rx)} ${f(ry)} 0
 
 const SKIN = "#d9a982"; // one neutral tone for every figure (see the header)
 const HAIR = ["#2a1d14", "#5a3a22", "#1c1a18", "#8a5a2a", "#3a2a1c", "#c9a060"];
-const CLOTH_SHADE = [0, -0.1, 0.08, -0.05, 0.12]; // variant → a slight darken (−) / lighten (+) of the category colour
+const CLOTH_SHADE = [0, -0.1, 0.08, -0.05, 0.12]; // variant -> a slight darken (-) / lighten (+) of the category colour
 
 function shade(hex, amt) {
   const m = /^#([0-9a-f]{6})$/i.exec(hex || "");
@@ -59,7 +59,7 @@ const badge = (symbol, fill = "gold") => [
 
 // --- the figures --------------------------------------------------------------------------------------------------
 
-/** kind → {label, row, cloth, accent, shapes(variant)} */
+/** kind -> {label, row, cloth, accent, shapes(variant)} */
 export const CITIZEN_KINDS = {
   // workforce (C24010)
   executive: {
@@ -172,7 +172,7 @@ export const CITIZEN_KINDS = {
     ],
   },
   young: {
-    label: "Young adult (18–34)", row: "age", cloth: "#4f8fcf", accent: "#2a4a6a",
+    label: "Young adult (18-34)", row: "age", cloth: "#4f8fcf", accent: "#2a4a6a",
     shapes: () => person({
       hair: "long",
       back: [{ d: rrect(14.4, 13.2, 5.6, 7.4, 1.4), fill: "accent", ink: true }],
@@ -180,7 +180,7 @@ export const CITIZEN_KINDS = {
     }),
   },
   midlife: {
-    label: "Midlife (35–64)", row: "age", cloth: "#7a6a52", accent: "#f4f1ea",
+    label: "Midlife (35-64)", row: "age", cloth: "#7a6a52", accent: "#f4f1ea",
     shapes: () => person({ torso: [{ d: "M10 11.8L12 15.4l2-3.6Z", fill: "accent" }, { d: "M12 15.4V23", fill: "none", stroke: "#5a4c3a", w: 0.8 }] }),
   },
   elder: {
@@ -245,11 +245,11 @@ export const CITIZEN_KINDS = {
 
   // education (C15003), adults 25+
   less_than_hs: {
-    label: "No high-school diploma", row: "education", cloth: "#8a7a64", accent: "#c9b99a",
+    label: "Primary school or less", row: "education", cloth: "#8a7a64", accent: "#c9b99a",
     shapes: () => person(),
   },
   high_school: {
-    label: "High school", row: "education", cloth: "#4a7a9a", accent: "#f4efe2",
+    label: "Secondary or vocational school", row: "education", cloth: "#4a7a9a", accent: "#f4efe2",
     shapes: () => person({
       front: [
         { d: "M14.2 19.8l5.6-3.2 1 1.6-5.6 3.2Z", fill: "accent", ink: true },
@@ -258,7 +258,7 @@ export const CITIZEN_KINDS = {
     }),
   },
   some_college: {
-    label: "Some college", row: "education", cloth: "#5a6a9a", accent: "#c0392b",
+    label: "Post-secondary school", row: "education", cloth: "#5a6a9a", accent: "#c0392b",
     shapes: () => person({
       front: [
         { d: rrect(13.8, 18.4, 6.6, 1.8, 0.3), fill: "accent", ink: true },
@@ -276,7 +276,7 @@ export const CITIZEN_KINDS = {
     }),
   },
   graduate: {
-    label: "Graduate degree", row: "education", cloth: "#7a2a3a", accent: "#f2d27a",
+    label: "Master's degree or higher", row: "education", cloth: "#7a2a3a", accent: "#f2d27a",
     shapes: () => person({
       torso: [
         { d: "M8.2 12.6c1 3 2.2 4.6 3.8 4.6s2.8-1.6 3.8-4.6l1.4 1.2c-1 4.2-2.8 6.2-5.2 6.2s-4.2-2-5.2-6.2Z", fill: "#e0b04a", ink: true },
@@ -288,11 +288,11 @@ export const CITIZEN_KINDS = {
 
   // nativity (B05002)
   born_in_state: {
-    label: "Born in this state", row: "nativity", cloth: "#5a7a3a", accent: "#f2d27a",
+    label: "Born in this voivodeship", row: "nativity", cloth: "#5a7a3a", accent: "#f2d27a",
     shapes: () => [...person(), ...badge([{ d: "M18.6 15.8l2.6 2.4h-.8v2.8h-3.6v-2.8h-.8Z", fill: "#3a2a14" }])],
   },
   other_state: {
-    label: "Born in another state", row: "nativity", cloth: "#3a6a8a", accent: "#a8743a",
+    label: "Born in another voivodeship", row: "nativity", cloth: "#3a6a8a", accent: "#a8743a",
     shapes: () => person({
       front: [
         { d: rrect(14.4, 16.4, 6.8, 5.6, 0.8), fill: "accent", ink: true },
@@ -301,7 +301,7 @@ export const CITIZEN_KINDS = {
     }),
   },
   native_abroad: {
-    label: "US citizen born abroad", row: "nativity", cloth: "#6a5a8a", accent: "#e8eef6",
+    label: "Polish citizen born abroad", row: "nativity", cloth: "#6a5a8a", accent: "#e8eef6",
     shapes: () => [...person(), ...badge([{ d: "M15.6 18.8l6-1.6-.2.8-2.6 1 .2 2-.8.2-.6-1.8-2 .4Z", fill: "#2a4a6a" }], "accent")],
   },
   foreign_born: {
@@ -313,7 +313,7 @@ export const CITIZEN_KINDS = {
 };
 
 function mortar(tassel, col = "#24365e") {
-  // a flat board and a shallow band above the brow: the head (top at y 3.4) shows its face below y ≈ 5
+  // a flat board and a shallow band above the brow: the head (top at y 3.4) shows its face below y ~ 5
   return [
     { d: "M8.4 4.6v-1.2h7.2v1.2c-1 .6-2.2.9-3.6.9s-2.6-.3-3.6-.9Z", fill: col, ink: true },
     { d: "M12 0.6l6.6 1.9-6.6 1.9-6.6-1.9Z", fill: col, ink: true },
@@ -334,7 +334,7 @@ function car(n) {
   ];
 }
 
-// Data keys and suggested icon ids → kinds.
+// Data keys and suggested icon ids -> kinds.
 const ALIAS = {
   "c-executive": "executive", "c-engineer": "engineer", "c-scholar": "scholar", "c-healer": "healer", "c-service": "service",
   "c-clerk": "clerk", "c-farmer": "farmer", "c-builder": "builder", "c-maker": "maker",
@@ -343,6 +343,12 @@ const ALIAS = {
   "c-edu0": "less_than_hs", "c-edu1": "high_school", "c-edu2": "some_college", "c-edu3": "bachelors", "c-edu4": "graduate",
   "c-local": "born_in_state", "c-newcomer": "other_state", "c-abroad": "native_abroad", "c-immigrant": "foreign_born",
   car: "drove_alone", bike: "other", artist: "scholar", worker: "maker", adult: "midlife", senior: "elder",
+  // Polish census (NSP 2021) keys a builder may use for education and birthplace.
+  primary: "less_than_hs", lower_secondary: "less_than_hs", no_school: "less_than_hs",
+  basic_vocational: "high_school", vocational: "high_school", secondary: "high_school", general_secondary: "high_school",
+  vocational_secondary: "high_school", post_secondary: "some_college", tertiary: "graduate", higher: "graduate",
+  born_in_voivodeship: "born_in_state", other_voivodeship: "other_state", polish_born_abroad: "native_abroad",
+  foreign_citizen: "foreign_born", foreigner: "foreign_born", born_abroad: "foreign_born",
 };
 
 export function citizenKind(id) {

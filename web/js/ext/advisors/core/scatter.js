@@ -1,12 +1,12 @@
 // Canvas scatter plot: hover, click, drag-rectangle brushing, size-by and colour-by. No pan or zoom.
 //
-// createScatter(host, opts) → {update(opts), setHot(key), setSelected(Set|null), destroy()}
+// createScatter(host, opts) -> {update(opts), setHot(key), setSelected(Set|null), destroy()}
 // opts:
 //   points: [{key, x, y, s?, c?, label, sub?}]     s = size value, c = colour value (or css colour with colorIsCss)
 //   x / y: {label, fmt(v), log, domain?}            axes (non-positive values are dropped on a log axis)
-//   size: {label, fmt, max = 13, min = 2} | null    radius ∝ √s
-//   color: (c, point) → css | null                  default: gold
-//   refLines: [{k, label}]                          lines y = k·x (e.g. affordability ratios)
+//   size: {label, fmt, max = 13, min = 2} | null    radius prop. to sqrt s
+//   color: (c, point) -> css | null                  default: gold
+//   refLines: [{k, label}]                          lines y = k*x (e.g. affordability ratios)
 //   refX / refY: [{v, label}]                       vertical / horizontal reference lines
 //   labels: [key]                                   points to label with their name
 //   height = 300, ariaLabel
@@ -56,7 +56,7 @@ export function createScatter(host, opts) {
     })).sort((a, b) => b.r - a.r);
     root._count = valid.length;
     cv.setAttribute("aria-label", o.ariaLabel || `Scatter plot of ${valid.length} points: ${o.y?.label || "y"} against ${o.x?.label || "x"}`);
-    hint.textContent = o.brush === false ? "" : `${valid.length.toLocaleString("en-US")} points · drag to select`;
+    hint.textContent = o.brush === false ? "" : `${valid.length.toLocaleString("en-US")} points \u00b7 drag to select`;
     draw();
   }
 
@@ -215,6 +215,10 @@ export function createScatter(host, opts) {
         [q.px - g - tw, q.py],
         [q.px - tw / 2, q.py - g - H2],
         [q.px - tw / 2, q.py + g + H2],
+        // corners, for a big dot at the plot's edge
+        [q.px - tw - g * 0.7, q.py + g * 0.7 + H2],
+        [q.px - tw - g * 0.7, q.py - g * 0.7 - H2],
+        [q.px + g * 0.7, q.py + g * 0.7 + H2],
       ];
       let at = null;
       for (const [x, y] of spots) {

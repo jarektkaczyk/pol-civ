@@ -1,9 +1,9 @@
 // Sortable, searchable, virtualised data table (handles all 3,100 counties smoothly).
 //
-// createTable(host, opts) → {setRows(rows), setColumns(cols), setHot(key, scroll), setSelected(Set|null), destroy, el}
+// createTable(host, opts) -> {setRows(rows), setColumns(cols), setHot(key, scroll), setSelected(Set|null), destroy, el}
 // opts:
-//   columns: [{key, label, value(row) → sortable value, text(row) → string, html?(row), align: "l"|"r",
-//              width ("1.4fr", "72px"), bar?: {max, color}, title?, tip?(row) → cell tooltip,
+//   columns: [{key, label, value(row) -> sortable value, text(row) -> string, html?(row), align: "l"|"r",
+//              width ("1.4fr", "72px"), bar?: {max, color}, title?, tip?(row) -> cell tooltip,
 //              hideBelow?: px (drop the column while the table is narrower)}]
 //   short: header html (may hold &shy; so a long word breaks with a hyphen); the header wraps to two lines.
 //   Left-aligned cells get a tooltip with their full text (for a name column: "name, sub" with row.full).
@@ -48,7 +48,7 @@ export function createTable(host, opts) {
     head.innerHTML = `${opts.rank ? `<span class="th r" role="columnheader">#</span>` : ""}${cols.map((c) => {
       const s = sort?.key === c.key ? sort.dir : null;
       return `<span class="th ${c.align === "l" ? "l" : "r"}" role="columnheader" aria-sort="${s === "asc" ? "ascending" : s === "desc" ? "descending" : "none"}">
-        <button type="button" data-sort="${esc(c.key)}" title="${esc(c.title || `Sort by ${c.label}`)}">${c.short ? c.short : esc(c.label)}${s ? `<span class="arr" aria-hidden="true">${s === "asc" ? "▲" : "▼"}</span>` : ""}</button></span>`;
+        <button type="button" data-sort="${esc(c.key)}" title="${esc(c.title || `Sort by ${c.label}`)}">${c.short ? c.short : esc(c.label)}${s ? `<span class="arr" aria-hidden="true">${s === "asc" ? "\u25b2" : "\u25bc"}</span>` : ""}</button></span>`;
     }).join("")}`;
   }
 
@@ -89,7 +89,7 @@ export function createTable(host, opts) {
       const k = String(keyOf(r));
       const cls = `adv-tr${k === String(hot) ? " hot" : ""}${sel?.has(keyOf(r)) ? " sel" : ""}`;
       html += `<div class="${cls}" role="row" data-i="${i}" data-key="${esc(k)}" tabindex="-1" style="top:${i * rowH}px;height:${rowH}px">${opts.rank ? `<span class="td r rk" role="cell">${i + 1}</span>` : ""}${cols.map((c) => {
-        let inner = c.html ? c.html(r) : esc(c.text ? c.text(r) : r[c.key] ?? "–");
+        let inner = c.html ? c.html(r) : esc(c.text ? c.text(r) : r[c.key] ?? "\u2013");
         if (c.bar) {
           const v = (c.value || ((x) => x[c.key]))(r);
           const wpc = fin(v) && c.bar.max > 0 ? Math.max(0, Math.min(1, Math.abs(v) / c.bar.max)) * 100 : 0;

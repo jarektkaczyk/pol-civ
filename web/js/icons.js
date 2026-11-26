@@ -1,4 +1,4 @@
-// icons.js — single-source vector icon set for canvas and DOM.
+// icons.js - single-source vector icon set for canvas and DOM.
 //
 // Every icon is drawn in a 24x24 box as one or more SVG path strings. Filled
 // paths use the even-odd rule, so a sub-path inside another one cuts a hole
@@ -64,7 +64,7 @@ function gear(cx, cy, teeth, rOut, rIn, hole) {
   return poly(pts) + circle(cx, cy, hole);
 }
 
-/** Star polygon with n points, outer radius r, inner radius r·inner (first point straight up). */
+/** Star polygon with n points, outer radius r, inner radius r.inner (first point straight up). */
 function star(cx, cy, r, inner = 0.45, n = 5) {
   const pts = [];
   for (let k = 0; k < n * 2; k++) {
@@ -430,6 +430,31 @@ const RAW = {
       T('M1.4 22.4l1.2-3.8 3.4-1.9 3.4.9 1.4 2.7-.3 2.1Z'),
       F(poly(rot([[-1, -1.4], [1, -1.4], [1, 13.6], [-1, 13.6]], 11, 7.4, -40))),
       F(poly(rot([[-9, 0.6], [-4.4, -2.4], [0, -3.4], [4.4, -2.4], [9, 0.6], [4.2, -0.6], [0, -1.2], [-4.2, -0.6]], 11, 7.4, -40))),
+    ],
+  },
+  // Polish deposits: rock salt (Wieliczka, Klodawa), Baltic amber, native sulphur (Tarnobrzeg).
+  'r-salt': {
+    bg: '#6a7480',
+    paths: [
+      T(poly([[2.6, 20.6], [5.4, 13.2], [9.6, 11.8], [11.8, 20.6]])),
+      F(poly([[7.2, 20.8], [9.8, 8.4], [15.6, 5.2], [19.4, 10.6], [21.2, 20.8]])),
+      D('M9.8 8.4l5.4 4.2 4.2-2M15.2 12.6l1 8.2', 1),
+    ],
+  },
+  'r-amber': {
+    bg: '#8a4e10',
+    paths: [
+      F('M12 2.8c4.6 0 8.6 3.6 8.6 8.6 0 5.6-4.4 10-9.4 10-4.4 0-7.8-3.2-7.8-7.6C3.4 8 7 2.8 12 2.8Z'),
+      T(ellipse(9.6, 9.4, 2.6, 1.8)),
+      D('M14.2 13.6c.8.6 1.4 1.6 1.2 2.8M13 12.6l-.8 1', 1),
+    ],
+  },
+  'r-sulphur': {
+    bg: '#7a7410',
+    paths: [
+      F(poly([[3, 20.6], [6.4, 12.2], [12, 9.4], [17.6, 12.2], [21, 20.6]])),
+      T(poly([[8.2, 11.2], [12, 3.2], [15.8, 11.2], [12, 9.4]])),
+      D('M6.4 12.2l5.6 3.4 5.6-3.4M12 15.6v5', 1),
     ],
   },
   'r-gold': {
@@ -913,6 +938,11 @@ export const ALIASES = {
   'l-homeowner': 'l-homeownership',
   'l-foreign_born': 'l-foreign-born',
   'r-coal': 'r-coal_mine',
+  'r-lignite': 'r-coal_mine',
+  'r-hard_coal': 'r-coal_mine',
+  'r-hard-coal': 'r-coal_mine',
+  'r-rock_salt': 'r-salt',
+  'r-sulfur': 'r-sulphur',
   'r-coal-mine': 'r-coal_mine',
   'r-coal-plant': 'r-coal_plant',
   'r-gas-plant': 'r-gas_plant',

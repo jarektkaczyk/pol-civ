@@ -50,9 +50,10 @@ const SELECT_ANIM_MS = 33; // ~30 fps while a state's border highlight animates
 const isMobile = () => matchMedia("(max-width: 700px)").matches;
 
 async function main() {
-  const [world, cities, nation, lenses, sources, resources, statesData] = await Promise.all([
+  const [world, cities, nation, lenses, sources, resources, statesData, metros, powiaty] = await Promise.all([
     loadJSON("world"), loadJSON("cities"), loadJSON("nation"),
     loadJSON("lenses", true), loadJSON("sources", true), loadJSON("resources", true), loadJSON("states", true),
+    loadJSON("metros", true), loadJSON("powiaty", true),
   ]);
   const lensFile = lenses && Array.isArray(lenses.lenses) ? lenses : { vintage: "", groups: [], lenses: [] };
   const w = prepareWorld(world, cities, { resources });
@@ -96,7 +97,7 @@ async function main() {
     requestDraw();
     url.schedule();
   });
-  const pedia = initPedia({ world, nation, lenses: lensFile, sources: sources || [], w, resources, states });
+  const pedia = initPedia({ world, nation, lenses: lensFile, sources: sources || [], w, resources, states, metros });
   const help = initHelp();
 
   // --- static layer cache ----------------------------------------------------------------------------------------
@@ -533,7 +534,7 @@ async function main() {
   const stateName = (idx) => states?.[idx]?.name || w.raw.states[idx]?.name || "State";
 
   function describeCanvas() {
-    const parts = ["Hex map of the contiguous United States", state.lens ? `coloured by the ${state.lens.name} lens` : "showing terrain"];
+    const parts = ["Hex map of Poland", state.lens ? `coloured by the ${state.lens.name} lens` : "showing terrain"];
     if (state.selectedCity) parts.push(`${state.selectedCity.name} selected`);
     else if (state.selectedState != null) parts.push(`${stateName(state.selectedState)} selected`);
     canvas.setAttribute("aria-label", parts.join(", "));
@@ -779,14 +780,16 @@ async function main() {
     selection: state.selectedCity ? { kind: "city", name: state.selectedCity.name }
       : state.selectedState != null ? { kind: "state", name: stateName(state.selectedState) } : null,
   });
-  const slug = (s) => String(s).toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  // Fold Polish letters first: NFD does not decompose ł, so "Łódź" would lose its first letter.
+  const slug = (s) => String(s).replace(/\u0142/g, "l").replace(/\u0141/g, "L").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const share = initShare({
     button: document.getElementById("btn-share"),
     getInfo: shareInfo,
     beforeCopy: () => url.flush(),
     fileName: () => {
       const sel = shareInfo().selection;
-      return `united-states-${state.lens?.id || "terrain"}${sel ? "-" + slug(sel.name) : ""}.png`;
+      return `polska-${state.lens?.id || "terrain"}${sel ? "-" + slug(sel.name) : ""}.png`;
     },
     onToast: toast,
   });
@@ -1168,7 +1171,7 @@ async function main() {
   }
   Object.assign(app, {
     // data. Optional files arrive via loadData(name) (and the "data" event); see docs/DATA_CONTRACTS.md.
-    data: { world, cities, states, nation, lenses: lensFile, resources, sources: sources || [], counties: null },
+    data: { world, cities, states, nation, lenses: lensFile, resources, sources: sources || [], counties: null, metros, powiaty },
     loadData,
     loadCounties: () => loadData("counties"),
     w, cam, state, cityById, lensById,

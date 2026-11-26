@@ -18,7 +18,7 @@ import { drawCityTile, cityTileVisible, cityIsDot, metroSpill } from "./art/city
 import { drawWater, drawRivers, strokeSegs } from "./art/water.js";
 import { lodFor } from "./art/lod.js";
 
-export const OCEAN_BG = OCEAN_DEEP_CSS;
+export const OCEAN_BG = "#1b232c"; // beyond the map window (see drawEdgeFog)
 export { cityIsDot } from "./art/city.js";
 
 /**
@@ -294,11 +294,12 @@ export function warmSprites(ctx, vp, w, opts = {}) {
 }
 
 function drawEdgeFog(ctx, vp, W, H) {
-  const band = 260;
+  const band = Math.min(260, 0.06 * Math.min(W, H)); // a thin mist at the map's edge, not a vignette
   const v = vp;
   if (v.x0 > band && v.y0 > band && v.x1 < W - band && v.y1 < H - band) return;
-  // Beyond the map: misty deep ocean (not grey), so tall/portrait screens read as open sea.
-  const fog = (a) => `rgba(24,48,74,${a})`;
+  // Beyond the map: Poland's window is ringed by land on three sides, so the mist is a neutral dark slate that
+  // reads as unexplored country next to the fogged neighbours and as night sea next to the Baltic.
+  const fog = (a) => `rgba(27,35,44,${a})`;
   // Outside the rectangle: solid sea mist.
   ctx.fillStyle = fog(0.92);
   const big = 1e5;
@@ -319,9 +320,33 @@ function drawEdgeFog(ctx, vp, W, H) {
 }
 
 
+// Band segments along lake hexes are left out: a lake inside a voivodeship is not its border (a ring of colour
+// around Lake Śniardwy would read as a separate region). Cached per prepared world.
+const bandCache = new WeakMap();
+function bandsWithoutLakes(w) {
+  let out = bandCache.get(w);
+  if (out) return out;
+  out = new Map();
+  const { grid, water } = w;
+  for (const [st, segs] of w.bands) {
+    const keep = [];
+    for (let k = 0; k < segs.length; k += 8) {
+      // The outer edge's midpoint, nudged away from the inset edge, lies in the neighbouring cell.
+      const mx = (segs[k] + segs[k + 2]) / 2, my = (segs[k + 1] + segs[k + 3]) / 2;
+      const ix = (segs[k + 4] + segs[k + 6]) / 2, iy = (segs[k + 5] + segs[k + 7]) / 2;
+      const j = grid.cellAt(mx + (mx - ix) * 0.5, my + (my - iy) * 0.5);
+      if (j >= 0 && water[j] === 3) continue;
+      for (let q = 0; q < 8; q++) keep.push(segs[k + q]);
+    }
+    out.set(st, keep);
+  }
+  bandCache.set(w, out);
+  return out;
+}
+
 function drawBorders(ctx, w, s, Rpx, lens) {
   // Inner colour band per state (Civ-style), then the edge lines.
-  for (const [st, segs] of w.bands) {
+  for (const [st, segs] of bandsWithoutLakes(w)) {
     ctx.beginPath();
     for (let k = 0; k < segs.length; k += 8) {
       ctx.moveTo(segs[k], segs[k + 1]);

@@ -1,13 +1,13 @@
 // City-tile art: the city-centre hex (a village, or a pseudo-isometric street grid that grows from a small town into
-// a dense skyline), the capital's domed landmark, the small marker used for cities when hexes are too small for a
+// a dense skyline), the capital's Palace of Culture, the small marker used for cities when hexes are too small for a
 // tile, and the suburban-fringe art that terrain.js can stamp on urban cells.
 //
 // Interface (used by render/map.js, render/art/terrain.js and web/dev/gallery.js):
 //
-//   cityTileVisible(city, Rpx) → bool     is the city drawn at all at this zoom (small towns vanish zoomed out)
-//   cityIsDot(city, Rpx) → bool           drawn as a dot (true) or as a full tile (false)
-//   cityClass(population) → {id, ...}     size class: village, town, city, metropolis, megalopolis
-//   metroSpill(w) → Map(cell → pseudo-city)  urban neighbours of 1.5M+ metros drawn as smaller city tiles (map.js);
+//   cityTileVisible(city, Rpx) -> bool     is the city drawn at all at this zoom (small towns vanish zoomed out)
+//   cityIsDot(city, Rpx) -> bool           drawn as a dot (true) or as a full tile (false)
+//   cityClass(population) -> {id, ...}     size class: village, town, city, metropolis, megalopolis
+//   metroSpill(w) -> Map(cell -> pseudo-city)  urban neighbours of 1.5M+ metros drawn as smaller city tiles (map.js);
 //                                         terrain.js leaves them bare like real city cells
 //   drawCityTile(ctx, city, x, y, R, {Rpx, s, lod, selected, stateColor, seed})
 //     ctx        2D context in WORLD transform (km; s css px per km applied)
@@ -22,20 +22,21 @@
 //     radius, kind "" or "small"), the same shape as terrain.js SPRITES entries: ground = lawn, cul-de-sac roads,
 //     a parking lot or a school field; build = rows of houses, tree clumps, a strip mall or a school.
 //
-// How a city tile is made:
-//   village      6-10 houses along one or two country roads, a church with a steeple or a water tower, garden
-//                trees and a few crop fields around it, straight on the terrain (no paving), within ~45% of the hex.
-//   town+        the hex gets a lawn base; the built-up area is a paved pad (an asphalt street grid with a lighter
-//                kerb and a short soft feather) made of iso blocks packed edge to edge. Each block has a sidewalk
-//                and becomes: core (a podium filling the block with one or two towers), mid-rise (1, 2 or 4 parcels
-//                of packed buildings), residential (a lawn block with houses at its corners and a tree), a park
-//                (paths, trees, a pond), a plaza (fountain) or a civic church. Bigger classes have smaller blocks,
-//                a bigger pad and taller towers; outside the pad the hex has scattered houses and trees.
+// How a city tile is made (Polish towns):
+//   village      6-10 houses with clay-tile roofs along one or two country roads, a church (brick in the north, a
+//                white chapel in the centre, wooden or Baroque in the south), garden trees and strip fields around it.
+//   town+        the hex gets a lawn base; the built-up area is a paved pad of iso blocks. The most central blocks are
+//                the market square (rynek) with its town hall (ratusz) and tower; the first church stands beside it.
+//                Around it: rows of tenements (kamienice) with pastel facades and red roofs; more churches (brick
+//                Gothic, Baroque twin domes in the south); parks; houses at the edge; and in cities of 100K+ the
+//                socialist-era slabs (bloki) on the outer blocks.
+//   named        Krakow: the Cloth Hall and St Mary's two towers; Gdansk: St Mary's massive tower; Torun: a brick
+//                hall church. Modern glass towers only in Warszawa (a skyline) and a few in Katowice, Wroclaw and
+//                Gdansk. The capital gets the Palace of Culture and Science on its square beside a tree-lined park.
 //   Buildings are boxes with a lit top, a half-lit south-west face and a shaded south-east face (light from the
-//   upper left), cast shadows to the lower right (one fill, so overlaps don't darken twice), gable roofs, set-backs,
-//   crowns in the state colour, a spire on the tallest tower, windows at close zoom. The capital gets a domed
-//   capitol on a stone plaza at the head of a tree-lined mall with an obelisk, and a low skyline around it.
-//
+//   upper left), cast shadows to the lower right (one fill, so overlaps don't darken twice), gable roofs, windows at
+//   close zoom.
+
 // Every tile is painted once into an offscreen sprite keyed by (city seed, class, colour, capital, zoom bucket,
 // device scale) and blitted with drawImage afterwards; an LRU with a pixel budget bounds the memory. Close-zoom tiles
 // (over 220 device px of hex radius) have their own smaller LRU; past 480 px they are painted directly.
@@ -48,12 +49,12 @@ import { rng } from "./sprites.js";
 
 /** Cities draw as a dot (on top of the terrain) rather than a full tile when hexes are small. */
 export const cityIsDot = (city, Rpx) =>
-  Rpx < 9 || (Rpx < 18 && city.population < 2.5e5) || (Rpx < 26 && city.population < 1e5);
+  Rpx < 9 || (Rpx < 18 && city.population < 6e4) || (Rpx < 26 && city.population < 2.5e4);
 
 // --- metro spill ----------------------------------------------------------------------------------------------
-const SPILL_MIN_POP = 1.5e6;
-const spills = new WeakMap(); // world → Map(cell → pseudo-city)
-/** Neighbour hexes of big metros drawn as smaller city tiles: 1 for 1.5M+, 2 for 5M+, the most developed urban ones. */
+const SPILL_MIN_POP = 6e5;
+const spills = new WeakMap(); // world -> Map(cell -> pseudo-city)
+/** Neighbour hexes of big cities drawn as smaller city tiles: 1 for 600K+, 2 for 1.5M+, the most developed urban ones. */
 export function metroSpill(w) {
   let out = spills.get(w);
   if (out) return out;
@@ -68,9 +69,9 @@ export function metroSpill(w) {
       cand.push([j, dev ? dev[j] || 0 : 50]);
     }
     cand.sort((a, b) => b[1] - a[1]);
-    const n = city.population >= 5e6 ? 2 : 1;
+    const n = city.population >= 1.5e6 ? 2 : 1;
     cand.slice(0, n).forEach(([j], k) => {
-      out.set(j, { id: `spill-${j}`, name: city.name, capital: false, of: city, population: (city.population >= 5e6 ? 9e5 : 5e5) / (k + 1) });
+      out.set(j, { id: `spill-${j}`, name: city.name, capital: false, of: city, population: (city.population >= 1.5e6 ? 3e5 : 1.6e5) / (k + 1) });
     });
   }
   spills.set(w, out);
@@ -78,24 +79,26 @@ export function metroSpill(w) {
 }
 
 /** Zoomed far out only the big cities show at all. */
-export const cityTileVisible = (city, Rpx) => !(Rpx < 9 && city.population < (Rpx < 6 ? 1e6 : 2.5e5));
+export const cityTileVisible = (city, Rpx) => !(Rpx < 9 && city.population < (Rpx < 6 ? 3e5 : 6e4));
 
 // --- size classes --------------------------------------------------------------------------------------------------
 //   extent   how far (hex apothem = 1) the paved pad reaches
 //   lot      block pitch in R at full zoom (never smaller than LOT_MIN_PX css px)
-//   core     centrality (0 edge … 1 centre) above which blocks get towers; mid likewise for mid-rise blocks
+//   core     centrality (0 edge ... 1 centre) above which blocks get towers; mid likewise for mid-rise blocks
 //   height   tallest tower in R
 //   park     share of blocks that are parks
 //   ragged   chance that an outer block is left out (an irregular edge)
-//   grey     how grey the lawn base of the hex is (0 green … 1 concrete)
+//   grey     how grey the lawn base of the hex is (0 green ... 1 concrete)
 //   fringe   houses and trees on the unpaved rest of the hex
-//   civic    one block becomes a church / meeting house
+//   civic    how many blocks become churches (brick Gothic in the north, Baroque domes in the south)
+//   blocks   centrality below which residential blocks of bigger cities become socialist-era slabs (0 = none)
+// Polish towns are smaller than US metros: a town of 20K already has a market square and a church.
 export const CITY_CLASSES = [
   { id: "village", min: 0, village: true },
-  { id: "town", min: 1.5e5, extent: 0.66, lot: 0.2, core: 0.9, mid: 0.55, height: 0.2, park: 0.05, ragged: 0.4, grey: 0.08, fringe: true, civic: true },
-  { id: "city", min: 4e5, extent: 0.8, lot: 0.18, core: 0.66, mid: 0.33, height: 0.44, park: 0.06, ragged: 0.32, grey: 0.14, fringe: true, civic: true },
-  { id: "metropolis", min: 1.5e6, extent: 0.9, lot: 0.16, core: 0.5, mid: 0.18, height: 0.58, park: 0.06, ragged: 0.25, grey: 0.2, fringe: true },
-  { id: "megalopolis", min: 5e6, extent: 0.96, lot: 0.145, core: 0.36, mid: 0.08, height: 0.68, park: 0.05, ragged: 0.12, grey: 0.26, fringe: false },
+  { id: "town", min: 2e4, extent: 0.62, lot: 0.21, core: 0.92, mid: 0.5, height: 0.13, park: 0.05, ragged: 0.4, grey: 0.08, fringe: true, civic: 1, blocks: 0 },
+  { id: "city", min: 1e5, extent: 0.78, lot: 0.18, core: 0.72, mid: 0.36, height: 0.17, park: 0.06, ragged: 0.32, grey: 0.12, fringe: true, civic: 2, blocks: 0.3 },
+  { id: "metropolis", min: 4e5, extent: 0.88, lot: 0.16, core: 0.58, mid: 0.22, height: 0.2, park: 0.07, ragged: 0.25, grey: 0.16, fringe: true, civic: 3, blocks: 0.4 },
+  { id: "megalopolis", min: 1.5e6, extent: 0.95, lot: 0.145, core: 0.45, mid: 0.12, height: 0.24, park: 0.07, ragged: 0.14, grey: 0.2, fringe: true, civic: 3, blocks: 0.42 },
 ];
 const LOT_MIN_PX = 5.5;
 
@@ -114,7 +117,7 @@ const P = {
   field: [[214, 186, 104], [176, 178, 86], [196, 160, 92], [150, 172, 80]],
   road: [196, 186, 160], roadEdge: [92, 84, 70],
   walls: [[236, 226, 204], [242, 238, 228], [218, 200, 164], [226, 214, 190], [214, 222, 226]],
-  roofs: [[170, 78, 56], [124, 82, 60], [92, 98, 112], [184, 110, 66], [70, 82, 100]],
+  roofs: [[176, 74, 50], [154, 64, 46], [190, 100, 62], [122, 62, 48], [96, 94, 100]],
   stone: [[208, 196, 172], [188, 178, 160], [168, 98, 74], [196, 188, 176], [150, 118, 96]],
   glass: [[118, 160, 190], [96, 128, 158], [150, 178, 196], [196, 170, 112], [128, 170, 176]],
   marble: [240, 236, 224], dome: [246, 244, 236], white: [244, 240, 230],
@@ -123,7 +126,7 @@ const P = {
 // --- geometry ------------------------------------------------------------------------------------------------------
 // Iso ground axes (screen units per km along each axis); the up vector is (0, -1).
 const AX = 0.866, AY = 0.5;
-const iso = (u, v) => [(u - v) * AX, (u + v) * AY]; // ground (u along A, v along B) → screen offset
+const iso = (u, v) => [(u - v) * AX, (u + v) * AY]; // ground (u along A, v along B) -> screen offset
 const CORNERS = [0, 1, 2, 3, 4, 5].map((k) => {
   const a = ((60 * k - 30) * Math.PI) / 180;
   return [Math.cos(a), Math.sin(a)];
@@ -379,94 +382,373 @@ class Painter {
 
 // --- landmarks -----------------------------------------------------------------------------------------------------
 
-/** A white church with a gabled nave along A and a steeple at its front (lower right) end. */
-function drawChurch(p, x, y, sz, accent) {
-  const g = p.g;
-  const roof = mix([88, 92, 104], accent, 0.35);
-  const F = foot(x, y, sz, sz * 0.55);
-  const hw = sz * 0.62;
-  p.shadow(F, hw + sz * 0.4);
-  gable(g, F, hw, sz * 0.48, P.white, roof, 0, p.detail >= 1 ? p.px(0.5) : 0);
-  // steeple: a square tower, a belfry band and a spire in the state colour, a gold finial
-  const [tx, ty] = iso(sz * 0.95, 0);
-  const t = sz * 0.3, th = sz * 1.55, sh = sz * 1.15;
-  const Ft = foot(x + tx, y + ty, t, t);
-  p.shadow(Ft, th + sh * 0.6);
-  const top = p.box(Ft, 0, th, P.white);
-  if (p.detail >= 1) {
-    const [, E, S, W] = Ft.map((q) => up(q, th * 0.72));
-    const bh = th * 0.14;
-    fillPoly(g, [W, S, up(S, bh), up(W, bh)], "rgba(60,52,44,.7)");
-    fillPoly(g, [S, E, up(E, bh), up(S, bh)], "rgba(30,26,22,.75)");
-  }
-  const tip = [x + tx, y + ty - th - sh];
-  fillPoly(g, [top.W, top.S, tip], css(shade(accent, 0.12)));
-  fillPoly(g, [top.S, top.E, tip], css(shade(accent, -0.3)));
-  g.beginPath();
-  g.arc(tip[0], tip[1], Math.max(p.px(0.7), sz * 0.07), 0, Math.PI * 2);
-  g.fillStyle = "#f0d27a";
-  g.fill();
+// --- Polish identity -------------------------------------------------------------------------------------------------
+// Which town gets which landmarks. Names are matched folded (no diacritics, lower case), so data with or without
+// Polish letters both work. Nothing here depends on a data value: only on the town's name and voivodeship.
+const fold = (v) => String(v || "").replace(/\u0142/g, "l").replace(/\u0141/g, "L").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+// The south (Dolnoslaskie, Malopolskie, Opolskie, Podkarpackie, Slaskie, Swietokrzyskie): Baroque domes are common.
+const SOUTH_CODES = new Set(["02", "12", "16", "18", "24", "26"]);
+const SOUTH_NAMES = ["dolnoslask", "malopol", "opol", "podkarpac", "slask", "swietokrzysk"];
+const TOWER_CITIES = new Set(["katowice", "wroclaw", "gdansk"]); // a few modern towers; Warszawa has a skyline
+const profiles = new WeakMap();
+
+/** Look of a town: {towers 0 none | 1 a few | 2 a skyline, pkin, church (a named church or null), hall, south}. */
+function profileOf(city) {
+  let pr = profiles.get(city);
+  if (pr) return pr;
+  const base = city.of || city;
+  const spill = !!city.of;
+  const n = fold(base.name);
+  const warsaw = n === "warszawa" || n === "warsaw";
+  const st = [].concat(base.states ?? base.state ?? base.voivodeship ?? []).map(fold);
+  let south = st.some((x) => SOUTH_CODES.has(x.replace(/^pl/, "").slice(0, 2)) || SOUTH_NAMES.some((k) => x.includes(k)));
+  if (!st.length && Number.isFinite(base.lat)) south = base.lat < 50.9;
+  pr = {
+    towers: warsaw ? (spill ? 1 : 2) : TOWER_CITIES.has(n) && !spill ? 1 : 0,
+    pkin: warsaw && !spill,
+    church: spill ? null : n === "krakow" ? "mariacki" : n === "gdansk" ? "gdansk" : n === "torun" ? "torun" : null,
+    hall: !spill && n === "krakow" ? "sukiennice" : null,
+    south,
+  };
+  if (typeof city === "object") profiles.set(city, pr);
+  return pr;
 }
 
-/** A water tower: four legs, a white tank with a band in the state colour and a conical cap. */
-function drawWaterTower(p, x, y, sz, accent) {
-  const g = p.g;
-  const z = sz * 1.9, rx = sz * 0.62, ry = rx * 0.5, th = sz * 0.7;
-  g.beginPath();
-  g.ellipse(x + z * 0.5, y + z * 0.2, rx * 1.1, ry * 0.9, 0, 0, Math.PI * 2);
-  g.fillStyle = "rgba(22,18,12,.22)";
-  g.fill();
-  // legs (back pair darker)
-  const lw = Math.max(p.px(0.7), sz * 0.07);
-  for (const [lx, ly, a] of [[-0.45, -0.18, 0.55], [0.45, -0.18, 0.55], [-0.5, 0.2, 0.9], [0.5, 0.2, 0.9]]) {
-    g.beginPath();
-    g.moveTo(x + lx * rx, y + ly * rx);
-    g.lineTo(x + lx * rx * 0.55, y - z + ly * ry * 0.5);
-    g.strokeStyle = `rgba(70,74,80,${a})`;
-    g.lineWidth = lw;
-    g.stroke();
+const BRICK = [164, 76, 52], TILE = [158, 68, 48], COPPER = [92, 150, 126], SLATE = [74, 80, 94], SAND = [226, 212, 182];
+const PLASTER = [[240, 232, 212], [236, 214, 160], [232, 224, 200]];
+const WOOD = [118, 82, 54], SHINGLE = [96, 80, 64];
+// Tenement facades (kamienice): cream, ochre, salmon, mint, pale blue, white; roofs of red clay tile.
+const TENEMENT = [[238, 226, 196], [232, 200, 140], [228, 180, 150], [198, 214, 186], [200, 212, 222], [244, 238, 226], [222, 190, 160]];
+const TILES = [[170, 70, 48], [150, 60, 44], [186, 92, 58], [132, 62, 48], [112, 104, 104]];
+// Socialist-era slabs (bloki), many since repainted in pastels.
+const SLAB = [[230, 228, 220], [214, 214, 206], [236, 222, 180], [208, 224, 210], [232, 210, 200], [206, 214, 226]];
+
+/** A square tower on (cx, cy), half size t, height th; returns the top corners from Painter.box. */
+function tower(p, cx, cy, t, th, wall) {
+  const F = foot(cx, cy, t, t);
+  p.shadow(F, th + t * 2);
+  const top = p.box(F, 0, th, wall);
+  if (p.detail >= 1) {
+    // belfry openings: a dark band near the top of both visible faces
+    const [, E, S, W] = F.map((q) => up(q, th * 0.8));
+    const bh = th * 0.08;
+    fillPoly(p.g, [W, S, up(S, bh), up(W, bh)], "rgba(40,26,20,.55)");
+    fillPoly(p.g, [S, E, up(E, bh), up(S, bh)], "rgba(24,16,12,.6)");
   }
-  const cy = y - z;
-  const body = g.createLinearGradient(x - rx, 0, x + rx, 0);
-  body.addColorStop(0, "#fbfaf6");
-  body.addColorStop(0.5, "#e6e4de");
-  body.addColorStop(1, "#9c9a96");
+  return top;
+}
+/** A pointed helmet from a tower top up to height h above it. */
+function spire(p, top, cx, cy, z, h, col) {
+  const tip = [cx, cy - z - h];
+  fillPoly(p.g, [top.W, top.S, tip], css(shade(col, 0.16)));
+  fillPoly(p.g, [top.S, top.E, tip], css(shade(col, -0.32)));
+  return tip;
+}
+function finial(p, pt, r) {
+  p.g.beginPath();
+  p.g.arc(pt[0], pt[1], Math.max(p.px(0.6), r), 0, Math.PI * 2);
+  p.g.fillStyle = "#f0d27a";
+  p.g.fill();
+}
+/** A Baroque helmet: a bulb in copper green, a small lantern and a second bulb, a gold ball on top. */
+function onion(p, cx, base, r, col = COPPER) {
+  const g = p.g;
+  const bulb = (y0, rr, hh) => {
+    g.beginPath();
+    g.moveTo(cx - rr * 0.7, y0);
+    g.bezierCurveTo(cx - rr * 1.3, y0 - hh * 0.45, cx - rr * 0.25, y0 - hh * 0.7, cx, y0 - hh);
+    g.bezierCurveTo(cx + rr * 0.25, y0 - hh * 0.7, cx + rr * 1.3, y0 - hh * 0.45, cx + rr * 0.7, y0);
+    g.closePath();
+    const gr = g.createLinearGradient(cx - rr, 0, cx + rr, 0);
+    gr.addColorStop(0, css(shade(col, 0.28)));
+    gr.addColorStop(0.55, css(col));
+    gr.addColorStop(1, css(shade(col, -0.38)));
+    g.fillStyle = gr;
+    g.fill();
+  };
+  bulb(base, r, r * 1.5);
+  const ly = base - r * 1.25;
+  g.fillStyle = css(shade(col, -0.1));
+  g.fillRect(cx - r * 0.22, ly - r * 0.5, r * 0.44, r * 0.55);
+  bulb(ly - r * 0.45, r * 0.42, r * 0.85);
+  const tip = [cx, ly - r * 1.3];
   g.beginPath();
-  g.ellipse(x, cy, rx, ry, 0, 0, Math.PI);
-  g.lineTo(x - rx, cy - th);
-  g.ellipse(x, cy - th, rx, ry, 0, Math.PI, 2 * Math.PI);
-  g.closePath();
-  g.fillStyle = body;
-  g.fill();
-  // band in the state colour
-  const b0 = cy - th * 0.38, bh = th * 0.28;
+  g.moveTo(tip[0], tip[1]);
+  g.lineTo(tip[0], tip[1] - r * 0.45);
+  g.strokeStyle = "#d8b860";
+  g.lineWidth = Math.max(p.px(0.5), r * 0.08);
+  g.stroke();
+  finial(p, [tip[0], tip[1] - r * 0.45], r * 0.12);
+}
+/** Tall pointed windows (lancets) on the lit face of a nave, close zoom only. */
+function lancets(p, F, hw, n) {
+  if (p.detail < 2) return;
+  const [, , S, W] = F;
+  const g = p.g;
   g.beginPath();
-  g.ellipse(x, b0, rx, ry, 0, 0, Math.PI);
-  g.lineTo(x - rx, b0 - bh);
-  g.ellipse(x, b0 - bh, rx, ry, 0, Math.PI, 0, true);
-  g.closePath();
-  g.fillStyle = css(accent);
-  g.fill();
-  // cap
+  for (let k = 1; k <= n; k++) {
+    const t = k / (n + 1);
+    const x = W[0] + (S[0] - W[0]) * t, y = W[1] + (S[1] - W[1]) * t;
+    g.moveTo(x, y - hw * 0.18);
+    g.lineTo(x, y - hw * 0.8);
+  }
+  g.strokeStyle = "rgba(36,26,30,.6)";
+  g.lineWidth = Math.max(p.px(0.7), hw * 0.07);
+  g.stroke();
+}
+
+/**
+ * A church on the ground point (x, y), nave along A, the front (towers) at the lower right end. style:
+ *   gothic   red brick nave, one tower with a tall slate spire (the north and centre)
+ *   baroque  plastered nave, two towers with copper bulbs (the south)
+ *   mariacki Krakow's St Mary's: brick, two unequal towers, the taller with a spire and a gold crown
+ *   gdansk   Gdansk's St Mary's: a huge brick nave and a massive square tower with corner turrets
+ *   torun    a brick hall church with a heavy square tower and a low pyramid roof
+ *   wooden   a southern wooden church: dark log walls, shingle roof, a small bulb on the tower
+ *   chapel   a small plastered village church with one slender spire
+ */
+function drawPolishChurch(p, x, y, sz, style) {
+  const g = p.g;
+  const brick = style !== "baroque" && style !== "wooden" && style !== "chapel";
+  const wall = brick ? BRICK : style === "wooden" ? WOOD : style === "baroque" ? PLASTER[1] : PLASTER[0];
+  const roof = style === "wooden" ? SHINGLE : brick ? shade(TILE, -0.12) : TILE;
+  const big = style === "gdansk" ? 1.3 : style === "mariacki" || style === "torun" ? 1.12 : style === "chapel" || style === "wooden" ? 0.8 : 1;
+  const nL = sz * big, nW = sz * 0.5 * (style === "gdansk" ? 1.25 : 1);
+  const F = foot(x, y, nL, nW);
+  const hw = sz * (brick ? 0.82 : 0.62) * big, hr = sz * (brick ? 0.72 : 0.5) * big;
+  p.shadow(F, hw + hr * 0.6);
+  gable(g, F, hw, hr, wall, roof, 0, p.detail >= 1 ? p.px(0.5) : 0);
+  lancets(p, F, hw, 4);
+  // an apse at the back end (upper left) for the bigger churches
+  const lw = p.detail >= 1 ? p.px(0.5) : 0;
+  const front = (dv, s = 1) => {
+    const [tx, ty] = iso(nL + sz * 0.22 * s, dv);
+    return [x + tx, y + ty];
+  };
+  if (style === "baroque") {
+    for (const dv of [-0.3, 0.3]) {
+      const [cx, cy] = front(dv * sz);
+      const t = sz * 0.24, th = sz * 1.55;
+      const top = tower(p, cx, cy, t, th, PLASTER[0]);
+      onion(p, cx, cy - th - t * 0.3, t * 1.15);
+      void top;
+    }
+    return;
+  }
+  if (style === "mariacki") {
+    // the taller north tower: spire with a ring of spirelets and a gold crown
+    {
+      const [cx, cy] = front(-0.32 * sz);
+      const t = sz * 0.27, th = sz * 2.35;
+      const top = tower(p, cx, cy, t, th, BRICK);
+      const z = th;
+      for (const c of [top.W, top.E, top.N, top.S]) {
+        const tp = [c[0], c[1] - t * 1.3];
+        fillPoly(g, [[c[0] - t * 0.16, c[1]], [c[0] + t * 0.16, c[1]], tp], css(SLATE));
+      }
+      const tip = spire(p, top, cx, cy, z, sz * 1.2, COPPER);
+      const crY = cy - z - sz * 0.5;
+      g.beginPath();
+      g.ellipse(cx, crY, t * 0.42, t * 0.17, 0, 0, Math.PI * 2);
+      g.fillStyle = "#f0cf6a";
+      g.fill();
+      finial(p, tip, t * 0.16);
+    }
+    {
+      const [cx, cy] = front(0.34 * sz);
+      const t = sz * 0.24, th = sz * 1.85;
+      tower(p, cx, cy, t, th, BRICK);
+      onion(p, cx, cy - th - t * 0.25, t * 1.0);
+    }
+    return;
+  }
+  if (style === "gdansk" || style === "torun") {
+    const [cx, cy] = front(0, 1.2);
+    const t = sz * (style === "gdansk" ? 0.5 : 0.4), th = sz * (style === "gdansk" ? 2.7 : 2.0);
+    const top = tower(p, cx, cy, t, th, shade(BRICK, -0.04));
+    if (style === "gdansk") {
+      for (const c of [top.W, top.E, top.S]) {
+        const ct = foot(c[0], c[1], t * 0.12, t * 0.12);
+        fillPoly(g, ct.map((q) => up(q, 0)), css(BRICK));
+        fillPoly(g, [[c[0] - t * 0.12, c[1]], [c[0] + t * 0.12, c[1]], [c[0], c[1] - t * 0.75]], css(SLATE));
+      }
+    }
+    const tip = spire(p, top, cx, cy, th, t * (style === "gdansk" ? 0.7 : 1.0), SLATE);
+    finial(p, tip, t * 0.1);
+    return;
+  }
+  // gothic, wooden, chapel: one tower at the front
+  const [cx, cy] = front(0);
+  const t = sz * (style === "gothic" ? 0.3 : 0.24), th = sz * (style === "gothic" ? 1.9 : 1.3);
+  const top = tower(p, cx, cy, t, th, style === "gothic" ? BRICK : wall);
+  if (style === "wooden") {
+    onion(p, cx, cy - th - t * 0.2, t * 1.0, [86, 92, 78]);
+    return;
+  }
+  const tip = spire(p, top, cx, cy, th, sz * (style === "gothic" ? 1.25 : 0.95), style === "gothic" ? SLATE : COPPER);
+  finial(p, tip, t * 0.14);
+  void lw;
+}
+
+/** The town hall (ratusz) in the middle of the market square: a hall with a tall tower at its back end. */
+function drawTownHall(p, x, y, sz, south, kind = null) {
+  const g = p.g;
+  if (kind === "sukiennice") {
+    // Krakow: the long Cloth Hall with its crested attic, and the lone town-hall tower beside it
+    const F = foot(x, y, sz * 1.35, sz * 0.36);
+    const hw = sz * 0.42;
+    p.shadow(F, hw + sz * 0.3);
+    gable(g, F, hw, sz * 0.28, SAND, TILE, 0, p.detail >= 1 ? p.px(0.5) : 0);
+    // the attic: a row of small pinnacles along the front wall top
+    const [, , S, W] = F.map((q) => up(q, hw));
+    const n = Math.max(5, Math.round((sz * 2.7 * p.s) / 4));
+    g.beginPath();
+    for (let k = 0; k <= n; k++) {
+      const t = k / n;
+      const px = W[0] + (S[0] - W[0]) * t, py = W[1] + (S[1] - W[1]) * t;
+      g.moveTo(px - sz * 0.05, py);
+      g.lineTo(px, py - sz * 0.16);
+      g.lineTo(px + sz * 0.05, py);
+    }
+    g.fillStyle = css(shade(SAND, 0.08));
+    g.fill();
+    const [tx, ty] = iso(-sz * 0.6, -sz * 0.95);
+    const t = sz * 0.2, th = sz * 1.9;
+    const top = tower(p, x + tx, y + ty, t, th, BRICK);
+    const tip = spire(p, top, x + tx, y + ty, th, sz * 0.75, SLATE);
+    finial(p, tip, t * 0.15);
+    return;
+  }
+  const wall = south ? PLASTER[1] : BRICK;
+  const F = foot(x, y, sz * 0.85, sz * 0.55);
+  const hw = sz * 0.55;
+  p.shadow(F, hw + sz * 0.4);
+  gable(g, F, hw, sz * 0.45, wall, TILE, 0, p.detail >= 1 ? p.px(0.5) : 0);
+  const [tx, ty] = iso(-sz * 0.55, 0);
+  const t = sz * 0.22, th = sz * 1.75;
+  const top = tower(p, x + tx, y + ty, t, th, wall);
+  if (p.detail >= 1) {
+    // a clock face on the lit side
+    const [, , S, W] = foot(x + tx, y + ty, t, t).map((q) => up(q, th * 0.66));
+    g.beginPath();
+    g.arc((S[0] + W[0]) / 2, (S[1] + W[1]) / 2, t * 0.38, 0, Math.PI * 2);
+    g.fillStyle = "#f6f0dc";
+    g.fill();
+  }
+  if (south) onion(p, x + tx, y + ty - th - t * 0.2, t * 1.05);
+  else finial(p, spire(p, top, x + tx, y + ty, th, sz * 0.85, SLATE), t * 0.15);
+}
+
+/** A row of tenements (kamienice) on footprint half sizes a, b: narrow houses with pastel facades and tile roofs. */
+function drawTenements(p, x, y, a, b, h, r, k) {
+  const alongA = a >= b;
+  const len = alongA ? a : b, dep = alongA ? b : a;
+  const n = Math.max(1, Math.min(4, Math.round((len * 2) / Math.max(dep * 0.9, p.px(5)))));
+  const w = len / n;
+  for (let i = 0; i < n; i++) {
+    const off = -len + w * (2 * i + 1);
+    const [ox, oy] = alongA ? iso(off, 0) : iso(0, off);
+    const hh = h * (0.85 + 0.3 * r(300 + k * 7 + i));
+    const F = alongA ? foot(x + ox, y + oy, w * 0.98, dep) : foot(x + ox, y + oy, dep, w * 0.98);
+    const wall = pick(TENEMENT, r(310 + k * 7 + i)), roof = pick(TILES, r(320 + k * 7 + i));
+    p.shadow(F, hh + dep * 0.5);
+    gable(p.g, F, hh, Math.min(dep * 0.75, hh * 0.6), wall, roof, alongA ? 0 : 1, p.detail >= 1 ? p.px(0.45) : 0);
+    if (p.detail >= 2) p.windows(F, 0, hh * 0.92, false);
+  }
+}
+
+/** Socialist-era housing on a residential block: one or two long slabs with a flat roof and banded windows. */
+function drawSlabs(p, x, y, bh, R, r, ci) {
+  const alongA = r(401) < 0.5;
+  const two = bh * p.s >= 7 && r(402) < 0.7;
+  const offs = two ? [-0.45, 0.45] : [0];
+  offs.forEach((o, k) => {
+    const [ox, oy] = alongA ? iso(0, o * bh) : iso(o * bh, 0);
+    const a = alongA ? bh * 0.9 : bh * 0.24, b = alongA ? bh * 0.24 : bh * 0.9;
+    const h = Math.max(p.px(3), R * (0.045 + 0.04 * r(403 + k)) * (0.85 + ci * 0.08));
+    const col = pick(SLAB, r(405 + k));
+    const F = foot(x + ox, y + oy, a, b);
+    p.shadow(F, h);
+    p.box(F, 0, h, col, { top: shade(col, -0.1) });
+    if (p.detail === 1) {
+      // floors as faint bands
+      const [, E, S, W] = F;
+      const g = p.g;
+      g.beginPath();
+      const nf = Math.max(2, Math.min(6, Math.round((h * p.s) / 3)));
+      for (let f = 1; f < nf; f++) {
+        const z = (h * f) / nf;
+        g.moveTo(W[0], W[1] - z);
+        g.lineTo(S[0], S[1] - z);
+        g.lineTo(E[0], E[1] - z);
+      }
+      g.strokeStyle = "rgba(60,64,76,.35)";
+      g.lineWidth = p.px(0.6);
+      g.stroke();
+    }
+    p.windows(F, 0, h, false);
+  });
+}
+
+/** Warszawa's Palace of Culture and Science: a stepped sandstone tower on a cross of low wings, with a needle spire. */
+function drawPKiN(p, q) {
+  const g = p.g;
+  const tiers = [
+    [1.25, 0, 1.45], [0.95, 1.45, 1.35], [0.74, 2.8, 1.2], [0.56, 4.0, 1.0], [0.42, 5.0, 0.8], [0.3, 5.8, 0.55],
+  ];
+  const Fw1 = foot(0, 0, q * 2.4, q * 0.85), Fw2 = foot(0, 0, q * 0.85, q * 2.4);
+  p.shadow(Fw1, q * 0.6);
+  p.shadow(Fw2, q * 0.6);
+  p.shadow(foot(0, 0, q * 1.25, q * 1.25), q * 7.5);
+  p.box(Fw1, 0, q * 0.6, shade(SAND, -0.04));
+  p.box(Fw2, 0, q * 0.6, shade(SAND, -0.04));
+  let top = null;
+  for (const [a, z0, h] of tiers) {
+    const F = foot(0, 0, q * a, q * a);
+    top = p.box(F, z0 * q, h * q, SAND);
+    if (p.detail >= 1) {
+      // vertical ribs on both visible faces
+      const [, E, S, W] = F.map((pt) => up(pt, z0 * q));
+      g.beginPath();
+      for (const [A, B] of [[W, S], [S, E]]) {
+        for (let k = 1; k < 6; k++) {
+          const t = k / 6;
+          const bx = A[0] + (B[0] - A[0]) * t, by = A[1] + (B[1] - A[1]) * t;
+          g.moveTo(bx, by - q * 0.05);
+          g.lineTo(bx, by - h * q * 0.95);
+        }
+      }
+      g.strokeStyle = "rgba(120,100,70,.4)";
+      g.lineWidth = Math.max(p.px(0.45), q * 0.035);
+      g.stroke();
+    }
+    // pinnacles on the corners of each tier
+    for (const c of [top.W, top.S, top.E]) {
+      fillPoly(g, [[c[0] - q * 0.07, c[1]], [c[0] + q * 0.07, c[1]], [c[0], c[1] - q * 0.4]], css(shade(SAND, -0.1)));
+    }
+  }
+  // the needle
+  const z = 6.35 * q;
+  fillPoly(g, [top.W, top.S, top.E, [0, -z - q * 0.5]], css(shade(SAND, -0.06)));
   g.beginPath();
-  g.ellipse(x, cy - th, rx, ry, 0, 0, Math.PI);
-  g.lineTo(x, cy - th - sz * 0.55);
-  g.closePath();
-  g.fillStyle = "#d2d0ca";
-  g.fill();
-  g.beginPath();
-  g.moveTo(x - rx, cy - th);
-  g.lineTo(x, cy - th - sz * 0.55);
-  g.lineTo(x - rx * 0.1, cy - th + ry);
-  g.closePath();
-  g.fillStyle = "rgba(255,255,255,.55)";
-  g.fill();
+  g.moveTo(0, -z - q * 0.3);
+  g.lineTo(0, -z - q * 2.1);
+  g.strokeStyle = "#e9e2cc";
+  g.lineWidth = Math.max(p.px(0.8), q * 0.09);
+  g.stroke();
+  finial(p, [0, -z - q * 2.1], q * 0.1);
+}
+
+/** A village church by region: brick in the north, a white chapel in the centre, wooden in the south. */
+function villageChurchStyle(prof, t) {
+  if (prof.south) return t < 0.45 ? "wooden" : t < 0.75 ? "chapel" : "baroque";
+  return t < 0.55 ? "gothic" : "chapel";
 }
 
 // --- village -------------------------------------------------------------------------------------------------------
 
 /** A village: one or two country roads, 6-10 houses along them, a landmark, garden trees and fields around. */
-function paintVillage(p, seed, accent, Rpx) {
+function paintVillage(p, seed, accent, Rpx, prof) {
   const g = p.g, R = p.R;
   const r = rng(seed * 7919 + 101);
   const roadW = Math.max(R * 0.05, p.px(2.6)), roadIn = Math.max(R * 0.03, p.px(1.4));
@@ -494,7 +776,7 @@ function paintVillage(p, seed, accent, Rpx) {
   spots.sort((a, b) => a.d - b.d);
 
   // The landmark sits behind the main road near the crossroads; spots too close to it are dropped.
-  const church = r() < 0.62;
+  const church = r() < 2; // every Polish village has its church (the draw keeps the random sequence of the original)
   const lm = { u: cu + S * 1.1, v: v0 - side - hs * (church ? 0.5 : 0.2) };
   const free = spots.filter((sp) => Math.hypot(sp.u - lm.u, sp.v - lm.v) > hs * 3.2);
   const houses = free.slice(0, nHouses);
@@ -508,7 +790,8 @@ function paintVillage(p, seed, accent, Rpx) {
   }
   {
     const [x, y] = iso(lm.u, lm.v);
-    items.push({ y, draw: () => (church ? drawChurch(p, x, y, hs * 1.35, accent) : drawWaterTower(p, x, y, hs * 1.1, accent)) });
+    const style = villageChurchStyle(prof, r());
+    items.push({ y, draw: () => drawPolishChurch(p, x, y, hs * 1.9, style) });
   }
   // Garden trees between and behind the houses, away from the roads and the buildings.
   const roadDist = (u, v) => Math.min(Math.abs(v - v0), cross && Math.abs(v) <= cross.v1 + S ? Math.abs(u - cross.u) : Infinity);
@@ -641,13 +924,37 @@ function gridLayout(cls, seed, R, Rpx, capital) {
     const park = best((l) => l.c > 0.2 && l.c < 0.7, 12);
     if (park) park.type = "park";
   }
-  if (free.length > 12 && cls.core < 1) {
-    const plaza = best((l) => l.c > 0.45 && l.c < 0.82, 14);
+  // The market square (rynek) takes the most central free block; the first church stands next to it.
+  // In a town of a dozen blocks or more the square spans 2 x 2 blocks (the streets between them paved over).
+  let rynek = null;
+  if (free.length >= 4) {
+    for (const l of free) if (!l.type && (!rynek || l.c > rynek.c)) rynek = l;
+    if (rynek) {
+      rynek.type = "rynek";
+      rynek.span = 1;
+      if (free.length >= 12) {
+        const at = new Map(free.map((l) => [`${l.u},${l.v}`, l]));
+        const part = [[1, 0], [0, 1], [1, 1]].map(([du, dv]) => at.get(`${rynek.u + du},${rynek.v + dv}`));
+        if (part.every((l) => l && !l.type)) {
+          for (const l of part) l.type = "rynekPart";
+          rynek.span = 2;
+        }
+      }
+    }
+  }
+  if (free.length > 16) {
+    const plaza = best((l) => l.c > 0.3 && l.c < 0.7, 14);
     if (plaza) plaza.type = "plaza";
   }
-  if (cls.civic && free.length >= 8 && !capital) {
-    const civ = best((l) => l.c > 0.3 && l.c < 0.75, 16);
-    if (civ) civ.type = "civic";
+  for (let k = 0; k < (cls.civic || 0) && free.length >= 6 + k * 6; k++) {
+    let civ = null;
+    if (k === 0) {
+      for (const l of free) if (!l.type && l.c < 0.97 && (!civ || l.c > civ.c)) civ = l;
+    } else civ = best((l) => l.c > 0.25 && l.c < 0.85, 16 + k);
+    if (civ) {
+      civ.type = "civic";
+      civ.civic = k;
+    }
   }
   for (const l of free) {
     if (l.type) continue;
@@ -656,10 +963,10 @@ function gridLayout(cls, seed, R, Rpx, capital) {
     else if (l.c > cls.mid) l.type = "mid";
     else l.type = "res";
   }
-  return { L, sw, half, bh, lots, fringe };
+  return { L, sw, half, bh, lots, fringe, rynek };
 }
 
-// --- the capitol complex ---------------------------------------------------------------------------------------
+// --- the capital square (Warszawa) -----------------------------------------------------------------------------
 
 function capitolExtent(R, Rpx) {
   const q = R * 0.1 * Math.max(1, Math.min(1.5, 26 / Rpx)); // grows a bit when zoomed out, to stay legible
@@ -691,13 +998,10 @@ function paintCapitolGround(p, C) {
       g.lineWidth = Math.max(p.px(1), C.q * 0.12);
       g.stroke();
     }
-    // reflecting pool near the far end
-    const [rx, ry] = iso(C.mallTo - C.q * 1.6, 0);
-    fillPoly(g, foot(rx, ry, C.q * 0.9, C.q * 0.22), "rgba(110,170,210,.95)");
   }
 }
 
-/** Items to draw in depth order for the capitol complex: [{y, draw()}]. */
+/** Items to draw in depth order for the capital square: tree rows along the park and the Palace of Culture. */
 function capitolItems(p, C) {
   const items = [];
   const q = C.q;
@@ -712,120 +1016,8 @@ function capitolItems(p, C) {
       }
     }
   }
-  // the obelisk at the far end of the mall
-  const [ox, oy] = iso(C.mallTo - q * 0.4, 0);
-  items.push({
-    y: oy,
-    draw: () => {
-      const a = Math.max(q * 0.13, p.px(1.2)), h = q * 2.1;
-      const F = foot(ox, oy, a, a);
-      p.shadow(F, h);
-      const t = p.box(F, 0, h, P.marble, { outline: false });
-      const tip = [ox, oy - h - a * 2.4];
-      fillPoly(p.g, [t.W, t.S, tip], css(shade(P.marble, 0.05)));
-      fillPoly(p.g, [t.S, t.E, tip], css(shade(P.marble, -0.3)));
-    },
-  });
-  // the capitol: a long marble block (long axis along B), a portico toward the mall, a drum and a dome
-  items.push({
-    y: 0,
-    draw: () => {
-      const g = p.g;
-      const wingH = q * 0.55;
-      const F = foot(0, 0, q * 0.95, q * 2.5);
-      p.shadow(F, q * 1.4);
-      p.box(F, 0, wingH, P.marble);
-      // centre block, a little taller
-      const Fc = foot(0, 0, q * 1.05, q * 0.95);
-      p.box(Fc, 0, wingH * 1.25, P.marble);
-      // portico on the SE face with columns
-      const Fp = foot(q * 1.25, 0, q * 0.3, q * 0.6);
-      const por = p.box(Fp, 0, wingH * 1.1, shade(P.marble, -0.02));
-      // pediment
-      const ped = [por.S, por.E, [(por.S[0] + por.E[0]) / 2, (por.S[1] + por.E[1]) / 2 - q * 0.28]];
-      fillPoly(g, ped, css(shade(P.marble, -0.12)));
-      if (p.detail >= 1) {
-        const [, E, S] = Fp;
-        g.beginPath();
-        for (let k = 1; k < 6; k++) {
-          const t = k / 6;
-          const bx = S[0] + (E[0] - S[0]) * t, by = S[1] + (E[1] - S[1]) * t;
-          g.moveTo(bx, by - q * 0.05);
-          g.lineTo(bx, by - wingH * 1.0);
-        }
-        g.strokeStyle = "rgba(255,255,250,.85)";
-        g.lineWidth = Math.max(p.px(0.6), q * 0.05);
-        g.stroke();
-      }
-      // drum (a short cylinder) on the centre block
-      const z = wingH * 1.25;
-      const rx = q * 0.78, ry = rx * 0.5, dh = q * 0.55;
-      const cy = -z;
-      const drum = g.createLinearGradient(-rx, 0, rx, 0);
-      drum.addColorStop(0, css(shade(P.dome, 0.0)));
-      drum.addColorStop(0.45, css(shade(P.dome, -0.08)));
-      drum.addColorStop(1, css(shade(P.dome, -0.4)));
-      g.beginPath();
-      g.ellipse(0, cy, rx, ry, 0, 0, Math.PI);
-      g.lineTo(-rx, cy - dh);
-      g.ellipse(0, cy - dh, rx, ry, 0, Math.PI, 2 * Math.PI);
-      g.closePath();
-      g.fillStyle = drum;
-      g.fill();
-      g.beginPath();
-      g.ellipse(0, cy - dh, rx, ry, 0, 0, Math.PI * 2);
-      g.fillStyle = css(shade(P.dome, -0.12));
-      g.fill();
-      if (p.detail >= 1) {
-        g.beginPath();
-        for (let k = 1; k < 10; k++) {
-          const a = Math.PI - (k * Math.PI) / 10;
-          const cx = Math.cos(a) * rx;
-          g.moveTo(cx, cy + Math.sin(a) * ry - q * 0.04);
-          g.lineTo(cx, cy + Math.sin(a) * ry - dh + q * 0.04);
-        }
-        g.strokeStyle = "rgba(120,110,95,.45)";
-        g.lineWidth = Math.max(p.px(0.5), q * 0.035);
-        g.stroke();
-      }
-      // dome: a tall half-ellipse with a highlight from the upper left
-      const dy = cy - dh, dr = rx * 0.9, dhh = q * 1.05;
-      const dome = g.createRadialGradient(-dr * 0.35, dy - dhh * 0.6, dr * 0.05, 0, dy - dhh * 0.3, dr * 1.25);
-      dome.addColorStop(0, "#ffffff");
-      dome.addColorStop(0.5, css(P.dome));
-      dome.addColorStop(1, css(shade(P.dome, -0.42)));
-      g.beginPath();
-      g.ellipse(0, dy, dr, ry * 0.9, 0, 0, Math.PI);
-      g.ellipse(0, dy, dr, dhh, 0, Math.PI, 0);
-      g.closePath();
-      g.fillStyle = dome;
-      g.fill();
-      g.strokeStyle = "rgba(60,50,40,.4)";
-      g.lineWidth = p.px(0.6);
-      g.stroke();
-      if (p.detail >= 1) {
-        // ribs
-        g.beginPath();
-        for (const f of [-0.55, 0, 0.55]) {
-          g.moveTo(dr * f, dy + ry * 0.9 * Math.sqrt(1 - f * f) * 0.9);
-          g.quadraticCurveTo(dr * f * 0.95, dy - dhh * 0.7, 0, dy - dhh);
-        }
-        g.strokeStyle = "rgba(150,140,120,.45)";
-        g.lineWidth = p.px(0.5);
-        g.stroke();
-      }
-      // lantern and statue
-      const lw = Math.max(q * 0.16, p.px(1.2)), lh = q * 0.36;
-      g.fillStyle = css(shade(P.dome, -0.05));
-      g.fillRect(-lw, dy - dhh - lh, lw * 2, lh + q * 0.04);
-      g.fillStyle = css(shade(P.dome, -0.35));
-      g.fillRect(0, dy - dhh - lh, lw, lh + q * 0.04);
-      g.beginPath();
-      g.arc(0, dy - dhh - lh - lw * 0.5, lw * 0.75, 0, Math.PI * 2);
-      g.fillStyle = "#c9a45c";
-      g.fill();
-    },
-  });
+  // the Palace of Culture and Science on its square (Plac Defilad)
+  items.push({ y: 0, draw: () => drawPKiN(p, q) });
   return items;
 }
 
@@ -835,7 +1027,8 @@ function paintTile(g, city, R, Rpx, dev, detail, col, seed, capital) {
   const cls = cityClass(city.population);
   const sCss = Rpx / R;
   const p = new Painter(g, R, sCss, dev, detail, col);
-  const items = cls.village ? paintVillage(p, seed, col, Rpx) : paintGrid(p, cls, seed, Rpx, capital);
+  const prof = profileOf(city);
+  const items = cls.village ? paintVillage(p, seed, col, Rpx, prof) : paintGrid(p, cls, seed, Rpx, capital, prof);
   items.sort((a, b) => a.y - b.y);
 
   // All cast shadows first, as one fill so overlapping shadows don't darken twice, then the buildings. The
@@ -858,10 +1051,10 @@ function paintTile(g, city, R, Rpx, dev, detail, col, seed, capital) {
 }
 
 /** Town and bigger: lawn base, paved street grid, block fills; returns the standing items. */
-function paintGrid(p, cls, seed, Rpx, capital) {
+function paintGrid(p, cls, seed, Rpx, capital, prof) {
   const g = p.g, R = p.R;
   const lay = gridLayout(cls, seed, R, Rpx, capital);
-  const { L, half, bh, lots, fringe } = lay;
+  const { L, half, bh, lots, fringe, rynek } = lay;
   const ci = CITY_CLASSES.indexOf(cls);
   const accent = p.accent;
   const r0 = (id, salt) => hash01(seed * 7919 + id, salt);
@@ -913,6 +1106,7 @@ function paintGrid(p, cls, seed, Rpx, capital) {
   for (const l of lots) {
     if (l.type === "reserved") continue;
     poly(paths.walk, foot(l.x, l.y, bh, bh));
+    if (l.type === "rynek" || l.type === "rynekPart") continue; // the square is paved below, as one piece
     const kind = l.type === "res" ? "lawn" : l.type === "park" ? "park" : l.type === "plaza" ? "plaza" : "paved";
     const F = foot(l.x, l.y, bh - swk, bh - swk);
     poly(paths[kind], F);
@@ -938,6 +1132,17 @@ function paintGrid(p, cls, seed, Rpx, capital) {
     g.strokeStyle = css(P.path, 0.9);
     g.lineWidth = Math.max(p.px(0.8), L * 0.04);
     g.stroke(parkWalks);
+  }
+  // The market square: one paved piece over its blocks and the streets between them, with a lighter inner ring.
+  let rk = null;
+  if (rynek) {
+    const off = rynek.span === 2 ? 0.5 : 0;
+    const [ox, oy] = iso(off * L, off * L);
+    const hs = rynek.span === 2 ? L - lay.sw * 0.5 : bh;
+    rk = { x: rynek.x + ox, y: rynek.y + oy, hs };
+    fillPoly(g, foot(rk.x, rk.y, hs, hs), css(P.walk));
+    fillPoly(g, foot(rk.x, rk.y, hs * 0.94, hs * 0.94), css(P.plaza));
+    fillPoly(g, foot(rk.x, rk.y, hs * 0.72, hs * 0.72), css(P.plazaInner));
   }
   // 4. Lane markings on the two main avenues (close).
   if (p.detail >= 2 && ci >= 2) {
@@ -965,17 +1170,34 @@ function paintGrid(p, cls, seed, Rpx, capital) {
 
   // 5. Everything that stands up.
   const items = [];
-  const hMax = R * (capital ? Math.min(cls.height, 0.24) : cls.height);
+  // Modern towers only where Poland has them: a skyline in Warszawa, a few in Katowice, Wroclaw and Gdansk. Elsewhere
+  // the centre is tall tenements.
+  const hMax = R * (prof.towers === 2 ? 0.5 : prof.towers === 1 ? 0.27 : cls.height);
   const big = bh * p.s >= 6; // blocks big enough to subdivide (css px)
   let tallest = null;
   for (const l of lots) {
     const r = (salt) => r0(l.id, salt);
     const { x, y } = l;
-    if (l.type === "core") {
+    const towerLot = l.type === "core" && (prof.towers === 2 || (prof.towers === 1 && l.c > 0.78 && r(19) < 0.6));
+    if (towerLot) {
       const h = Math.max(p.px(7), hMax * (0.3 + 0.7 * l.c ** 1.4 * (0.55 + 0.45 * r(21))));
       const it = { y, h, draw: () => drawCore(p, x, y, bh, h, r, it === tallest) };
       if (!tallest || h > tallest.h) tallest = it;
       items.push(it);
+    } else if (l.type === "core" || (l.type === "mid" && (ci < 2 || r(27) < 0.75))) {
+      // tenement rows around the old town: 2-4 narrow houses per parcel, taller in the centre
+      const h = Math.max(p.px(3.5), R * (0.04 + 0.03 * r(24)) * (0.8 + ci * 0.1) * (l.type === "core" ? 1.35 : 1));
+      const split = !big ? 1 : r(25) < 0.5 ? 2 : r(25) < 0.75 ? 3 : 4;
+      for (const pc of parcels(split, bh)) {
+        const [ox, oy] = iso(pc.u, pc.v);
+        const gap = Math.max(p.px(0.45), L * 0.018);
+        items.push({ y: y + oy, draw: () => drawTenements(p, x + ox, y + oy, pc.a - gap, pc.b - gap, h, r, pc.k) });
+      }
+    } else if (l.type === "res" && cls.blocks && l.c < cls.blocks && r(28) < 0.8) {
+      items.push({ y, draw: () => drawSlabs(p, x, y, bh, R, r, ci) });
+    } else if (l.type === "rynek" && rk) {
+      const { x: hx, y: hy, hs } = rk;
+      items.push({ y: hy, draw: () => drawTownHall(p, hx, hy, hs * (prof.hall ? 0.62 : 0.5), prof.south, prof.hall) });
     } else if (l.type === "mid") {
       const h = Math.max(p.px(3.5), R * (0.045 + 0.06 * r(24)) * (0.8 + ci * 0.12) * (0.6 + 0.6 * l.c));
       const split = !big ? 1 : r(25) < 0.3 ? 1 : r(25) < 0.55 ? 2 : r(25) < 0.8 ? 3 : 4;
@@ -1022,7 +1244,8 @@ function paintGrid(p, cls, seed, Rpx, capital) {
     } else if (l.type === "plaza") {
       items.push({ y, draw: () => drawPlaza(p, x, y, bh, accent) });
     } else if (l.type === "civic") {
-      items.push({ y, draw: () => drawChurch(p, x, y, bh * 0.5, accent) });
+      const style = l.civic === 0 && prof.church ? prof.church : prof.south ? (r(29) < 0.6 ? "baroque" : "gothic") : r(29) < 0.85 ? "gothic" : "baroque";
+      items.push({ y, draw: () => drawPolishChurch(p, x, y, bh * (prof.church && l.civic === 0 ? 1.0 : 0.82), style) });
     }
   }
   // Fringe: houses and trees on the lawn outside the pad.
@@ -1184,7 +1407,7 @@ function drawPlaza(p, x, y, bh, accent) {
 // Drawn in R units (1 = hex radius) around the cell centre; upx = device px per unit; v = variant; kind "small" is the
 // compact version used on hills. The plan (roads, houses, trees, amenity) is shared by the ground and build sprites.
 
-const SUB_ROOFS = [[164, 71, 58], [107, 111, 122], [138, 90, 60], [79, 93, 110], [179, 107, 69], [91, 74, 68], [128, 64, 54]];
+const SUB_ROOFS = [[172, 72, 50], [96, 94, 102], [150, 62, 46], [188, 98, 62], [120, 60, 48], [82, 80, 88], [164, 82, 56]];
 const SUB_WALLS = [[239, 230, 210], [226, 215, 189], [216, 223, 224], [240, 220, 192], [230, 225, 214]];
 const suburbPlans = new Map();
 
@@ -1481,7 +1704,7 @@ export const SUBURB_ART = Object.freeze({
 });
 
 // --- sprite cache --------------------------------------------------------------------------------------------------
-// Sprites cover x ∈ [-SX·R, SX·R] and y ∈ [-SY0·R, SY1·R] around the hex centre (towers rise above the hex).
+// Sprites cover x in [-SX.R, SX.R] and y in [-SY0.R, SY1.R] around the hex centre (towers rise above the hex).
 const SX = 1.0, SY0 = 1.55, SY1 = 1.0;
 const MAX_SPRITE_RPX = 220; // device px; tiles up to this size share the main sprite cache
 // Bigger tiles (close zoom on a dpr-2/3 screen) get their own small cache, so panning there blits instead of
@@ -1562,7 +1785,7 @@ export function drawCityTile(ctx, city, x, y, R, opts = {}) {
   const RpxB = bucket(Rpx, 4); // layout zoom bucket (css px)
   const m = ctx.getTransform ? ctx.getTransform() : null;
   const kDev = m && m.a > 0 ? m.a : s; // device px per km
-  const kB = bucket(kDev, 6); // ≤ 12% downscale when blitted
+  const kB = bucket(kDev, 6); // <= 12% downscale when blitted
   const flat = m && !m.b && !m.c;
   const isBig = !flat || R * kB > MAX_SPRITE_RPX;
   if (isBig && ctx.canvas && flat) {
@@ -1597,9 +1820,9 @@ export function drawCityTile(ctx, city, x, y, R, opts = {}) {
 }
 
 /** The marker used for a city at small zoom: a neutral cream-and-bronze disc on a dark rim (so dots never read as
- *  state-coloured confetti or as resources), ringed for big cities; a gold star for the capital. */
+ *  state-coloured confetti or as resources), ringed for big cities; a gold crown for the capital. */
 export function drawCityDot(ctx, x, y, R, { Rpx, s, capital = false, population = 0 }) {
-  const big = population >= 1.5e6;
+  const big = population >= 4e5;
   const r = Math.max((big ? 2.8 : 2.1) / s, R * (Rpx < 9 ? (big ? 0.34 : 0.27) : 0.19));
   ctx.beginPath();
   ctx.arc(x + 0.6 / s, y + 0.9 / s, r * 1.1, 0, Math.PI * 2);
@@ -1625,7 +1848,7 @@ export function drawCityDot(ctx, x, y, R, { Rpx, s, capital = false, population 
   if (capital) drawCapitalLandmark(ctx, x, y - r * 0.05, r * 4.2, { s });
 }
 
-/** The capital marker used with dots: a small gold star (the full tile has the domed capitol instead). */
+/** The capital marker used with dots: a small gold crown (the full tile has the Palace of Culture instead). */
 export function drawCapitalLandmark(ctx, x, y, R, { s = 1 } = {}) {
   ctx.beginPath();
   star(ctx, x, y, Math.max(R * 0.2, 3.2 / s));
@@ -1636,11 +1859,16 @@ export function drawCapitalLandmark(ctx, x, y, R, { s = 1 } = {}) {
   ctx.stroke();
 }
 
+/** A small three-pointed crown (the capital's mark on dots and banners). */
 function star(ctx, x, y, r) {
-  for (let k = 0; k < 10; k++) {
-    const a = -Math.PI / 2 + (k * Math.PI) / 5;
-    const rr = k % 2 ? r * 0.45 : r;
-    k ? ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr) : ctx.moveTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr);
-  }
+  const b = y + r * 0.62, t = y - r * 0.78, m = y - r * 0.05;
+  ctx.beginPath();
+  ctx.moveTo(x - r, b);
+  ctx.lineTo(x - r, t + r * 0.25);
+  ctx.lineTo(x - r * 0.5, m);
+  ctx.lineTo(x, t);
+  ctx.lineTo(x + r * 0.5, m);
+  ctx.lineTo(x + r, t + r * 0.25);
+  ctx.lineTo(x + r, b);
   ctx.closePath();
 }

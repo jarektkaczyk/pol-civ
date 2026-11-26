@@ -8,13 +8,15 @@ export function compact(n) {
   return String(Math.round(n));
 }
 
-export const money = (n) => (n == null ? "–" : "$" + compact(n));
-export const dollars = (n) => (n == null ? "–" : "$" + Math.round(n).toLocaleString("en-US"));
+// Money is Polish złoty (PLN), written after the number as in Polish: "3.92T zł", "9,178 zł".
+export const money = (n) => (n == null ? "–" : compact(n) + "\u00a0zł");
+export const dollars = (n) => (n == null ? "–" : Math.round(n).toLocaleString("en-US") + "\u00a0zł");
+export const zloty = dollars;
 export const int = (n) => (n == null ? "–" : Math.round(n).toLocaleString("en-US"));
 export const pct = (x, d = 1) => (x == null ? "–" : (x * 100).toFixed(d) + "%");
 
 export function yieldValue(y, v) {
-  return y.unit === "usd" ? money(v) : compact(v);
+  return y.unit === "pln" || y.unit === "usd" ? money(v) : compact(v);
 }
 
 export function popShort(n) {

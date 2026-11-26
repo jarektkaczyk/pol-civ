@@ -2,8 +2,8 @@
 //
 //   * app.state.bannerFocus = the open city (render/banners.js): the other banners fade and drop their yield tier;
 //     a hovered one comes back to full strength, and they all still click through to their city.
-//   * Cities inside the metro's box lose their banner while the view is open (app.state.cities, the list the
-//     banners are drawn from, is narrowed and restored on close), so no plate sits on the metro's hexes. Their hexes
+//   * Cities inside the town's box lose their banner while the view is open (app.state.cities, the list the
+//     banners are drawn from, is narrowed and restored on close), so no plate sits on the town's hexes. Their hexes
 //     still open them on a click.
 //   * focusRect(ctx, cam): where the open city's banner sits on screen this frame, so the map layer's plaques,
 //     pills and labels can keep out of its way.
@@ -37,7 +37,7 @@ export function createBannerFocus(app) {
     st.bannerFocus = m.city;
   }
 
-  // The open city's banner rect, measured by drawing it alone into a 1×1 canvas at the same device scale (the same
+  // The open city's banner rect, measured by drawing it alone into a 1x1 canvas at the same device scale (the same
   // sprite as the real one, so this costs one tiny drawImage). It is pinned first, so it is never displaced.
   function focusRect(ctx, cam) {
     if (!model || model.city.cell == null) return null;

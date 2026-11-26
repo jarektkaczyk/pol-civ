@@ -1,7 +1,7 @@
 // Number formatting for the City View: format.js's compact helpers with a roll-over fix, so a value that rounds up
-// to the next unit reads "1.0M" rather than "1000K" (e.g. Westchester's 999,600 people). format.js is shared
-// with the rest of the app; this wrapper keeps the same output for every other value.
-import { compact as baseCompact, popShort as basePopShort } from "../../format.js";
+// to the next unit reads "1.0M" rather than "1000K" (e.g. a town of 999,600 people). format.js is shared with the
+// rest of the app; this wrapper keeps the same output for every other value. Money is Polish zloty, as in format.js.
+import { compact as baseCompact, popShort as basePopShort, money as baseMoney } from "../../format.js";
 
 const UNITS = [[1e12, "T"], [1e9, "B"], [1e6, "M"], [1e3, "K"]];
 
@@ -16,6 +16,7 @@ function rollover(n, fmt) {
 }
 
 export const compact = (n) => rollover(n, baseCompact);
-export const money = (n) => (n == null ? "–" : "$" + compact(n));
-export const yieldValue = (y, v) => (y.unit === "usd" ? money(v) : compact(v));
+// format.js money() is compact(n) + the currency; the rolled-over compact keeps its unit and currency text.
+export const money = (n) => (n == null || Number.isNaN(n) ? baseMoney(null) : baseMoney(1).replace(/^1/, compact(n)));
+export const yieldValue = (y, v) => (y.unit === "pln" || y.unit === "usd" ? money(v) : compact(v));
 export const popShort = (n) => rollover(n, basePopShort);

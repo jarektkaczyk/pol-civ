@@ -98,10 +98,10 @@ export function pad(domain, k = 0.04, log = false) {
 // --- colour ----------------------------------------------------------------------------------------------------
 
 export const RAMPS = {
-  // dark blue → teal → yellow (perceptually ordered; reads on the dark panels)
+  // dark blue -> teal -> yellow (perceptually ordered; reads on the dark panels)
   seq: ["#2c3e78", "#3d6aa0", "#3e98a8", "#5fbf8e", "#b5d65c", "#f6e05a"],
   gold: ["#4a3416", "#7a5a22", "#b4872f", "#e0b54c", "#f6dc8a", "#fff6d6"],
-  // red ← grey → teal, for signed values (growth)
+  // red <- grey -> teal, for signed values (growth)
   div: ["#c2463d", "#e08a6a", "#cfc4ae", "#7dc2b0", "#2e9c8a"],
   heat: ["#3b1f4a", "#7a2c62", "#bb3f5a", "#e8774a", "#f6b94a", "#fbe8a6"],
 };
@@ -125,7 +125,7 @@ export function withAlpha(color, a) {
   return `rgba(${p.join(",")},${a})`;
 }
 
-/** A colour scale: {type: "seq"|"div"|"cat", domain, ramp, log, categories: Map<value, color>} → fn(v) → css. */
+/** A colour scale: {type: "seq"|"div"|"cat", domain, ramp, log, categories: Map<value, color>} -> fn(v) -> css. */
 export function colorScale(spec) {
   if (!spec) return () => "#d9c79a";
   if (spec.type === "cat") {

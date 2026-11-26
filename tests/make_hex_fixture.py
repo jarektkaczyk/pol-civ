@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from pipeline.core.hexgrid import HexGrid  # noqa: E402
 
 FIXTURE = Path(__file__).parent / "fixtures" / "hex_cases.json"
-GRID = HexGrid(25.0, 12, 9)
+GRID = HexGrid(5.0, 12, 9)
 
 
 def _python_round_cell(grid: HexGrid, x: float, y: float) -> int:

@@ -1,9 +1,9 @@
 // Per-frame layers on top of the cached map: the highlight (app.state.highlight) and extension overlays
 // (app.registerOverlay). Both are drawn by main.js every frame, after map.js drawOverlay (selection / hover).
 //
-// Highlight: state.highlight = {cells?: Set<cell>, cities?: Set<cityId>, states?: Set<stateIdx>,
-//                              resources?: Set<itemIndex into resources.json items>, dimOthers?: bool, color?: css}
-//   * the highlighted cell group = cells ∪ every cell of the listed states
+// Highlight: app state stores {cells?, cities?, states?, resources?, dimOthers?, color?}.
+// The states set contains voivodeship indices from world.json.
+//   * the highlighted cell group combines cells with every cell of the listed voivodeships
 //   * dimOthers: everything outside that group is darkened (all land, if the group is empty)
 //   * the group is outlined along its outer edge (a dark under-stroke, then `color`)
 //   * highlighted cities and resources get a ring in `color`

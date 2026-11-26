@@ -1,86 +1,55 @@
-"""Cities = metro/micro areas with ACS 1-year data, placed at their principal city.
+"""Towns (cities.json), metros (metros.json) and the nation (nation.json) of Poland.
 
-Each city keeps its true position (x, y) and gets one land cell for its banner:
-the cell under the principal city, snapped to the nearest US land cell when that
-is water or foreign, and nudged up to 2 rings away when a bigger city already
-holds it. GDP (Gold) is the sum of the metro's counties from BEA CAGDP2.
-Population growth (2021 → the ACS year) comes from the Census population estimates, which
-cover every year on today's metro borders (see growth.py).
-For the City view each city also gets its member counties, a hex footprint (cells where most
-county samples are member counties), its yearly population series, ranks among all cities and
-its 5 nearest peers by population (see docs/DATA_CONTRACTS.md).
+Towns: every town with town rights (GUS, 1 January 2026; source pl_geo_places) gets a banner at its true position
+(the OSM place node). The banner cell is the cell under the town, snapped to Polish land and nudged one ring when a
+bigger town already holds it. The City View opens for the 66 cities with powiat rights and every other town of
+20,000 or more people (`city_view`).
+
+Economic fields come from the town's gmina: a town with its own urban gmina (TERYT type 1) is that gmina; a town
+inside an urban-rural gmina (type 4) reports the whole urban-rural gmina (type 3, town and villages) and says so
+in `scope`. `population` is always the town's own population (GUS Tabl. 20). Powiat-level figures (wage,
+unemployment, PKD jobs) are the town's powiat; for a city with powiat rights that is the city itself.
+
+Metros are Eurostat functional urban areas (FUA: a city and its commuting zone, source pl_geo_fua), with two
+merges published in metros.json `rule`: Trójmiasto (the Gdańsk and Gdynia FUAs) and the Górnośląsko-Zagłębiowska
+metro (the FUAs of Katowice, Gliwice, Tychy and Dąbrowa Górnicza, all members of the GZM metropolitan union).
 """
 
 from __future__ import annotations
 
 import math
-import re
 
 from ..core.geo import MapProjection
 from ..core.hexgrid import HexGrid
-from ..core.store import load_interim, load_interim_payload, write_web
-from .growth import Growth
-from .yields import GDP_INDUSTRIES, INDUSTRY_LINES, YIELDS, bea_combos, economy, gdp_profile, sum_counties
+from ..core.store import load_interim, write_web
+from .plstats import Stats, Units, num, optional
+from .yields import INDUSTRIES, YIELD_KEYS, YIELDS, Economy
 
-REQUIRES = ["_world", "census_gazetteer", "acs_1yr", "acs_5yr", "cbsa_delineation", "bea_gdp", "pep_population"]
-PRODUCES = ["cities.json", "nation.json"]
+REQUIRES = ["_world", "pl_geo_teryt", "pl_geo_places", "pl_geo_fua", "pl_stats_population", "pl_stats_labour",
+            "pl_stats_prosperity", "pl_gdp"]
+PRODUCES = ["cities.json", "metros.json", "nation.json"]
 
-NON_CONUS = {"AK", "HI", "PR"}
-CAPITAL_CBSA = "47900"  # Washington-Arlington-Alexandria, DC-VA-MD-WV
-DISPLAY_NAME = {"Boise City": "Boise"}  # official CBSA names that read oddly on a map
-HYPHENATED = {"Winston-Salem", "Wilkes-Barre", "Sedro-Woolley", "Lee's Summit", "Coeur d'Alene"}
-PLACE_SUFFIX = re.compile(
-    r" (city|town|village|borough|municipality|CDP|city and borough|urban county|"
-    r"metropolitan government|consolidated government|unified government)\b.*$"
+CAPITAL = "1465011"  # Warszawa
+CITY_VIEW_POP = 20000
+FOOTPRINT_MAJORITY = 4  # of a cell's 7 gmina samples
+PEERS = 5
+RANK_KEYS = ["population", "gdp", "gdp_per_capita", "growth"] + YIELD_KEYS
+METRO_MERGES = {
+    "PL006F": ("Trójmiasto", ["PL006F", "PL053F"]),
+    "PL010F": ("Górnośląsko-Zagłębiowska", ["PL010F", "PL055F", "PL061F", "PL070F"]),
+}
+METRO_RULE = (
+    "Metros are the Eurostat functional urban areas (FUA) of Poland: a city and the gminas from which at least 15% "
+    "of employed residents commute to it (Eurostat LAU 2025 correspondence). Two are merged: Trójmiasto = the FUAs "
+    "of Gdańsk (with Sopot) and Gdynia; Górnośląsko-Zagłębiowska = the FUAs of Katowice, Gliwice, Tychy and "
+    "Dąbrowa Górnicza, the four FUA core cities in the GZM metropolitan union (metropoliagzm.pl)."
 )
-
-
-def parse_cbsa_name(full: str) -> tuple[str, list[str]]:
-    """'Dallas-Fort Worth-Arlington, TX Metro Area' → ('Dallas', ['TX'])."""
-    base = re.sub(r" (Metro|Micro) Area$", "", full)
-    cities, _, states = base.rpartition(", ")
-    first = cities
-    for h in HYPHENATED:
-        if cities.startswith(h):
-            first = h
-            break
-    else:
-        first = re.split(r"--|-|/", cities)[0]
-    return first.strip(), states.split("-")
-
-
-def name_matches(pname: str, name: str) -> bool:
-    return pname == name or pname.startswith((name + " ", name + "-", name + "/"))
-
-
-def principal_place(places_by_state: dict, name: str, state: str):
-    """Fallback: the Gazetteer place best matching `name` in `state` (exact name first, then largest)."""
-    best = None
-    for p in places_by_state.get(state, ()):
-        pname = p["name"]
-        if not name_matches(pname, name):
-            continue
-        rest = PLACE_SUFFIX.sub("", pname)
-        exact = rest == name or rest.startswith(name + "-")
-        score = (exact, p["aland_km2"])
-        if best is None or score > best[0]:
-            best = (score, p)
-    return best[1] if best else None
-
-
-def delineated_place(principals: list[dict], places_by_geoid: dict, name: str, states: list[str]):
-    """The OMB principal city that the CBSA title names first, as a Gazetteer place."""
-    for p in principals:
-        place = places_by_geoid.get(p["place_geoid"])
-        if place and name_matches(PLACE_SUFFIX.sub("", p["name"]), name) and place["usps"] in states:
-            return place
-    return None
+METRO_REF = "https://metropoliagzm.pl/"
 
 
 def ring_search(grid: HexGrid, start: int, max_rings: int):
-    """Yield (ring, cell) for every cell within `max_rings` steps of `start`, nearest rings first."""
-    seen = {start}
-    frontier = [start]
+    """(ring, cell) for every cell within `max_rings` of `start`, nearest rings first."""
+    seen, frontier = {start}, [start]
     yield 0, start
     for ring in range(1, max_rings + 1):
         nxt = []
@@ -93,196 +62,195 @@ def ring_search(grid: HexGrid, start: int, max_rings: int):
         frontier = nxt
 
 
-def nearest_land(grid: HexGrid, owner: list[int], cell: int, x: float, y: float, state: int, max_rings=8):
-    """Nearest US land cell to (x, y), preferring `state`: the first ring with land, plus one more."""
-    found_ring = None
-    best = None
-    for ring, c in ring_search(grid, cell, max_rings):
-        if found_ring is not None and ring > found_ring + 1:
+def nearest_land(grid: HexGrid, owner: list[int], cell: int, x: float, y: float, max_rings=8) -> int:
+    """Nearest Polish land cell to (x, y): the first ring with land, plus one more ring to compare distances."""
+    found, best = None, None
+    for ring, c in ring_search(grid, max(cell, 0), max_rings):
+        if found is not None and ring > found + 1:
             break
         if owner[c] < 0:
             continue
-        found_ring = ring if found_ring is None else found_ring
+        found = ring if found is None else found
         cx, cy = grid.center(*grid.col_row(c))
-        score = (owner[c] != state, math.hypot(cx - x, cy - y))
-        if best is None or score < best[0]:
-            best = (score, c)
+        d = math.hypot(cx - x, cy - y)
+        if best is None or d < best[0]:
+            best = (d, c)
     return best[1] if best else -1
 
 
-def free_cell(grid: HexGrid, owner, taken: set, cell: int, x: float, y: float, state: int, max_rings=2):
-    """Nearest untaken land cell within `max_rings`, preferring `state`; None if there is none."""
+def free_cell(grid: HexGrid, owner, taken: set, cell: int, x: float, y: float, max_rings=1):
     best = None
-    for ring, c in ring_search(grid, cell, max_rings):
+    for _, c in ring_search(grid, cell, max_rings):
         if owner[c] < 0 or c in taken:
             continue
         cx, cy = grid.center(*grid.col_row(c))
-        score = (owner[c] != state, math.hypot(cx - x, cy - y))
-        if best is None or score < best[0]:
-            best = (score, c)
+        d = math.hypot(cx - x, cy - y)
+        if best is None or d < best[0]:
+            best = (d, c)
     return best[1] if best else None
 
 
-FOOTPRINT_MAJORITY = 4  # of a cell's 7 county samples
-PEERS = 5
-RANK_KEYS = ["population", "gdp", "gdp_per_capita", "growth"] + [y["key"] for y in YIELDS]
-
-
 def footprints(world: dict, members: dict[str, list[str]]) -> dict[str, set[int]]:
-    """CBSA code → US land cells where at least FOOTPRINT_MAJORITY of the 7 county samples are member counties."""
-    cbsa_of = {g: code for code, geoids in members.items() for g in geoids}
-    by_index = [cbsa_of.get(g) for g in world["counties"]]
+    """id -> Polish land cells where at least FOOTPRINT_MAJORITY of the 7 gmina samples are member gminas."""
+    idx = {g: i for i, g in enumerate(world["counties"])}
+    owner_of = {}
+    for key, gms in members.items():
+        for g in gms:
+            if g in idx:
+                owner_of.setdefault(idx[g], []).append(key)
     out: dict[str, set[int]] = {}
     for cell, s in enumerate(world["county_samples"]):
         if not s or world["owner"][cell] < 0:
             continue
         votes: dict[str, int] = {}
         for k in s:
-            code = by_index[k] if k >= 0 else None
-            if code:
-                votes[code] = votes.get(code, 0) + 1
-        for code, n in votes.items():
+            for key in owner_of.get(k, ()):
+                votes[key] = votes.get(key, 0) + 1
+        for key, n in votes.items():
             if n >= FOOTPRINT_MAJORITY:
-                out.setdefault(code, set()).add(cell)
+                out.setdefault(key, set()).add(cell)
     return out
 
 
-def pop_series(pep: dict | None, code: str, members: list[str] | None) -> dict | None:
-    """{year: population} from the PEP metro file, or None (missing, or a different county list, as for growth)."""
-    rec = pep["cbsa"].get(code) if pep else None
-    if not rec or not rec.get("pop") or (members is not None and set(members) != set(rec["counties"])):
-        return None
-    return {str(y): (round(v) if v is not None else None) for y, v in zip(pep["years"], rec["pop"])}
+def gmina_centres(world: dict, grid: HexGrid) -> dict[str, tuple[float, float]]:
+    """Mean position of the hexes whose centre sample lies in each gmina (map km)."""
+    acc: dict[int, list] = {}
+    for cell, s in enumerate(world["county_samples"]):
+        if s and s[0] >= 0:
+            a = acc.setdefault(s[0], [0.0, 0.0, 0])
+            x, y = grid.center(*grid.col_row(cell))
+            a[0] += x
+            a[1] += y
+            a[2] += 1
+    return {world["counties"][k]: (a[0] / a[2], a[1] / a[2]) for k, a in acc.items()}
 
 
-def add_ranks(cities: list[dict]) -> None:
-    """ranks: 1 = highest among all cities, null where the value is null (cities are sorted by population,
-    so ties keep population order). peers: the PEERS cities closest in population (by ratio)."""
-    def value(c, key):
-        if key == "gdp_per_capita":
-            return c["gdp"] / c["population"] if c.get("gdp") is not None and c.get("population") else None
-        if key in ("population", "gdp", "growth"):
-            return c.get(key)
-        return c["yields"].get(key)
+def value_of(c: dict, key: str):
+    if key == "gdp_per_capita":  # GDP covers the gmina: divide by the gmina's people, not the town's
+        pop = c.get("gmina_population") or c.get("population")
+        return c["gdp"] / pop if c.get("gdp") is not None and pop else None
+    if key in ("population", "gdp", "growth"):
+        return c.get(key)
+    return c["yields"].get(key)
 
-    for c in cities:
+
+def add_ranks(rows: list[dict], peer_pool: list[dict] | None = None) -> None:
+    """ranks: 1 = highest among `rows` (null where the value is null; ties keep population order).
+    peers: the PEERS rows of `peer_pool` (default all) closest in population by ratio, for members of the pool."""
+    for c in rows:
         c["ranks"] = {}
     for key in RANK_KEYS:
-        have = [c for c in cities if value(c, key) is not None]
-        have.sort(key=lambda c: -value(c, key))  # stable: ties stay in population order
+        have = [c for c in rows if value_of(c, key) is not None]
+        have.sort(key=lambda c: -value_of(c, key))
         for r, c in enumerate(have, 1):
             c["ranks"][key] = r
-        for c in cities:
+        for c in rows:
             c["ranks"].setdefault(key, None)
-    for i, c in enumerate(cities):
+    pool = peer_pool if peer_pool is not None else rows
+    ids = {id(c) for c in pool}
+    for c in rows:
+        if id(c) not in ids or not c.get("population"):
+            c["peers"] = []
+            continue
         lp = math.log(c["population"])
-        near = sorted((abs(math.log(o["population"]) - lp), j) for j, o in enumerate(cities) if j != i)
-        c["peers"] = [cities[j]["id"] for _, j in near[:PEERS]]
+        near = sorted((abs(math.log(o["population"]) - lp), o["id"]) for o in pool if o is not c and o.get("population"))
+        c["peers"] = [i for _, i in near[:PEERS]]
+
+
+def metro_groups(fua: dict, by6: dict[str, str]) -> list[dict]:
+    """FUAs after the published merges: [{id, name, fuas, gminas (TERYT7)}]."""
+    merged_into = {f: key for key, (_, fs) in METRO_MERGES.items() for f in fs}
+    groups: dict[str, dict] = {}
+    for code, f in sorted(fua.get("fuas", {}).items()):
+        key = merged_into.get(code, code)
+        g = groups.setdefault(key, {"id": key, "name": METRO_MERGES[key][0] if key in METRO_MERGES else f["name"],
+                                    "fuas": [], "gminas": []})
+        g["fuas"].append(code)
+        g["gminas"] += [by6[t6] for t6 in f["gminas"] if t6 in by6]
+    for g in groups.values():
+        g["gminas"] = sorted(set(g["gminas"]))
+    return list(groups.values())
 
 
 def build() -> None:
+    from .world import ABBR
+
     world = load_interim("_world")
-    gaz = load_interim("census_gazetteer")
-    acs_payload = load_interim_payload("acs_1yr")
-    acs = acs_payload["data"]
-    acs5 = load_interim("acs_5yr")["geos"]
-    deline = load_interim("cbsa_delineation")
-    bea_payload = load_interim_payload("bea_gdp")
-    bea = bea_payload["data"]
-    proj = MapProjection(**world["projection"])
+    teryt = load_interim("pl_geo_teryt")
+    places = (optional("pl_geo_places") or {}).get("data") or {}
+    units = Units(world, teryt)
+    stats = Stats()
+    econ = Economy(units, stats)
+    proj = MapProjection(**{k: world["projection"][k] for k in ("min_x", "max_y", "margin")})
     grid = HexGrid(**world["grid"])
     owner = world["owner"]
+    centres = gmina_centres(world, grid)
+    fua = stats.data("pl_geo_fua")
+    fua_of6 = {t6: g.get("fua") for t6, g in (fua.get("gminas") or {}).items()}
+    groups = metro_groups(fua, units.by6)
+    metro_of_fua = {f: g["id"] for g in groups for f in g["fuas"]}
 
-    state_index = {fips: i for i, fips in enumerate(world["states"])}
-    fips_of_usps = {g["usps"]: geoid[:2] for geoid, g in gaz["counties"].items()}
-    places_by_state: dict[str, list] = {}
-    for p in gaz["places"]:
-        places_by_state.setdefault(p["usps"], []).append(p)
-    places_by_geoid = {p["geoid"]: p for p in gaz["places"]}
-    county_pop = {k[9:]: r.get("B01003_001") for k, r in acs5.items()}
-    combos = bea_combos(bea, gaz["counties"])
-    pep = load_interim("pep_population")
-    growth = Growth(pep, acs["year"])
-    no_growth: dict[str, list[str]] = {}
-
-    cities = []
-    fallbacks, centroid, split_gdp, no_gdp = [], [], [], []
-    for cbsa_id, rec in acs["cbsa"].items():
-        meta = gaz["cbsa"].get(cbsa_id)
-        if not meta:
+    towns = []
+    no_pos, off_gmina = [], []
+    for p in places.get("points", []):
+        props = p["props"]
+        g = props["gmina"]
+        if g not in units.index:
+            print(f"    ! town {p['id']} {p['name']}: gmina {g} not on the map")
             continue
-        short, states = parse_cbsa_name(meta["name"])
-        if states[0] in NON_CONUS:
-            continue
-        econ_pop = rec.get("B01003_001")
-        if not econ_pop:
-            continue
-        place = delineated_place(deline["principal_cities"].get(cbsa_id, []), places_by_geoid, short, states)
-        if not place:
-            place = principal_place(places_by_state, short, states[0])
-            fallbacks.append(meta["name"])
-        if place:
-            lon, lat = place["lon"], place["lat"]
+        if p.get("lon") is not None:
+            x, y = proj(p["lon"], p["lat"])
+        elif g in centres:
+            x, y = centres[g]
+            no_pos.append(p["name"])
         else:
-            lon, lat = meta["lon"], meta["lat"]
-            centroid.append(meta["name"])
-        x, y = proj(lon, lat)
+            continue
+        own_gmina = p["id"][-1] == "1"
+        powiat_rights = bool(props.get("powiat_rights"))
+        prof = econ.profile([g], powiaty=[g[:4]] if powiat_rights else None)
+        town_pop = num(props.get("population"))
+        gmina_pop = prof["population"]
+        voiv = g[:2]
+        scope = ("city" if powiat_rights else "gmina") if own_gmina else "urban-rural gmina"
+        if not own_gmina:  # the gmina's series and growth are not the town's
+            prof["pop_series"] = None
+            prof["growth"] = None
+        c = {
+            "id": p["id"],
+            "name": p["name"],
+            "full": f"{p['name']}, {units.powiat_label(g[:4]) + ', ' if not powiat_rights else ''}{units.voiv_name.get(voiv, voiv)}",
+            "states": [ABBR.get(voiv, voiv)],
+            "voivodeship": voiv,
+            "powiat": g[:4],
+            "gmina": g,
+            "kind": "city" if powiat_rights else "town",
+            "city_view": powiat_rights or (town_pop or 0) >= CITY_VIEW_POP,
+            "metro": powiat_rights or (town_pop or 0) >= CITY_VIEW_POP,
+            "fua": metro_of_fua.get(fua_of6.get(g[:6])),
+            "capital": p["id"] == CAPITAL,
+            "x": round(x, 1),
+            "y": round(y, 1),
+            "cell": grid.cell_at(x, y),
+            **prof,
+            "population": town_pop,
+            "gmina_population": gmina_pop,
+            "scope": scope,
+        }
+        cell = c["cell"]
+        if cell >= 0 and world["county"][cell] >= 0 and world["counties"][world["county"][cell]] != g:
+            off_gmina.append(p["name"])
+        towns.append(c)
+    towns.sort(key=lambda c: -(c["population"] or 0))
 
-        members = deline["counties"].get(cbsa_id)
-        est: set = set()
-        if members:
-            lines, split = sum_counties(members, bea, combos, county_pop, est)
-            if split:
-                split_gdp.append(meta["name"])
-        else:
-            lines = None
-        gdp = gdp_profile(lines, bea["year"], est)
-        if gdp["total"] is None:
-            no_gdp.append(meta["name"])
-
-        g, why = growth.cbsa(cbsa_id, members)
-        if why:
-            no_growth.setdefault(why, []).append(meta["name"])
-
-        cities.append(
-            {
-                "id": cbsa_id,
-                "name": DISPLAY_NAME.get(short, short),
-                "full": meta["name"],
-                "states": states,
-                "metro": meta["metro"],
-                "capital": cbsa_id == CAPITAL_CBSA,
-                "x": round(x, 1),
-                "y": round(y, 1),
-                "cell": grid.cell_at(x, y),
-                **economy(rec, gdp),
-                "growth": g,
-                "growth_years": growth.years,
-                "counties": sorted(members or []),
-                "pop_series": pop_series(pep, cbsa_id, members),
-            }
-        )
-    cities.sort(key=lambda c: -c["population"])
-
-    # Banner cells: on US land, one city per cell where possible (bigger cities choose first).
     taken: set[int] = set()
-    snapped, pulled, moved, shared = [], [], [], []
-    for c in cities:
-        own = {state_index.get(fips_of_usps.get(u), -1) for u in c["states"]}
-        state = state_index.get(fips_of_usps.get(c["states"][0]), -1)
+    snapped, moved, shared = [], [], []
+    for c in towns:
         cell = c["cell"]
         if cell < 0 or owner[cell] < 0:
-            cell = nearest_land(grid, owner, max(cell, 0), c["x"], c["y"], state)
+            cell = nearest_land(grid, owner, cell, c["x"], c["y"])
             snapped.append(c["name"])
-        elif owner[cell] not in own:
-            # A border city whose point falls just across the line: pull it back into its
-            # first state if that state has a free cell within 2 rings (the same reach as below).
-            alt = free_cell(grid, owner, taken, cell, c["x"], c["y"], state)
-            if alt is not None and owner[alt] == state:
-                cell = alt
-                pulled.append(c["name"])
         if cell in taken:
-            alt = free_cell(grid, owner, taken, cell, c["x"], c["y"], state)
+            alt = free_cell(grid, owner, taken, cell, c["x"], c["y"]) or free_cell(grid, owner, taken, cell, c["x"], c["y"], 2)
             if alt is None:
                 shared.append(c["name"])
             else:
@@ -291,49 +259,78 @@ def build() -> None:
         taken.add(cell)
         c["cell"] = cell
 
-    feet = footprints(world, deline["counties"])
-    own_only = []
-    for c in cities:
-        cells = feet.get(c["id"], set())
-        if c["cell"] not in cells:
-            if not cells:
-                own_only.append(c["name"])
-            cells = cells | {c["cell"]}
+    feet = footprints(world, {c["id"]: [c["gmina"]] for c in towns if c["id"][-1] == "1"})
+    for c in towns:
+        cells = feet.get(c["id"], set()) | {c["cell"]}
         c["footprint"] = sorted(cells)
-    add_ranks(cities)
-    no_series = [c["name"] for c in cities if c["pop_series"] is None]
+    view = [c for c in towns if c["city_view"]]
+    add_ranks(towns, view)
 
-    print(f"    {len(cities)} cities; principal city from OMB list 2 for {len(cities) - len(fallbacks)}")
-    for label, items in (
-        ("placed by name heuristic (no OMB principal-city match)", fallbacks),
-        ("placed at area centroid", centroid),
-        ("snapped off water/foreign cells", snapped),
-        ("pulled back across a state line into their own state", pulled),
-        ("moved to a free neighbouring cell", moved),
-        ("still sharing a cell", shared),
-        ("GDP uses a population split of a BEA combined area", split_gdp),
-        ("without GDP", no_gdp),
-        ("with a one-hex footprint (no cell with a county-sample majority)", own_only),
-        ("without a population series", no_series),
-        *((f"without growth: {why}", names) for why, names in sorted(no_growth.items())),
-    ):
+    # Metros.
+    town_by_gmina = {}
+    for c in towns:
+        town_by_gmina.setdefault(c["gmina"], c)
+    mfeet = footprints(world, {g["id"]: g["gminas"] for g in groups})
+    metros = []
+    for g in groups:
+        member_towns = [c for c in towns if c["gmina"] in set(g["gminas"])]
+        core = max(member_towns, key=lambda c: c["population"] or 0) if member_towns else None
+        prof = econ.profile(g["gminas"])
+        voivs = {}
+        for gm in g["gminas"]:
+            voivs[gm[:2]] = voivs.get(gm[:2], 0) + (econ.pop.get(gm) or 0)
+        states = [ABBR.get(v, v) for v, _ in sorted(voivs.items(), key=lambda kv: -kv[1])]
+        cells = mfeet.get(g["id"], set()) | ({core["cell"]} if core else set())
+        metros.append({
+            "id": g["id"], "name": g["name"],
+            "full": f"{g['name']} metro area" if g["id"] not in METRO_MERGES else f"{g['name']} metro area ({', '.join(g['fuas'])})",
+            "fuas": g["fuas"], "states": states, "metro": True, "capital": bool(core and core["capital"]),
+            "core": core["id"] if core else None,
+            "cities": [c["id"] for c in member_towns],
+            "x": core["x"] if core else None, "y": core["y"] if core else None,
+            "cell": core["cell"] if core else (min(cells) if cells else None),
+            **prof,
+            "gminas": g["gminas"],
+            "footprint": sorted(cells),
+        })
+    metros.sort(key=lambda m: -(m["population"] or 0))
+    add_ranks(metros)
+
+    # Nation: all gminas as whole powiaty, with the published national figures where GUS has them.
+    nat = econ.profile(units.gminas, powiaty=units.powiaty)
+    head_pop = stats.rows("pl_stats_population", "headline").get("PL") or {}
+    head_lab = stats.rows("pl_stats_labour", "national_headlines").get("PL") or {}
+    gdp_c = stats.rows("pl_gdp", "gdp_country").get("PL") or {}
+    if num(head_pop.get("population")) is not None:
+        nat["population"] = head_pop["population"]
+    if num(gdp_c.get("gdp_pln")) is not None:
+        nat["gdp"] = nat["yields"]["gold"] = round(gdp_c["gdp_pln"])
+        nat["gdp_year"] = econ.years["gdp_nation"]
+        nat["gdp_estimated"] = False
+    if num(head_lab.get("registered_unemployment_rate")) is not None:
+        nat["unemployment"] = round(head_lab["registered_unemployment_rate"] / 100, 4)
+    if num(head_lab.get("average_gross_monthly_wage")) is not None:
+        nat["wage"] = round(head_lab["average_gross_monthly_wage"])
+        nat["wage_exact"] = True
+
+    print(f"    {len(towns)} towns, {len(view)} with a City View, {len(metros)} metros")
+    for label, items in (("placed at their gmina centre (no OSM node)", no_pos),
+                         ("whose point falls in a hex centred on a neighbouring gmina (normal at 5 km hexes)", off_gmina),
+                         ("snapped onto land", snapped), ("moved to a free neighbouring cell", moved),
+                         ("sharing a cell", shared),
+                         ("NUTS 3 subregions shared by workers (no wage)", econ.by_workers_only)):
         if items:
-            print(f"    {len(items)} {label}: {', '.join(items[:8])}{' …' if len(items) > 8 else ''}")
+            print(f"    {len(items)} {label}: {', '.join(items[:8])}{' ...' if len(items) > 8 else ''}")
 
-    nat_rec = acs["geos"].get("0100000US", {})
-    nation = economy(nat_rec, gdp_profile(bea["nation"], bea["year"]))
-    nation["growth"] = growth.nation()
-    nation["growth_years"] = growth.years
-    write_web("cities.json", cities)
-    write_web(
-        "nation.json",
-        {
-            "vintage": acs_payload["vintage"],
-            "year": acs["year"],
-            "gdp_vintage": bea_payload["vintage"],
-            "nation": nation,
-            "yields": YIELDS,
-            "industries": {k: label for k, (_, label) in INDUSTRY_LINES.items()},
-            "gdp_industries": GDP_INDUSTRIES,
-        },
-    )
+    write_web("cities.json", towns)
+    write_web("metros.json", {"version": 1, "rule": METRO_RULE, "ref": METRO_REF,
+                              "vintage": stats.vintage("pl_geo_fua"), "metros": metros})
+    write_web("nation.json", {
+        "vintage": stats.vintage("pl_stats_population") or "GUS",
+        "year": econ.years["population"] or 2025,
+        "gdp_vintage": stats.vintage("pl_gdp"),
+        "years": econ.years,
+        "nation": nat,
+        "yields": YIELDS,
+        "industries": INDUSTRIES,
+    })

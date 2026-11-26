@@ -1,0 +1,53 @@
+{
+ "flood_2024": {
+  "title": "State of natural disaster after the September 2024 flood",
+  "acts": {
+   "DU/2024/1365": {"date": "2024-09-16", "url": "https://api.sejm.gov.pl/eli/acts/DU/2024/1365"},
+   "DU/2024/1380": {"date": "2024-09-17", "url": "https://api.sejm.gov.pl/eli/acts/DU/2024/1380"},
+   "DU/2024/1392": {"date": "2024-09-20", "url": "https://api.sejm.gov.pl/eli/acts/DU/2024/1392"},
+   "DU/2024/1394": {"date": "2024-09-21", "url": "https://api.sejm.gov.pl/eli/acts/DU/2024/1394"},
+   "DU/2024/1412": {"date": "2024-09-25", "url": "https://api.sejm.gov.pl/eli/acts/DU/2024/1412"}
+  },
+  "areas": [
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "kamiennogórski", "phrase": "kamiennogórski", "act": "DU/2024/1365"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "karkonoski", "phrase": "karkonoski", "act": "DU/2024/1365"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "kłodzki", "phrase": "kłodzki", "act": "DU/2024/1365"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "lwówecki", "phrase": "lwówecki", "act": "DU/2024/1365"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "wałbrzyski", "phrase": "wałbrzyski", "act": "DU/2024/1365"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "ząbkowicki", "phrase": "ząbkowicki", "act": "DU/2024/1365"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "Wałbrzych", "phrase": "Wałbrzych", "act": "DU/2024/1365"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "Jelenia Góra", "phrase": "Jelenią Górę", "act": "DU/2024/1365"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "dzierżoniowski", "phrase": "dzierżoniowski", "act": "DU/2024/1380"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "lubański", "phrase": "lubański", "act": "DU/2024/1380"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "świdnicki", "phrase": "świdnicki", "act": "DU/2024/1380"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "bolesławiecki", "phrase": "bolesławiecki", "act": "DU/2024/1392"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "jaworski", "phrase": "jaworski", "act": "DU/2024/1392"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "legnicki", "phrase": "legnicki", "act": "DU/2024/1392"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "złotoryjski", "phrase": "złotoryjski", "act": "DU/2024/1392"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "zgorzelecki", "phrase": "powiat zgorzelecki", "act": "DU/2024/1394"},
+   {"voivodeship": "dolnośląskie", "unit": "gmina", "pkw_powiat": "oławski", "pkw_gmina": "m. Oława", "phrase": "gminę miejską Oława", "act": "DU/2024/1394"},
+   {"voivodeship": "dolnośląskie", "unit": "gmina", "pkw_powiat": "oławski", "pkw_gmina": "gm. Oława", "phrase": "gminę wiejską Oława", "act": "DU/2024/1394"},
+   {"voivodeship": "dolnośląskie", "unit": "gmina", "pkw_powiat": "wrocławski", "pkw_gmina": "gm. Kąty Wrocławskie", "phrase": "gminę Kąty Wrocławskie", "act": "DU/2024/1394"},
+   {"voivodeship": "dolnośląskie", "unit": "gmina", "pkw_powiat": "wrocławski", "pkw_gmina": "gm. Sobótka", "phrase": "gminę Sobótka", "act": "DU/2024/1394"},
+   {"voivodeship": "dolnośląskie", "unit": "powiat", "pkw_powiat": "Legnica", "phrase": "Legnicę", "act": "DU/2024/1412"},
+   {"voivodeship": "dolnośląskie", "unit": "gmina", "pkw_powiat": "wrocławski", "pkw_gmina": "gm. Mietków", "phrase": "gminę Mietków", "act": "DU/2024/1412"},
+   {"voivodeship": "opolskie", "unit": "powiat", "pkw_powiat": "głubczycki", "phrase": "głubczycki", "act": "DU/2024/1365"},
+   {"voivodeship": "opolskie", "unit": "powiat", "pkw_powiat": "nyski", "phrase": "nyski", "act": "DU/2024/1365"},
+   {"voivodeship": "opolskie", "unit": "powiat", "pkw_powiat": "prudnicki", "phrase": "prudnicki", "act": "DU/2024/1365"},
+   {"voivodeship": "opolskie", "unit": "gmina", "pkw_powiat": "krapkowicki", "pkw_gmina": "gm. Strzeleczki", "phrase": "gminę Strzeleczki", "act": "DU/2024/1365"},
+   {"voivodeship": "opolskie", "unit": "powiat", "pkw_powiat": "brzeski", "phrase": "brzeski", "act": "DU/2024/1380"},
+   {"voivodeship": "opolskie", "unit": "powiat", "pkw_powiat": "kędzierzyńsko-kozielski", "phrase": "kędzierzyńsko-kozielski", "act": "DU/2024/1380"},
+   {"voivodeship": "opolskie", "unit": "powiat", "pkw_powiat": "opolski", "phrase": "opolski", "act": "DU/2024/1380"},
+   {"voivodeship": "opolskie", "unit": "powiat", "pkw_powiat": "krapkowicki", "phrase": "powiat krapkowicki w zakresie innym", "act": "DU/2024/1380"},
+   {"voivodeship": "śląskie", "unit": "powiat", "pkw_powiat": "bielski", "phrase": "bielski", "act": "DU/2024/1365"},
+   {"voivodeship": "śląskie", "unit": "powiat", "pkw_powiat": "cieszyński", "phrase": "cieszyński", "act": "DU/2024/1365"},
+   {"voivodeship": "śląskie", "unit": "powiat", "pkw_powiat": "pszczyński", "phrase": "pszczyński", "act": "DU/2024/1365"},
+   {"voivodeship": "śląskie", "unit": "powiat", "pkw_powiat": "raciborski", "phrase": "raciborski", "act": "DU/2024/1365"},
+   {"voivodeship": "śląskie", "unit": "powiat", "pkw_powiat": "Bielsko-Biała", "phrase": "Bielsko-Białą", "act": "DU/2024/1365"},
+   {"voivodeship": "lubuskie", "unit": "gmina", "pkw_powiat": "żagański", "pkw_gmina": "gm. Szprotawa", "phrase": "gminę miejsko-wiejską Szprotawa", "act": "DU/2024/1394"},
+   {"voivodeship": "lubuskie", "unit": "gmina", "pkw_powiat": "żagański", "pkw_gmina": "m. Żagań", "phrase": "miasto Żagań", "act": "DU/2024/1394"},
+   {"voivodeship": "lubuskie", "unit": "gmina_part", "pkw_powiat": "żagański", "pkw_gmina": "gm. Małomice", "phrase": "miasto Małomice", "act": "DU/2024/1394", "note": "the town of Małomice only, not the rural part of the gmina"},
+   {"voivodeship": "lubuskie", "unit": "gmina", "pkw_powiat": "żagański", "pkw_gmina": "gm. Żagań", "phrase": "gminę wiejską Żagań", "act": "DU/2024/1394"}
+  ]
+ }
+}

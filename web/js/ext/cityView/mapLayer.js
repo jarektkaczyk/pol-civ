@@ -1,5 +1,5 @@
-// City View map layer: the metro's glowing border (world space) and, in screen space, the per-hex "tile yields"
-// (estimated residents + dominant land use), labels for the metro's resource sites and the district plaques (the
+// City View map layer: the town's glowing border (world space) and, in screen space, the per-hex "tile yields"
+// (estimated residents + dominant land use), labels for the town's resource sites and the district plaques (the
 // metro's real districts from districts.json, at schematic positions: see model.js placeDistricts). The border sits under the banners; the marks draw over the faded neighbour banners but under the open
 // city's own (see drawMarks). Share images get both (snapshot: true).
 import { drawIcon, hasIcon } from "../../icons.js";
@@ -82,19 +82,19 @@ function tentMark(ctx, x, y, r) {
   ctx.fill();
 }
 
-const clip = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s);
+const clip = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + "\u2026" : s);
 
 const overlaps = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 
 /**
  * createMapLayer(app, {focusRect}) registers the overlays; set(model) shows a city (null: none).
- * focusRect(ctx, cam) → the open city's banner rect on screen (css px) or null: the marks keep out of its way.
+ * focusRect(ctx, cam) -> the open city's banner rect on screen (css px) or null: the marks keep out of its way.
  * Returns {set, focus(cell), landColor(key), dispose(), animates()}.
  */
 // The border glows and marches for a short while after a city opens, then rests on a still frame, so an idle map
-// draws nothing. The pulse period is 2π·520 ms; the animation stops one period plus a little in, where the pulse is
+// draws nothing. The pulse period is 2pi x 520 ms; the animation stops one period plus a little in, where the pulse is
 // 0.6 again (the still / reduced-motion value).
-const ANIM_MS = Math.round(520 * (2 * Math.PI + Math.asin(0.2))); // ≈ 3.37 s
+const ANIM_MS = Math.round(520 * (2 * Math.PI + Math.asin(0.2))); // ~ 3.37 s
 
 export function createMapLayer(app, { focusRect = () => null } = {}) {
   let view = null; // {model, edge, fill}
@@ -120,10 +120,10 @@ export function createMapLayer(app, { focusRect = () => null } = {}) {
       const pulse = t >= 0 ? 0.5 + 0.5 * Math.sin(t / 520) : 0.6;
       ctx.lineJoin = "round";
       ctx.lineCap = "round";
-      // A faint wash of the state colour lifts the metro off the dimmed map.
+      // A faint wash of the voivodeship colour lifts the town off the dimmed map.
       ctx.fillStyle = css(col, 0.07);
       ctx.fill(view.fill);
-      // Glow: wide soft strokes in the state colour, then a crisp bronze-and-colour line.
+      // Glow: wide soft strokes in the voivodeship colour, then a crisp bronze-and-colour line.
       ctx.strokeStyle = css(col, 0.14 + 0.08 * pulse);
       ctx.lineWidth = 16 / s;
       ctx.stroke(view.edge);
@@ -164,7 +164,7 @@ export function createMapLayer(app, { focusRect = () => null } = {}) {
   // The marks: tile-yield pills, district plaques and site labels, laid out together so they keep clear of each
   // other and of the open city's banner. Live, they draw in two passes around the banners (render/banners.js runs
   // between overlay z < 100 and z >= 100): whatever overlaps the open city's banner goes under it (z 8), everything
-  // else over the faded neighbour banners (z 120), so no other city's plate can bury the metro. Share images keep
+  // else over the faded neighbour banners (z 120), so no other city's plate can bury the town. Share images keep
   // a single pass under all banners (they only take overlays below z 100).
   function drawMarks(ctx, cam, pass) {
     if (!view) return;
@@ -175,7 +175,7 @@ export function createMapLayer(app, { focusRect = () => null } = {}) {
     const onScreen = (sx, sy, pad) => sx > -pad && sy > -pad && sx < cam.w + pad && sy < cam.h + pad;
     ctx.textBaseline = "middle";
     const banner = cam === app.cam ? focusRect(ctx, cam) : null; // measured for the live view only
-    // Draw `fn` in this pass? Under the banner → the "under" pass; else the "over" pass; "all" draws both.
+    // Draw `fn` in this pass? Under the banner -> the "under" pass; else the "over" pass; "all" draws both.
     const mine = (rect) => pass === "all" || (pass === "under") === !!(banner && overlaps(rect, banner));
 
     // 2. Districts (real, from districts.json; schematic positions): hex plaques with the industry icon and, nearer, its name and LQ. Their screen
@@ -187,7 +187,7 @@ export function createMapLayer(app, { focusRect = () => null } = {}) {
       let txt = "", tw = 0;
       if (label) {
         ctx.font = `600 ${Math.round(Math.min(11, Math.max(9, r * 0.32)))}px ${SANS}`;
-        txt = `${clip(d.short || "", 18)}${d.lq != null ? ` ×${d.lq.toFixed(1)}` : ""}`;
+        txt = `${clip(d.short || "", 18)}${d.lq != null ? ` \u00d7${d.lq.toFixed(1)}` : ""}`;
         tw = ctx.measureText(txt).width + 10;
       }
       const rect = label
@@ -232,7 +232,7 @@ export function createMapLayer(app, { focusRect = () => null } = {}) {
         if (onScreen(sx, sy, r * 3)) plaque(d, sx, sy - lift, r, label);
       }
       if (m.inCity.length && m.city.cell != null && Rpx >= 22) {
-        // Small metros: the remaining districts in a row across the lower part of the city's hex.
+        // Small towns: the remaining districts in a row across the lower part of the city's hex.
         const [cx, cy] = cam.toScreen(g.cx(m.city.cell), g.cy(m.city.cell));
         const n = m.inCity.length;
         const rMax = Math.max(8, Math.min(15, Rpx * 0.17));
@@ -245,11 +245,11 @@ export function createMapLayer(app, { focusRect = () => null } = {}) {
     const plaqueRects = plaques.map(([d, sx, sy, r, label]) => {
       if (!label) return { x: sx - r, y: sy - r, w: 2 * r, h: 2 * r };
       ctx.font = `600 ${Math.round(Math.min(11, Math.max(9, r * 0.32)))}px ${SANS}`;
-      const tw = ctx.measureText(`${clip(d.short || "", 18)}${d.lq != null ? ` ×${d.lq.toFixed(1)}` : ""}`).width + 10;
+      const tw = ctx.measureText(`${clip(d.short || "", 18)}${d.lq != null ? ` \u00d7${d.lq.toFixed(1)}` : ""}`).width + 10;
       return { x: Math.min(sx - r, sx - tw / 2), y: sy - r, w: Math.max(2 * r, tw), h: r * 0.98 + 7 + r };
     });
 
-    // 1. Tile yields: [people ≈12K | land 41%] under each footprint hex (not the city's own hex: its banner). They
+    // 1. Tile yields: [people ~12K | land 41%] under each footprint hex (not the city's own hex: its banner). They
     //    give way to the plaques and to each other; on phones only the five most populous hexes get one.
     if (Rpx >= 18) {
       const full = Rpx >= 30;
@@ -272,7 +272,7 @@ export function createMapLayer(app, { focusRect = () => null } = {}) {
     for (const q of plaques) drawPlaque(...q);
     obstacles.push(...plaqueRects);
 
-    // 3. Resource sites of the metro: a label per hex (the biggest site, "+N" more). Each label tries a few spots
+    // 3. Resource sites of the town: a label per hex (the biggest site, "+N" more). Each label tries a few spots
     //    around its hex (above, higher, below the yield pill) and takes the first one clear of the plaques, the
     //    city's banner and the labels already placed; with no clear spot the name is left out (the site keeps its
     //    ring, and the Resources list names it). The focused site is placed first and always shown.
@@ -322,7 +322,7 @@ export function createMapLayer(app, { focusRect = () => null } = {}) {
   function pillWidth(ctx, t, full) {
     const h = full ? 16 : 13;
     ctx.font = `600 ${full ? 10 : 9}px ${SANS}`;
-    const resTxt = t.residents != null ? `≈${compact(t.residents)}` : "–";
+    const resTxt = t.residents != null ? `\u2248${compact(t.residents)}` : "\u2013";
     const landTxt = t.land && full ? `${Math.round(t.land.share * 100)}%` : "";
     const ic = h - 4;
     const wRes = ic + 2 + ctx.measureText(resTxt).width;
@@ -334,7 +334,7 @@ export function createMapLayer(app, { focusRect = () => null } = {}) {
     const h = full ? 16 : 13;
     const fs = full ? 10 : 9;
     ctx.font = `600 ${fs}px ${SANS}`;
-    const resTxt = t.residents != null ? `≈${compact(t.residents)}` : "–";
+    const resTxt = t.residents != null ? `\u2248${compact(t.residents)}` : "\u2013";
     const landTxt = t.land && full ? `${Math.round(t.land.share * 100)}%` : "";
     const ic = h - 4;
     const wRes = ic + 2 + ctx.measureText(resTxt).width;

@@ -6,7 +6,7 @@
 //   donut(host, opts)          SVG donut with a centre label
 //   histogram(host, opts)      SVG histogram (linear or log bins) with hoverable bins
 //   smallMultiples(host, opts) a grid of small panels
-//   rampLegend / swatchLegend / sizeLegend → HTML strings
+//   rampLegend / swatchLegend / sizeLegend -> HTML strings
 // Every chart calls opts.onHover(item | null) and opts.onClick(item) and returns {setHot(key), el, ...}.
 import { esc, fin, clamp, scale, ticks, logTicks, rampColor } from "./util.js";
 
@@ -48,7 +48,7 @@ const markHot = (root, key, cls = "hot") => {
 
 /**
  * rows: [{key, label, sub, value, text, color, icon (html), tone: "good"|"bad"}]
- * opts: {diverging, max, onHover(row), onClick(row), selected (key), rank (show 1., 2., …), compact}
+ * opts: {diverging, max, onHover(row), onClick(row), selected (key), rank (show 1., 2., ...), compact}
  */
 export function barList(host, opts) {
   const rows = opts.rows || [];
@@ -62,7 +62,7 @@ export function barList(host, opts) {
     const neg = fin(r.value) && r.value < 0;
     const style = opts.diverging ? `${neg ? "right:50%" : "left:50%"};width:${wv.toFixed(2)}%` : `width:${wv.toFixed(2)}%`;
     const color = r.color ? `background:${esc(r.color)}` : "";
-    return `<button type="button" role="listitem" class="adv-bar${r.key === opts.selected ? " sel" : ""}" data-key="${esc(r.key)}" title="${esc([r.full || r.label, r.sub, r.text].filter(Boolean).join(" · "))}">
+    return `<button type="button" role="listitem" class="adv-bar${r.key === opts.selected ? " sel" : ""}" data-key="${esc(r.key)}" title="${esc([r.full || r.label, r.sub, r.text].filter(Boolean).join(" \u00b7 "))}">
       ${opts.rank ? `<span class="rk">${i + 1}</span>` : ""}${r.icon ? `<span class="ic" aria-hidden="true">${r.icon}</span>` : ""}
       <span class="lb">${esc(r.label)}${r.sub ? ` <span class="sub">${esc(r.sub)}</span>` : ""}</span>
       <span class="vl${r.tone ? " " + r.tone : ""}">${esc(r.text ?? "")}</span>
@@ -126,7 +126,7 @@ export function stackedBars(host, opts) {
 
 // --- share bar -------------------------------------------------------------------------------------------------
 
-/** parts: [{key, label, value, color, text, icon}] → one bar plus a legend. opts: {onHover(part), onClick(part), selected} */
+/** parts: [{key, label, value, color, text, icon}] -> one bar plus a legend. opts: {onHover(part), onClick(part), selected} */
 export function shareBar(host, opts) {
   const parts = (opts.parts || []).filter((p) => fin(p.value) && p.value > 0);
   const tot = parts.reduce((a, p) => a + p.value, 0) || 1;
@@ -224,7 +224,7 @@ export function histogram(host, opts) {
       const fill = opts.colorOf ? opts.colorOf((bn.x0 + bn.x1) / 2, bn.i / (nb - 1)) : color;
       return `<g data-key="${bn.i}" class="bin"><rect class="hit" x="${(m.l + bn.i * bw).toFixed(2)}" y="${m.t}" width="${bw.toFixed(2)}" height="${H - m.t - m.b}"/>
         <rect class="bar" x="${(m.l + bn.i * bw + 0.5).toFixed(2)}" y="${(H - m.b - h).toFixed(2)}" width="${Math.max(0.5, bw - 1).toFixed(2)}" height="${h.toFixed(2)}" fill="${esc(fill)}"/>
-        <title>${esc(`${fmt(bn.x0)} – ${fmt(bn.x1)}: ${bn.count}${opts.unitLabel ? " " + opts.unitLabel : ""}${opts.weighted && opts.weightFmt ? ` (${opts.weightFmt(bn.weight)})` : ""}`)}</title></g>`;
+        <title>${esc(`${fmt(bn.x0)} \u2013 ${fmt(bn.x1)}: ${bn.count}${opts.unitLabel ? " " + opts.unitLabel : ""}${opts.weighted && opts.weightFmt ? ` (${opts.weightFmt(bn.weight)})` : ""}`)}</title></g>`;
     }).join("")}
     <line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b + 0.5}" y2="${H - m.b + 0.5}" class="axis"/>
     ${tk.map((v) => { const px = x(t(v)); return px == null ? "" : `<line x1="${px}" x2="${px}" y1="${H - m.b}" y2="${H - m.b + 4}" class="axis"/><text x="${px}" y="${H - 6}" text-anchor="middle" class="tick">${esc(fmt(v))}</text>`; }).join("")}

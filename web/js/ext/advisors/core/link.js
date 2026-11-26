@@ -29,8 +29,8 @@ export function createLinker(app) {
   };
 
   // --- the hover beacon ------------------------------------------------------------------------------------------
-  // A hovered county can be a handful of pixels across, and a hovered place can sit under the dock. While the
-  // dashboard hovers something, a pulsing gold ring (≥ 10 css px) marks its centre with its name; when the centre is
+  // A hovered gmina can be a handful of pixels across, and a hovered place can sit under the dock. While the
+  // dashboard hovers something, a pulsing gold ring (>= 10 css px) marks its centre with its name; when the centre is
   // outside the free map area, an arrow on the area's edge points to it instead.
   function syncBeacon() {
     const want = hov && !hov.noBeacon && !hovQuiet ? app.highlightBounds?.(last) || pointBox(hov) : null;

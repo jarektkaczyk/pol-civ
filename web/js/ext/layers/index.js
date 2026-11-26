@@ -1,4 +1,4 @@
-// Map-art extension: tile improvements (Interstates and major highways, railroads, ports, airports),
+// Map-art extension: Polish motorways, expressways, railways, ports and airports,
 // military forts and restricted ground, wonders and protected land, and freight trade routes, each as a static layer
 // drawn into the cached map (nothing animates; an idle map draws no frames), with a switch in the "Map" menu.
 //
@@ -11,12 +11,12 @@ import { makeLayers } from "./layers.js";
 import { tips } from "./tips.js";
 
 const TOGGLES = [
-  { id: "roads", label: "Roads", icon: "t-road", def: true, title: "Interstates and major highways (Natural Earth, as map art)", layers: ["roads"] },
-  { id: "rail", label: "Railroads", icon: "t-rail", def: true, title: "Main and secondary rail lines (Natural Earth, as map art)", layers: ["rail"] },
-  { id: "hubs", label: "Ports & airports", icon: "d-harbor", def: true, title: "USACE principal ports by tonnage, FAA primary and cargo airports", layers: ["hubs"] },
-  { id: "military", label: "Military", icon: "m-army", def: true, title: "DoD installations as forts, the largest ranges as restricted ground", layers: ["forts", "restricted", "plates"] },
-  { id: "wonders", label: "Wonders", icon: "w-landmark", def: true, title: "Most-visited parks, top research universities and curated landmarks", layers: ["wonders", "protected", "plates"] },
-  { id: "trade", label: "Trade routes", icon: "t-trade", def: false, title: "The 40 largest freight flows between states (FAF5 estimates)", layers: ["trade"] },
+  { id: "roads", label: "Roads", icon: "t-road", def: true, title: "Motorways and expressways", layers: ["roads"] },
+  { id: "rail", label: "Railways", icon: "t-rail", def: true, title: "Main and secondary railway lines", layers: ["rail"] },
+  { id: "hubs", label: "Ports & airports", icon: "d-harbor", def: true, title: "Polish seaports and passenger airports", layers: ["hubs"] },
+  { id: "military", label: "Military", icon: "m-army", def: true, title: "Garrisons and main training areas", layers: ["forts", "restricted", "plates"] },
+  { id: "wonders", label: "Heritage", icon: "w-landmark", def: true, title: "World Heritage, memorials, parks, universities and landmarks", layers: ["wonders", "protected", "plates"] },
+  { id: "trade", label: "Trade routes", icon: "t-trade", def: false, title: "The 30 largest regional freight flows at least 100 km apart", layers: ["trade"] },
 ];
 
 export function install(app) {

@@ -1,16 +1,15 @@
 // Static map layers for the map art, as factories over a model (model.js) and a switch state, so the app
 // (index.js) and the art gallery (web/dev/gallery.js) draw exactly the same thing.
 //
-//   makeLayers(model, on, {tips}) → [layer, …]   on = {roads, rail, hubs, military, wonders, trade} (booleans, read live)
+//   makeLayers(model, on, {tips}) -> [layer, ...]   on = {roads, rail, hubs, military, wonders, trade} (booleans, read live)
 //
 // z slots (render/map.js Z): roads 55 and rail 56 (above rivers and borders, under city tiles), protected land 57 and
 // restricted ground 58 (hatching on hexes), ports & airports 65, forts 66, wonders 67 (above city tiles, under the fog),
 // name plates 68 (forts and wonders laid out together, clear of city banners and City View district plaques), trade
-// routes 85 (above resources, under state names). Everything is drawn into the cached static map; nothing animates.
+// routes 85 (above resources, under voivodeship names). Everything is drawn into the cached static map; nothing animates.
 import { drawRoads, drawRail, drawPort, drawAirport, drawTradeRoutes, hitRoute, ROAD_MIN_RPX } from "../../render/art/improvements.js";
 import { drawFort, drawRestricted, drawProtected, drawWonder, drawPlaque } from "../../render/art/sites.js";
 import { visibleSites, siteSize, hitSites } from "./model.js";
-import { esc } from "../../format.js";
 
 const inVp = (it, vp, padKm) => it.x > vp.x0 - padKm && it.x < vp.x1 + padKm && it.y > vp.y0 - padKm && it.y < vp.y1 + padKm;
 
@@ -29,13 +28,7 @@ function drawSites(ctx, vp, o, list, paint) {
 
 export function makeLayers(model, on, { tips = {}, app = null } = {}) {
   const m = model;
-  // A site moved off its city tile says so under its tooltip (the numbers are always the true site's).
-  const moved = (it, html) => {
-    if (!html || !it.nudged || typeof html !== "string") return html;
-    const city = m.w.cityByCell.get(it.cell);
-    const where = city ? `${esc(city.name)}'s city hex` : "a city hex";
-    return `${html}<br><span class="muted">Drawn on the next hex so it stays visible; its true location falls in ${where}.</span>`;
-  };
+  const moved = (_it, html) => html;
   const ver = () => `v${m.version}`;
   const grid = () => m.w.grid;
   // While a lens colours the map, roads and rail fade so the data stays readable.

@@ -1,28 +1,43 @@
-// Original advisor emblems: a gilded medallion with a simple glyph, drawn as inline SVG (no external art).
+// Original advisor emblems: a gilded medallion with a simple glyph for each office of the old Commonwealth, drawn as
+// inline SVG (no external art).
 import { esc } from "./util.js";
 
 const GLYPHS = {
-  // lightning bolt over a small derrick-like base
-  energy: `<path d="M35.5 12 20 35h10.5L27 52l17-25H33z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.6" stroke-linejoin="round"/>`,
-  // a classical bank: pediment, four columns, plinth
-  economy: `<path d="M32 13 13 23v3h38v-3z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.4" stroke-linejoin="round"/>
-    <path d="M17 29h5v15h-5zM25.5 29h5v15h-5zM33.5 29h5v15h-5zM42 29h5v15h-5z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.2"/>
-    <path d="M14 46h36v5H14z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.4"/>`,
+  // Zupnik: crossed miner's hammer and iron (salt and coal) over a small lightning bolt (power)
+  energy: `<path d="M19 47 43.5 22.5M45 47 20.5 22.5" stroke="#2a1d08" stroke-width="4.6" stroke-linecap="round"/>
+    <path d="M19 47 43.5 22.5M45 47 20.5 22.5" stroke="#c99a5a" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M49.7 24.2 46.2 27.7 36.3 17.8 39.8 14.3z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M14.3 24.2 17.8 27.7 27.7 17.8 24.2 14.3z" fill="#e9dcb7" stroke="#2a1d08" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M24.2 14.3 20 13l1.2 4.2" fill="#e9dcb7" stroke="#2a1d08" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="M34 33.5 28.5 43h4.2l-2.2 8.5 8.3-11.2h-4.4l3.1-6.8z" fill="#ffe08a" stroke="#2a1d08" stroke-width="1.3" stroke-linejoin="round"/>`,
+  // Podskarbi: an iron-bound treasury chest with a gold lock
+  economy: `<path d="M15 31c0-7.5 7-10.5 17-10.5S49 23.5 49 31z" fill="#e9dcb7" stroke="#2a1d08" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M15 31h34v18H15z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M21.5 21.6V49M42.5 21.6V49" stroke="#2a1d08" stroke-width="4"/><path d="M21.5 21.8V48.6M42.5 21.8V48.6" stroke="#b4872f" stroke-width="2.4"/>
+    <path d="M15 31h34" stroke="#2a1d08" stroke-width="1.4"/>
+    <path d="M28.5 29h7v9.5l-3.5 2.5-3.5-2.5z" fill="#ffe08a" stroke="#2a1d08" stroke-width="1.2" stroke-linejoin="round"/>
+    <circle cx="32" cy="33" r="1.5" fill="#2a1d08"/><path d="M32 33.5v3.4" stroke="#2a1d08" stroke-width="1.2"/>`,
   // two figures, one in front
   people: `<circle cx="24" cy="23" r="6.5" fill="#e9dcb7" stroke="#2a1d08" stroke-width="1.3"/>
     <path d="M12 47c0-8 5-13 12-13s12 5 12 13z" fill="#e9dcb7" stroke="#2a1d08" stroke-width="1.3"/>
     <circle cx="38" cy="26" r="7.5" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.4"/>
     <path d="M24 52c0-9 6-15 14-15s14 6 14 15z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.4"/>`,
-  // a house holding a coin
-  prosperity: `<path d="M32 13 12 31h6v19h28V31h6z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.5" stroke-linejoin="round"/>
-    <circle cx="32" cy="38" r="7.5" fill="#e0b54c" stroke="#2a1d08" stroke-width="1.4"/>
-    <path d="M32 33.5v9M29.6 35.6h3.6a1.6 1.6 0 0 1 0 3.2h-2.4a1.6 1.6 0 0 0 0 3.2h3.6" fill="none" stroke="#2a1d08" stroke-width="1.2" stroke-linecap="round"/>`,
-  // open book with a star above
+  // Ochmistrz: a manor house (dwor) with a hipped roof and a columned porch
+  prosperity: `<path d="M9.5 34 18 23h28l8.5 11z" fill="#b8644a" stroke="#2a1d08" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M18 23h28" stroke="#e08a6a" stroke-width="1.2"/>
+    <path d="M13 34h38v15H13z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.5"/>
+    <path d="M23 34.5 32 26l9 8.5z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M25 35v14M29.7 35v14M34.3 35v14M39 35v14" stroke="#2a1d08" stroke-width="2.6"/><path d="M25 35.5v13M29.7 35.5v13M34.3 35.5v13M39 35.5v13" stroke="#fffaf0" stroke-width="1.3"/>
+    <path d="M15.5 38h4.5v5h-4.5zM44 38h4.5v5H44z" fill="#5a6a7a" stroke="#2a1d08" stroke-width="1"/>
+    <path d="M30.6 42.5h2.8V49h-2.8z" fill="#6a3a1c"/>`,
+  // Rektor: an open book under a sun with an orbiting planet (Copernicus)
   knowledge: `<path d="M32 26c-5-4-12-5-19-4v24c7-1 14 0 19 4 5-4 12-5 19-4V22c-7-1-14 0-19 4z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.5" stroke-linejoin="round"/>
     <path d="M32 26v24" stroke="#2a1d08" stroke-width="1.3"/>
     <path d="M17 29c4-.4 8 .2 11 2M17 34c4-.4 8 .2 11 2M47 29c-4-.4-8 .2-11 2M47 34c-4-.4-8 .2-11 2" stroke="#8a6a2c" stroke-width="1" fill="none"/>
-    <path d="m32 9 1.9 4 4.3.4-3.3 2.8 1 4.2-3.9-2.3-3.9 2.3 1-4.2-3.3-2.8 4.3-.4z" fill="#ffe08a" stroke="#2a1d08" stroke-width=".9"/>`,
-  // mountains, sun and furrowed fields
+    <ellipse cx="32" cy="15.5" rx="10" ry="3.6" fill="none" stroke="#fff4d2" stroke-width="1.2" transform="rotate(-12 32 15.5)"/>
+    <circle cx="32" cy="15.5" r="3.4" fill="#ffe08a" stroke="#2a1d08" stroke-width="1"/>
+    <circle cx="41.6" cy="13.2" r="1.5" fill="#bfe0f2" stroke="#2a1d08" stroke-width=".8"/>`,
+  // Geometra: mountains with snow, sun and furrowed fields
   land: `<circle cx="43" cy="20" r="5" fill="#ffe08a" stroke="#2a1d08" stroke-width="1.2"/>
     <path d="M10 40 24 20l8 11 5-6 15 15z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.5" stroke-linejoin="round"/>
     <path d="m24 20-3.5 5 2.3-.6 1.4 1.8 1.6-2.2z" fill="#dfe8ef"/>
@@ -33,20 +48,28 @@ const GLYPHS = {
     <path d="M32 11 36 28 53 32 36 36 32 53 28 36 11 32 28 28z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.4" stroke-linejoin="round"/>
     <path d="M32 11 36 28 32 32zM53 32 36 36 32 32zM32 53 28 36 32 32zM11 32 28 28 32 32z" fill="#c9a45c"/>
     <circle cx="32" cy="32" r="2.6" fill="#2a1d08"/>`,
-  // a heater shield with a star over two chevrons
-  military: `<path d="M32 11 49 16.5V30c0 11-7.5 18.5-17 23-9.5-4.5-17-12-17-23V16.5z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.6" stroke-linejoin="round"/>
-    <path d="M32 15.5 45 19.6V30c0 8.6-5.6 14.6-13 18.6z" fill="#d9c79a" opacity=".55"/>
-    <path d="m32 18.5 2.1 4.4 4.8.5-3.6 3.2 1 4.7-4.3-2.5-4.3 2.5 1-4.7-3.6-3.2 4.8-.5z" fill="#b4872f" stroke="#2a1d08" stroke-width=".9" stroke-linejoin="round"/>
-    <path d="m22.5 36 9.5 5.5 9.5-5.5M22.5 41.5 32 47l9.5-5.5" fill="none" stroke="#2a1d08" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`,
-  // a merchant's balance with a coin on one pan
-  commerce: `<path d="M32 15v32" stroke="#2a1d08" stroke-width="3.4" stroke-linecap="round"/><path d="M32 15v32" stroke="#fff4d2" stroke-width="1.6" stroke-linecap="round"/>
-    <path d="M15 21h34" stroke="#2a1d08" stroke-width="3.6" stroke-linecap="round"/><path d="M15 21h34" stroke="#fff4d2" stroke-width="1.8" stroke-linecap="round"/>
-    <circle cx="32" cy="14" r="3" fill="#ffe08a" stroke="#2a1d08" stroke-width="1.2"/>
-    <path d="m17 21-5 13M17 21l5 13M47 21l-5 13M47 21l5 13" stroke="#2a1d08" stroke-width="1" fill="none"/>
-    <path d="M10.5 34h13c0 4-3 6-6.5 6s-6.5-2-6.5-6zM40.5 34h13c0 4-3 6-6.5 6s-6.5-2-6.5-6z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.3" stroke-linejoin="round"/>
-    <ellipse cx="17" cy="32.6" rx="3.6" ry="1.6" fill="#e0b54c" stroke="#2a1d08" stroke-width="1"/>
-    <path d="M24 51h16l-2.5-4h-11z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.3" stroke-linejoin="round"/>`,
-  // a laurel wreath around a small flame
+  // Hetman: the bulawa, the hetman's mace of command, with a red-and-white plume
+  military: `<path d="M27 27 46.5 46.5" stroke="#2a1d08" stroke-width="5" stroke-linecap="round"/>
+    <path d="M27 27 46.5 46.5" stroke="#c99a5a" stroke-width="3" stroke-linecap="round"/>
+    <path d="M36 36 40.5 40.5" stroke="#b4872f" stroke-width="3.4"/>
+    <circle cx="47.5" cy="47.5" r="2.6" fill="#ffe08a" stroke="#2a1d08" stroke-width="1.1"/>
+    <circle cx="26.8" cy="26.8" r="2.8" fill="#ffe08a" stroke="#2a1d08" stroke-width="1.1"/>
+    <path d="M22.5 31.5c-6 .5-10-4-9.5-9.5s4-9.5 9.5-9.5 10 4 9.5 9.5-3.5 9-9.5 9.5z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.5"/>
+    <path d="M22.7 12.4c-3.2 5.6-3.2 13.4 0 19M14 21.5c5.6-1.4 11.8-1.4 17.6 0M16 15.5c4.4 2.2 9.8 8 11.8 14" fill="none" stroke="#8a6a2c" stroke-width="1.2"/>
+    <circle cx="18.4" cy="17.6" r="1.4" fill="#e0b54c"/><circle cx="26.8" cy="18" r="1.4" fill="#e0b54c"/><circle cx="18.6" cy="26.4" r="1.4" fill="#e0b54c"/>
+    <path d="M16.6 13c-2-3 0-6.5 2.8-7.5-.4 2.4 1 3.6 2.4 4.4" fill="#f4ecd8" stroke="#2a1d08" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M19.4 11.2c1.6-2.6 4.6-3.2 6.8-2-1.8.8-2.4 2-2.6 3.4" fill="#c8323a" stroke="#2a1d08" stroke-width="1" stroke-linejoin="round"/>`,
+  // Gdansk Merchant: a Hanseatic cog under a square sail with a red band and a pennant
+  commerce: `<path d="M32 12v29" stroke="#2a1d08" stroke-width="2.4"/>
+    <path d="M32 9.5 40 12l-8 2.4z" fill="#c8323a" stroke="#2a1d08" stroke-width=".9" stroke-linejoin="round"/>
+    <path d="M20 16h24c1.4 6 1.4 12 0 18H20c-1.4-6-1.4-12 0-18z" fill="#fff4d2" stroke="#2a1d08" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M19.2 22.5h25.6v4.6H19.2z" fill="#c8323a"/>
+    <path d="M20 16h24c1.4 6 1.4 12 0 18H20c-1.4-6-1.4-12 0-18z" fill="none" stroke="#2a1d08" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M10 38h44l-5.5 10.5h-33z" fill="#c08a4a" stroke="#2a1d08" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M44 38v-4.5h8.5V38M12 38v-3h6.5v3" fill="#d9a868" stroke="#2a1d08" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M13.5 42.5h37" stroke="#7a4a1c" stroke-width="1"/>
+    <path d="M10 52c3 0 3-1.8 6-1.8s3 1.8 6 1.8 3-1.8 6-1.8 3 1.8 6 1.8 3-1.8 6-1.8 3 1.8 6 1.8 3-1.8 6-1.8" fill="none" stroke="#bfe0f2" stroke-width="1.4" stroke-linecap="round"/>`,
+  // Kustosz: a laurel wreath around the key of the treasury
   culture: wreath(),
 };
 
@@ -65,8 +88,9 @@ function wreath() {
   return `<path d="M27.5 49.4A16 16 0 0 1 18.6 24.5M36.5 49.4A16 16 0 0 0 45.4 24.5" fill="none" stroke="#2a1d08" stroke-width="1.4"/>
     ${leaves.join("")}
     <path d="M27 48.5c2 1.6 8 1.6 10 0" fill="none" stroke="#b4872f" stroke-width="2" stroke-linecap="round"/>
-    <path d="M32 19c4.5 5 6.5 9 6.5 13a6.5 6.5 0 0 1-13 0c0-3 1.5-5 3-7 .5 2.5 1.5 3.5 2.5 3.5 0-3.5-.5-6 1-9.5z" fill="#ffe08a" stroke="#2a1d08" stroke-width="1.3" stroke-linejoin="round"/>
-    <path d="M32 29c1.8 2 2.6 3.4 2.6 4.8a2.6 2.6 0 0 1-5.2 0c0-1.4.9-2.9 2.6-4.8z" fill="#e0763a"/>`;
+    <circle cx="32" cy="23.5" r="5" fill="none" stroke="#2a1d08" stroke-width="3.6"/><circle cx="32" cy="23.5" r="5" fill="none" stroke="#ffe08a" stroke-width="2"/>
+    <path d="M32 28.5v15.5" stroke="#2a1d08" stroke-width="3.8" stroke-linecap="round"/><path d="M32 28.8v15" stroke="#ffe08a" stroke-width="2" stroke-linecap="round"/>
+    <path d="M32.6 38.6h4.4v2.4h-2v1.4h2v2.2h-4.4z" fill="#ffe08a" stroke="#2a1d08" stroke-width="1" stroke-linejoin="round"/>`;
 }
 
 /** The medallion SVG for an advisor ({id, color}). */

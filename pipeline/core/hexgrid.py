@@ -2,7 +2,7 @@
 
 Cell (col, row) has its center at  x = W * (col + 0.5 * (row & 1)),  y = H * row
 with W = sqrt(3) * radius and H = 1.5 * radius, in map km (y down).
-web/js/hex.js mirrors this exactly — keep the two in sync.
+web/js/hex.js mirrors this exactly - keep the two in sync.
 """
 
 from __future__ import annotations

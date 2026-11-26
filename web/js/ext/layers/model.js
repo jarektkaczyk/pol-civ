@@ -2,11 +2,11 @@
 // draw, once per data arrival, and decides where each site stands inside its hex so sites never sit on a city tile
 // or on each other.
 //
-//   createModel(w) → model; model.setData(name, data) (re-runs the placement); model.version (bumps on change)
+//   createModel(w) -> model; model.setData(name, data) (re-runs the placement); model.version (bumps on change)
 //   model fields: net, ports, airports, installations, ranges (cell sets), parks (cell sets), wonders, routes, data
-//   each site item: {kind, data, cell, x, y (km, where it is drawn), size(Rpx) → css px, minRpx, prio}
-//   visibleSites(model, layerId, Rpx) → items drawn at this zoom (decluttered, cached per zoom bucket)
-//   wonderMotif(wonder) → the sprite motif for a wonders.json row (WONDER_MOTIF_BY_ID, else a generic one by kind)
+//   each site item: {kind, data, cell, x, y (km, where it is drawn), size(Rpx) -> css px, minRpx, prio}
+//   visibleSites(model, layerId, Rpx) -> items drawn at this zoom (decluttered, cached per zoom bucket)
+//   wonderMotif(wonder) -> the sprite motif for a wonders.json row (WONDER_MOTIF_BY_ID, else a generic one by kind)
 //
 // Sites whose true hex is a city tile (or a big metro's spill tile, or the hexes its banner covers) are drawn on the
 // nearest free hex one ring out, leaning toward their true point; item.cell stays the true hex and item.drawCell is
@@ -18,24 +18,20 @@ import { metroSpill } from "../../render/art/city.js";
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 /**
- * What each wonder looks like, by wonders.json id: the motif names a sprite in render/art/sites.js WONDER_MOTIFS.
- * Picked by hand from what the site is (a canyon, a forest, a statue, …); ids not listed get a generic motif for
+ * What each mapped place looks like, by wonders.json id: the motif names a sprite in render/art/sites.js WONDER_MOTIFS.
+ * Picked by hand from what the site is (a canyon, a forest, a statue, ...); ids not listed get a generic motif for
  * their kind (see sites.js drawWonder).
  */
 export const WONDER_MOTIF_BY_ID = {
-  // national parks and park units
-  "nps-GRCA": "canyon", "nps-ZION": "canyon",
-  "nps-ROMO": "peak", "nps-GLAC": "peak", "nps-GRTE": "peak", "nps-YOSE": "peak",
-  "nps-GRSM": "forest", "nps-OLYM": "forest", "nps-ACAD": "forest", "nps-CUVA": "forest", "nps-INDU": "forest",
-  "nps-JOTR": "desert",
-  "nps-YELL": "geyser", "nps-HOSP": "geyser",
-  "nps-JEFF": "arch", "nps-MALL": "obelisk",
-  "nps-GOGA": "bridge", "nps-GATE": "coast", "nps-GUIS": "coast",
-  "nps-LAKE": "dam",
-  // landmarks
-  "nps-STLI": "statue", "nhl-66000808": "mission", "nhl-84003872": "gantry", "nhl-66000899": "mound",
-  "nhl-66000496": "adobe", "nhl-87002652": "ballpark", "nps-INDE": "brickhall", "nhl-66000826": "rotunda",
-  "nps-MORU": "carved", "nhl-66000377": "quarter", "nps-WRBR": "flight", "nps-GOSP": "spike",
+  "whc_29": "quarter", "whc_30": "quarter", "whc_31": "remembrance", "whc_32": "saltmine",
+  "whc_33": "bison", "whc_564": "quarter", "whc_835": "quarter", "whc_847": "castle",
+  "whc_905": "woodchurch", "whc_1053": "woodchurch", "whc_1054": "woodchurch", "whc_1127": "forest",
+  "whc_1133": "forest", "whc_1165": "rotunda", "whc_1424": "woodchurch", "whc_1539": "headframe",
+  "whc_1599": "mound", "whc_1715": "cranes",
+  "np_tatrzanski": "peak", "np_karkonoski": "peak", "np_kampinoski": "forest",
+  "np_gor_stolowych": "peak", "np_pieninski": "peak", "np_wolinski": "coast",
+  "landmark-varso-tower": "spire", "landmark-busiest-seaport": "cranes",
+  "landmark-largest-power-station": "gantry", "landmark-busiest-airport": "flight",
 };
 const UNI_MOTIFS = ["hall", "redhall", "spire"];
 
@@ -216,13 +212,13 @@ function place(m) {
   const all = [...m.wonders, ...m.installations, ...m.ports, ...m.airports].sort((a, b) => a.prio - b.prio);
   const res = m.w.resources?.byCell;
   const blocked = blockedCells(m.w);
-  const load = new Map(); // drawCell → sites so far
+  const load = new Map(); // drawCell -> sites so far
   for (const it of all) {
     it.drawCell = chooseCell(m, it, blocked, load);
     it.nudged = it.drawCell !== it.cell;
     load.set(it.drawCell, (load.get(it.drawCell) || 0) + 1);
   }
-  const taken = new Map(); // drawCell → Set(slot index; -1 = centre)
+  const taken = new Map(); // drawCell -> Set(slot index; -1 = centre)
   for (const it of all) {
     const cell = it.drawCell;
     // sites sharing a hex are drawn smaller so each keeps its own slot

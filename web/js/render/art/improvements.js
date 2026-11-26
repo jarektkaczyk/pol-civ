@@ -1,4 +1,4 @@
-// Tile improvements: roads, railroads, ports, airports and freight "trade routes", drawn in code as strategy-map art.
+// Tile improvements: roads, railways, ports, airports and freight routes, drawn in code as strategy-map art.
 //
 // Everything here is drawn into the CACHED static map (see ext/layers/, which registers the layers), never per frame:
 //   * Roads and rail come from infrastructure.json as links between neighbouring hex centres. prepareNetwork() turns
@@ -6,18 +6,18 @@
 //     a road with exactly two links of its class is a smooth quadratic curve through the centre, so a run of links
 //     reads as one winding road rather than a zigzag; junctions and dead ends are straight spokes. Rail sharing a link
 //     with a road is shifted to one side so the two read as parallel lines.
-//   * Ports and airports are small painted glyphs (sprites, sized in css px by zoom and by rank / hub class).
+//   * Ports and airports are small painted glyphs, sized in css px by zoom and national rank.
 //   * Trade routes are dashed caravan arcs between the two anchor cities (the ends of trade.json `path`), weighted by
-//     value and coloured by the dominant mode, with a cart / boat / barrel marker at the middle. Static: no animation.
+//     tonnage and coloured by the transport mode, with a marker at the middle. Static: no animation.
 //
 // Exports
-//   prepareNetwork(w, infra) → net                     once per data load
+//   prepareNetwork(w, infra) -> net                     once per data load
 //   drawRoads(ctx, net, vp, o) / drawRail(ctx, net, vp, o)   world transform (km), o = the static-layer options
 //   ROAD_MIN_RPX, MAJOR_MIN_RPX, RAIL2_MIN_RPX           zoom thresholds (hex radius in css px)
 //   portTier(port), drawPort(ctx, x, y, sizeKm, opts), drawAirport(ctx, x, y, sizeKm, opts)   (any transform)
-//   prepareRoutes(w, trade) → routes; drawTradeRoutes(ctx, routes, vp, o); hitRoute(routes, x, y, Rpx, s)
-//   MODE_STYLE                                          per FAF mode: colour, dash, marker kind, label
-//   routeArc(grid, cellA, cellB, bow) → arc               the trade-route arc geometry (for advisors drawing the same)
+//   prepareRoutes(w, trade) -> routes; drawTradeRoutes(ctx, routes, vp, o); hitRoute(routes, x, y, Rpx, s)
+//   MODE_STYLE                                          per freight mode: colour, dash, marker kind, label
+//   routeArc(grid, cellA, cellB, bow) -> arc               the trade-route arc geometry (for advisors drawing the same)
 //   drawTradeMarker(ctx, kind, x, y, sizePx)              the medallion marker (screen units)
 import { bucketPx, deviceScale, getSprite, drawSprite } from "./sprites.js";
 
@@ -26,8 +26,8 @@ const TILE_KM = 300;
 const DIR_COS = [0, 1, 2, 3, 4, 5].map((d) => Math.cos((d * Math.PI) / 3));
 const DIR_SIN = [0, 1, 2, 3, 4, 5].map((d) => Math.sin((d * Math.PI) / 3));
 
-export const ROAD_MIN_RPX = 10; // Interstates and main-line rail from the region view ("mid") in
-export const MAJOR_MIN_RPX = 18; // major highways and secondary rail once hexes are big enough to read them
+export const ROAD_MIN_RPX = 10; // motorways and main-line rail from the region view in
+export const MAJOR_MIN_RPX = 18; // expressways and secondary rail once hexes are big enough to read them
 export const RAIL2_MIN_RPX = 18;
 const DETAIL_RPX = 30; // cobbles, centre dashes, sleepers
 
@@ -42,13 +42,13 @@ function dirTo(grid, a, b) {
 /**
  * Build Path2D pieces for a list of links ([a, b, cls, ...]).
  * classes: the class values in drawing order; each tile gets one Path2D per class.
- * offsetOf(a, b) → km to shift the link sideways (0 = on the centre line). The shift goes to one fixed physical side
+ * offsetOf(a, b) -> km to shift the link sideways (0 = on the centre line). The shift goes to one fixed physical side
  * of the line (below it, leaning right), so it is the same seen from either end and a run of links never swaps sides.
  */
 function buildPieces(w, links, classes, offsetOf = null) {
   const { grid } = w;
   const R = grid.R;
-  const byCell = new Map(); // cell → [{d, cls, vx, vy}]
+  const byCell = new Map(); // cell -> [{d, cls, vx, vy}]
   const add = (i, d, cls, vx, vy) => {
     let l = byCell.get(i);
     if (!l) byCell.set(i, (l = []));
@@ -63,7 +63,7 @@ function buildPieces(w, links, classes, offsetOf = null) {
     add(a, d, cls, off * px, off * py);
     add(b, (d + 3) % 6, cls, off * px, off * py);
   }
-  const tiles = new Map(); // "tx,ty" → {x0, y0, x1, y1, paths: {cls: Path2D}}
+  const tiles = new Map(); // "tx,ty" -> {x0, y0, x1, y1, paths: {cls: Path2D}}
   for (const [i, list] of byCell) {
     const cx = grid.cx(i), cy = grid.cy(i);
     const key = `${Math.floor(cx / TILE_KM)},${Math.floor(cy / TILE_KM)}`;
@@ -93,13 +93,13 @@ function buildPieces(w, links, classes, offsetOf = null) {
 }
 
 /**
- * infrastructure.json → {roads: tiles, rail: tiles, roadLinks: Set, ports, airports, counts}.
- * Road classes: 0 Interstate, 1 major highway. Rail tiers: 0 main, 1 secondary.
+ * infrastructure.json -> {roads: tiles, rail: tiles, roadLinks: Set, ports, airports, counts}.
+ * Road classes: 0 motorway, 1 expressway or other major road. Rail tiers: 0 main, 1 secondary.
  */
 export function prepareNetwork(w, infra) {
   const roads = Array.isArray(infra?.roads) ? infra.roads : [];
   const rail = Array.isArray(infra?.rail) ? infra.rail : [];
-  const roadLinks = new Map(); // "a,b" → class
+  const roadLinks = new Map(); // "a,b" -> class
   for (const [a, b, cls] of roads) roadLinks.set(a < b ? `${a},${b}` : `${b},${a}`, cls);
   const R = w.grid.R;
   // Rail on a road link runs alongside it (a fifth of a hex to the side); elsewhere on the centre line.
@@ -132,7 +132,7 @@ export function roadWidths(Rpx) {
   return { inter: clamp(Rpx * 0.095, 1.7, 9), major: clamp(Rpx * 0.06, 1.1, 5.5) };
 }
 
-/** Paved Interstates (stone kerbs, pale paving, cobble joints when close) and dirt-track major highways. */
+/** Paved motorways and expressways, with stone kerbs and centre details when close. */
 export function drawRoads(ctx, net, vp, o) {
   if (!net || o.Rpx < ROAD_MIN_RPX) return;
   const s = vp.s, Rpx = o.Rpx;
@@ -144,23 +144,23 @@ export function drawRoads(ctx, net, vp, o) {
   ctx.lineJoin = "round";
   const a0 = ctx.globalAlpha;
   ctx.globalAlpha = a0 * fade;
-  // Major highways: a packed-earth track with a darker rut edge.
+  // Expressways: narrower paving with a darker edge.
   if (Rpx >= MAJOR_MIN_RPX) {
-    ctx.strokeStyle = "rgba(74,56,34,.55)";
+    ctx.strokeStyle = "rgba(52,40,26,.75)";
     ctx.lineWidth = (major + 1.4) / s;
     strokeAll(ctx, tiles, 1);
-    ctx.strokeStyle = "#c9ab78";
+    ctx.strokeStyle = "#d1bc91";
     ctx.lineWidth = major / s;
     strokeAll(ctx, tiles, 1);
     if (Rpx >= DETAIL_RPX) {
-      ctx.strokeStyle = "rgba(120,92,56,.45)";
+      ctx.strokeStyle = "rgba(246,236,210,.75)";
       ctx.lineWidth = Math.max(0.6, major * 0.18) / s;
       ctx.setLineDash([major * 0.9 / s, major * 1.6 / s]);
       strokeAll(ctx, tiles, 1);
       ctx.setLineDash([]);
     }
   }
-  // Interstates: dark stone kerb, pale paving, then (close) a cobble rhythm and a faint crown line.
+  // Motorways: dark stone kerb, pale paving, then close centre detail.
   ctx.strokeStyle = "rgba(52,40,26,.8)";
   ctx.lineWidth = (inter + 2.2) / s;
   strokeAll(ctx, tiles, 0);
@@ -255,15 +255,15 @@ function inkStroke(g, upx, wPx = 1.1, col = "rgba(28,20,10,.9)") {
 
 // --- ports ----------------------------------------------------------------------------------------------------------
 
-/** 0: 100M+ short tons, 1: 25–100M, 2: under 25M (the research's tonnage tiers). */
+/** 0: 50M+ tonnes, 1: 10M to 50M tonnes, 2: under 10M tonnes. */
 export function portTier(p) {
-  const t = p?.tons;
-  return t == null ? 2 : t >= 1e8 ? 0 : t >= 2.5e7 ? 1 : 2;
+  const t = p?.cargo_kt;
+  return t == null ? 2 : t >= 50000 ? 0 : t >= 10000 ? 1 : 2;
 }
 
 /**
  * A harbour: timber quay on the water line, a gantry crane (big ports) or a derrick (small ones), and containers
- * for coastal ports or a coal barge for Great Lakes / river ports. Painted upright; size = glyph width (user units).
+ * for seaports or a coal barge for inland ports. Painted upright; size = glyph width in user units.
  */
 export function drawPort(ctx, x, y, size, { tier = 1, type = "coastal" } = {}) {
   const river = type === "inland" || type === "great_lakes";
@@ -365,9 +365,13 @@ function paintPort(g, upx, tier, river) {
 
 // --- airports -------------------------------------------------------------------------------------------------------
 
-const HUB_ORDER = { L: 0, M: 1, S: 2, N: 3 };
-/** 0 large hub … 3 nonhub, 4 cargo-only (no FAA hub class). */
-export const airportTier = (a) => (a?.hub && HUB_ORDER[a.hub] != null ? HUB_ORDER[a.hub] : 4);
+/** Airport tier by national passenger rank. Planned airports use the smallest current glyph. */
+export const airportTier = (a) => {
+  if (a?.rank <= 2) return 0;
+  if (a?.rank <= 5) return 1;
+  if (a?.rank <= 10) return 2;
+  return a?.passengers != null ? 3 : 4;
+};
 
 /**
  * An airfield: a diagonal runway with threshold bars and centre dashes, a terminal and tower for hubs, a hangar for
@@ -480,7 +484,7 @@ function paintAirport(g, upx, tier) {
 
 // --- trade routes ---------------------------------------------------------------------------------------------------
 
-/** Per FAF mode: line colour (saturated, to read on any terrain over a parchment halo), dash pattern (in line widths;
+/** Per freight mode: line colour, dash pattern in line widths,
  * null = solid), marker kind and a label. */
 export const MODE_STYLE = {
   truck: { color: "#ee8a1e", dash: [2.4, 1.1], marker: "cart", label: "Truck" },
@@ -497,13 +501,13 @@ export const TOP_ROUTES = 10; // drawn wider and fully opaque; the rest thinner 
 /**
  * The arc between two hexes as the map draws it (world km): a quadratic curve from the west end, bowing by `bow`
  * (a signed fraction of the chord; positive = north). Exported so an advisor can draw the same geometry.
- *   routeArc(grid, cellA, cellB, bow) → {pts: Float64Array [x,y,…], path: Path2D, ends: [ax, ay, bx, by], len, bbox}
+ *   routeArc(grid, cellA, cellB, bow) -> {pts: Float64Array [x,y,...], path: Path2D, ends: [ax, ay, bx, by], len, bbox}
  */
 export function routeArc(grid, ca, cb, bow = 0.16) {
   let ax = grid.cx(ca), ay = grid.cy(ca), bx = grid.cx(cb), by = grid.cy(cb);
   if (bx < ax) [ax, ay, bx, by] = [bx, by, ax, ay];
   const dx = bx - ax, dy = by - ay, d = Math.hypot(dx, dy) || 1;
-  const nx = dy / d, ny = -dx / d; // left of west→east: up on the map
+  const nx = dy / d, ny = -dx / d; // left of west->east: up on the map
   const qx = (ax + bx) / 2 + nx * bow * d, qy = (ay + by) / 2 + ny * bow * d;
   const N = 32;
   const pts = new Float64Array((N + 1) * 2);
@@ -525,18 +529,18 @@ export function routeArc(grid, ca, cb, bow = 0.16) {
 }
 
 /**
- * trade.json → [{route, a, b, pts: Float64Array [x,y,…] (a sampled arc), path, ends, len, bbox, weight, top, bow, style}],
+ * trade.json -> [{route, a, b, pts: Float64Array [x,y,...] (a sampled arc), path, ends, len, bbox, weight, top, bow, style}],
  * biggest first. Each route is drawn as a gentle arc between its two anchor cities (the ends of trade.json `path`),
- * like a caravan route on a strategy map: arcs keep the 40 routes legible where a road-following drawing would bundle
- * them along the same Interstates. Routes that share an anchor fan out (alternating sides, growing bow by rank) so
- * they leave it as a spray rather than a single wedge. Neither form is data: FAF assigns no route.
+ * like a caravan route on a strategy map. Arcs keep the 30 routes legible. Routes that share an anchor fan out by
+ * rank so they leave it as a spray rather than a single wedge. The arc shape is illustrative.
  */
 export function prepareRoutes(w, trade) {
   const { grid } = w;
   const zones = new Map((trade?.zones || []).map((z) => [z.id, z]));
-  const list = [...(trade?.routes || [])].sort((p, q) => (q.value_musd || 0) - (p.value_musd || 0));
-  const vmax = Math.max(1, ...list.map((r) => r.value_musd || 0));
-  const seen = new Map(); // anchor cell → routes so far
+  const valueOf = (r) => r.value_kt ?? r.tons_k ?? 0;
+  const list = [...(trade?.routes || [])].sort((p, q) => valueOf(q) - valueOf(p));
+  const vmax = Math.max(1, ...list.map(valueOf));
+  const seen = new Map(); // anchor cell -> routes so far
   const routes = [];
   for (const r of list) {
     const za = zones.get(r.a), zb = zones.get(r.b);
@@ -551,7 +555,7 @@ export function prepareRoutes(w, trade) {
     const arc = routeArc(grid, ca, cb, bow);
     routes.push({
       route: r, a: za || null, b: zb || null, ...arc, bow,
-      weight: Math.sqrt((r.value_musd || 0) / vmax), top: routes.length < TOP_ROUTES,
+      weight: Math.sqrt(valueOf(r) / vmax), top: routes.length < TOP_ROUTES,
       style: MODE_STYLE[r.top_mode] || MODE_STYLE.other,
     });
   }

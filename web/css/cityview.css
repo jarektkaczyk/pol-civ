@@ -1,5 +1,5 @@
 /* City View (web/js/ext/cityView): the city screen dock, the map legend and the quick panel's "Open City View"
-   button. Uses the palette in style.css (--gold, --gold-bright, --ink, --panel, --serif …). --sc = state colour. */
+   button. Uses the palette in style.css (--gold, --gold-bright, --ink, --panel, --serif ...). --sc = state colour. */
 
 /* ---------- "Open City View" on the quick city panel ---------- */
 .cv-open {
@@ -23,7 +23,7 @@
 /* ---------- the dock ---------- */
 .app-dock.cv-dock {
   padding: 0 0 14px; scroll-padding-top: 46px;
-  background: radial-gradient(120% 60% at 50% 0%, rgba(42,66,92,.55), transparent 70%), linear-gradient(180deg, var(--panel-2), var(--panel));
+  background: radial-gradient(120% 60% at 50% 0%, rgba(38,62,86,.55), transparent 70%), linear-gradient(180deg, var(--panel-2), var(--panel));
   border-left: 2px solid #8a6d34;
   box-shadow: -2px 0 0 #120d06, -10px 0 30px rgba(0,0,0,.5), inset 1px 0 0 rgba(255,235,190,.1);
 }
@@ -37,7 +37,7 @@
   box-shadow: inset -1px 0 0 rgba(0,0,0,.45), 1px 0 0 rgba(232,199,122,.35);
 }
 .cv-close { position: absolute; top: 12px; right: 12px; width: 30px; height: 30px; }
-.cv-kind { font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--gold); }
+.cv-kind { font: italic 13px var(--serif); color: var(--gold); }
 .cv-title { display: flex; align-items: center; gap: 12px; margin-top: 6px; padding-right: 30px; }
 .cv-crest {
   flex: none; width: 54px; height: 60px; display: grid; place-items: center; position: relative;
@@ -252,8 +252,8 @@
 .cv-fig canvas { display: block; width: 100%; height: 100%; filter: drop-shadow(0 1px 0 rgba(0,0,0,.6)); }
 .cv-fig:focus-visible { outline: 1.5px solid var(--gold-bright); outline-offset: 1px; }
 .cv-fig.up::after, .cv-fig.down::after { position: absolute; left: 50%; top: -3px; transform: translateX(-50%); font-size: 7px; line-height: 1; text-shadow: 0 0 2px #000, 0 0 3px #000; }
-.cv-fig.up::after { content: "▲"; color: #9be88f; }
-.cv-fig.down::after { content: "▼"; color: #ff9a8a; }
+.cv-fig.up::after { content: "\25B2"; color: #9be88f; }
+.cv-fig.down::after { content: "\25BC"; color: #ff9a8a; }
 .cv-cz-row.focus .cv-fig:not(.lit) { opacity: .32; filter: grayscale(.7); }
 .cv-cz-row.focus .cv-fig.lit { transform: translateY(-2px); }
 .cv-cz-us { display: flex; align-items: center; gap: 5px; max-width: calc(var(--n, 10) * 24px); margin-top: 3px; font-size: 8.5px; letter-spacing: .1em; color: var(--ink-dim); }

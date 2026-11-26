@@ -11,7 +11,7 @@ FIXTURE = Path(__file__).parent / "fixtures" / "hex_cases.json"
 
 
 class HexGridTest(unittest.TestCase):
-    grid = HexGrid(25.0, 117, 90)  # the production map size
+    grid = HexGrid(5.0, 82, 94)  # the production map size (Poland, 5 km hexes)
 
     def test_center_roundtrip(self):
         g = self.grid
@@ -55,8 +55,8 @@ class HexGridTest(unittest.TestCase):
 
     def test_js_rounding_on_ties(self):
         """Exact .5 ties round up like JS Math.round, not to even like Python's round()."""
-        g = HexGrid(25.0, 12, 9)
-        x, y = -math.sqrt(3) * 25 / 2, 75.0  # the left edge of cell (0, 2): round() would say "outside"
+        g = HexGrid(5.0, 12, 9)
+        x, y = -math.sqrt(3) * 5 / 2, 15.0  # the left edge of cell (0, 2): round() would say "outside"
         self.assertEqual(g.cell_at(x, y), g.index(0, 2))
 
     def test_golden_fixture(self):

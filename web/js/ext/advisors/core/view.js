@@ -14,7 +14,7 @@ export function section(parent, { title, note = "", kicker = "", cls = "", open 
   return s.querySelector(".adv-sec-body");
 }
 
-/** Headline tiles: [{label, value, sub, color}] → html */
+/** Headline tiles: [{label, value, sub, color}] -> html */
 export function tiles(items) {
   return `<div class="adv-tiles">${items.map((t) => `<div class="adv-tile"${t.color ? ` style="--tc:${esc(t.color)}"` : ""}>
     <span class="k">${esc(t.label)}</span><b title="${esc(t.value)}">${esc(t.value)}</b>${t.sub ? `<span class="s" title="${esc(t.sub)}">${esc(t.sub)}</span>` : ""}</div>`).join("")}</div>`;
@@ -58,7 +58,7 @@ export function selectBox(parent, { options, value, onChange, label = "", cls = 
   return { el: wrap, select: s, set(v) { s.value = v; }, get value() { return s.value; } };
 }
 
-/** Checkbox chips. items: [{key, label, color, icon (html), on, count}] → onChange(Set of on keys) */
+/** Checkbox chips. items: [{key, label, color, icon (html), on, count}] -> onChange(Set of on keys) */
 export function chips(parent, { items, onChange, label = "" }) {
   const g = el("div", "adv-chips");
   g.setAttribute("role", "group");
@@ -97,7 +97,7 @@ export function lensButton(app, lensId, label) {
   const sync = () => {
     const on = app.state.lens?.id === lensId;
     b.setAttribute("aria-pressed", String(on));
-    b.innerHTML = `${icon(lens.icon || "layers", lens.emoji || "🗺️", { size: 14 })}<span>${esc(on ? `Showing ${lens.name} lens` : label || `Show ${lens.name} lens on map`)}</span>`;
+    b.innerHTML = `${icon(lens.icon || "layers", lens.emoji || "\u{1f5fa}\ufe0f", { size: 14 })}<span>${esc(on ? `Showing ${lens.name} lens` : label || `Show ${lens.name} lens on map`)}</span>`;
   };
   sync();
   b.addEventListener("click", () => {
@@ -115,7 +115,7 @@ export function lensButton(app, lensId, label) {
  */
 export function mapPicker(ctx, parent, { options, value, label = "Map" }) {
   const row = el("div", "adv-mappick");
-  row.innerHTML = `<span class="k">${icon("layers", "▤", { size: 13 })}${esc(label)}</span>`;
+  row.innerHTML = `<span class="k">${icon("layers", "\u25a4", { size: 13 })}${esc(label)}</span>`;
   const resolve = (o) => {
     const r = o?.lens ? o.lens() : null;
     return typeof r === "string" ? ctx.app.lensById?.get(r) || null : r || null;
@@ -153,7 +153,7 @@ export function sourcesHtml(data, ids, caveats = []) {
   return `<footer class="adv-sources">
     ${caveats.length ? `<h4>Read with care</h4><ul class="adv-caveats">${caveats.map((c) => `<li>${c}</li>`).join("")}</ul>` : ""}
     <h4>Sources</h4>
-    <ul>${list.map((s) => `<li><b>${esc(s.title)}</b>, ${esc(s.publisher || "")}${s.vintage ? ` <span class="v">${esc(s.vintage)}</span>` : ""}</li>`).join("")}</ul>
+    <ul>${list.map((s) => `<li><b>${esc(s.title)}</b>, ${esc(s.publisher || "")}${s.vintage ? ` <span class="v" style="white-space:normal">${esc(s.vintage)}</span>` : ""}</li>`).join("")}</ul>
     <button type="button" class="adv-link" data-pedia="Sources">All sources, files and checksums in the Almanac</button>
   </footer>`;
 }

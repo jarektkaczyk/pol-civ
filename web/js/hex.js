@@ -1,5 +1,5 @@
 // Pointy-top hex grid, "odd-r" offset layout, map km with y down.
-// Mirrors pipeline/core/hexgrid.py – keep the two in sync.
+// Mirrors pipeline/core/hexgrid.py - keep the two in sync.
 
 export const SQRT3 = Math.sqrt(3);
 

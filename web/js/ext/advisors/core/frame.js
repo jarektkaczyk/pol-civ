@@ -3,8 +3,8 @@
 // The advisors' dock covers the left ~460 px of the map (the bottom 55% on phones). These helpers work out the part
 // of the screen that is really free (whether or not app.visibleArea() already accounts for docks) and fit world
 // boxes into it:
-//   mapArea(app)                  → {x0, y0, x1, y1} css px of map not under the top bar, docks or a sheet
-//   landBox(app)                  → km bbox of the lower 48 (cached)
+//   mapArea(app)                  -> {x0, y0, x1, y1} css px of map not under the top bar, docks or a sheet
+//   landBox(app)                  -> km bbox of the country (cached)
 //   frameBox(app, box, opts)      fly so the km box fits the free area (opts: pad, maxScale, ms)
 //   frameNation(app)              the whole country beside the dock
 //   focusPoint(app, x, y, scale)  centre a km point in the free area

@@ -21,8 +21,12 @@
 //     drawShore(ctx, w, cells, {s, Rpx, lod, lens})  AFTER the land tiles: the smoothed shoreline (Chaikin through
 //                                               the hex-edge midpoints), shallows, foam, sand and surf; world transform
 //     drawRivers(ctx, w, {s, Rpx, lod, lens})   world.json rivers, tapered from source to mouth; world transform.
-//                                               Runs a queued drawShore first. map.js draws it after the land and
-//                                               the terrain glyphs, with the borders, clipped to the world.
+//                                               Runs a queued drawShore first, then drawOutlines. map.js draws it
+//                                               after the land and the terrain glyphs, with the borders, clipped to
+//                                               the world.
+//     drawOutlines(ctx, w, {s, Rpx, lod, lens}) world.json lakes (inland water smaller than a hex: the lake
+//                                               districts) and spits (land narrower than a hex in sea hexes: Hel,
+//                                               the Vistula Spit), as smoothed outlines over the hexes.
 //     shoreRegions(w) → {water, land}          the smoothed regions (Path2D, even-odd), for clipping other layers
 //
 // LOD: far = colour, texture, smoothed shore, shallows and foam; mid adds the river centre line; near adds wave
@@ -721,6 +725,7 @@ export const drawCoastFoam = (ctx, w, opts = {}) => drawShore(ctx, w, opts.cells
 // Each river is drawn as a filled ribbon whose width grows from source to mouth (the end that lies lower, or in
 // water), over a darker bank ribbon, with a lighter centre line on top. Rivers outside the canvas are skipped.
 
+const RIVER_S0 = 1.2;
 const riverCache = new WeakMap(); // rivers array -> prepared [{pts (source → mouth), cum, len, bbox, rank}]
 
 function prepRivers(w) {
@@ -739,9 +744,11 @@ function prepRivers(w) {
     let p = rv.pts;
     if (!p || p.length < 4) continue;
     const n = p.length;
-    // pts run in either direction in world.json; make them run source → mouth.
+    // pts run source -> mouth when the file gives the discharge at both ends (dis0_m3s, dis_m3s); otherwise they may
+    // run either way: make them run source -> mouth by height.
+    const hasDis = rv.dis0_m3s != null && rv.dis_m3s != null;
     const h0 = height(p[0], p[1]), h1 = height(p[n - 2], p[n - 1]);
-    if (h0 != null && h1 != null && h0 < h1) {
+    if (!hasDis && h0 != null && h1 != null && h0 < h1) {
       const q = [];
       for (let k = n - 2; k >= 0; k -= 2) q.push(p[k], p[k + 1]);
       p = q;
@@ -753,7 +760,11 @@ function prepRivers(w) {
       x0 = Math.min(x0, p[k]); x1 = Math.max(x1, p[k]);
       y0 = Math.min(y0, p[k + 1]); y1 = Math.max(y1, p[k + 1]);
     }
-    prep.push({ pts: p, cum, len: cum[cum.length - 1], bbox: [x0, y0, x1, y1], rank: rv.rank });
+    // Rank as a continuous number at each end (1 = largest), from the discharge: 9 - 2.6 log10(m3/s), the same
+    // formula the pipeline uses for `rank`.
+    const rankOf = (q) => Math.max(1, Math.min(9.5, 9 - 2.6 * Math.log10(Math.max(q, 0.5))));
+    const r0 = hasDis ? rankOf(rv.dis0_m3s) : null, r1 = hasDis ? rankOf(rv.dis_m3s) : null;
+    prep.push({ pts: p, cum, len: cum[cum.length - 1], bbox: [x0, y0, x1, y1], rank: rv.rank, r0, r1 });
   }
   riverCache.set(rivers, prep);
   return prep;
@@ -811,13 +822,15 @@ export function drawRivers(ctx, w, { s, Rpx, lod, lens = false }) {
     const q = pendingShore;
     drawShore(ctx, w, q.cells, { ...q.opts, s, Rpx, lod, lens });
   }
+  drawOutlines(ctx, w, { s, Rpx, lod, lens });
   const rivers = prepRivers(w);
   const view = visibleRect(ctx);
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
 
-  // Mouth width in css px by rank (1 = biggest), never wider than a good part of a hex.
-  const mouthPx = (rank) => Math.min(Math.max(0.8, (10 - rank) * 0.24 * Math.sqrt(s / 0.25)), Rpx * 0.3);
+  // Mouth width in css px by rank (1 = biggest), never wider than a good part of a hex. The zoom term is relative to
+  // a whole-country view (about RIVER_S0 css px per km), so rivers widen gently as the map zooms in.
+  const mouthPx = (rank) => Math.min(Math.max(0.6, (10 - rank) * 0.2 * Math.sqrt(s / RIVER_S0)), Rpx * 0.22);
   const visible = (rv, padKm) =>
     !view || !(rv.bbox[2] < view[0] - padKm || rv.bbox[0] > view[2] + padKm || rv.bbox[3] < view[1] - padKm || rv.bbox[1] > view[3] + padKm);
 
@@ -840,20 +853,27 @@ export function drawRivers(ctx, w, { s, Rpx, lod, lens = false }) {
   for (const rv of rivers) {
     const Wm = mouthPx(rv.rank);
     if (!visible(rv, (Wm * 2) / s)) continue;
-    const taper = Math.min(1, rv.len / 450); // short pieces keep their width
-    const frac = (k) => 1 - taper * (1 - (0.32 + 0.68 * Math.sqrt(rv.len ? rv.cum[k] / rv.len : 1)));
-    const hwPx = (k) => Math.max(0.35, (Wm * frac(k)) / 2);
+    let hwPx;
+    if (rv.r0 != null) {
+      // Width follows the discharge from one end to the other (pieces of one river join without a step).
+      const W0 = mouthPx(rv.r0), W1 = mouthPx(rv.r1);
+      hwPx = (k) => Math.max(0.35, (W0 + (W1 - W0) * Math.sqrt(rv.len ? rv.cum[k] / rv.len : 1)) / 2);
+    } else {
+      const taper = Math.min(1, rv.len / 120); // short pieces keep their width
+      const frac = (k) => 1 - taper * (1 - (0.32 + 0.68 * Math.sqrt(rv.len ? rv.cum[k] / rv.len : 1)));
+      hwPx = (k) => Math.max(0.35, (Wm * frac(k)) / 2);
+    }
     const body = new Path2D(), bank = new Path2D();
     ribbon(body, rv.pts, (k) => hwPx(k) / s);
     ribbon(bank, rv.pts, (k) => (hwPx(k) * 1.25 + 0.75) / s);
     bodies.push(body);
     banks.push(bank);
     if (showCentre && Wm >= 2.2) {
-      // The centre line starts some way down, where the river has some width.
+      // The centre line starts where the river has some width.
       const p = rv.pts;
       let started = false;
       for (let k = 0; k < p.length; k += 2) {
-        if (rv.cum[k / 2] < rv.len * 0.3 * taper) continue;
+        if (hwPx(k / 2) * 2 < 2.2) continue;
         if (!started) { centre.moveTo(p[k], p[k + 1]); started = true; }
         else centre.lineTo(p[k], p[k + 1]);
       }
@@ -869,6 +889,103 @@ export function drawRivers(ctx, w, { s, Rpx, lod, lens = false }) {
     ctx.lineWidth = Math.max(0.6, Math.min(2.2, Rpx * 0.035)) / s;
     ctx.stroke(centre);
   }
+}
+
+// --- lakes and spits ------------------------------------------------------------------------------------------------
+// Outlines in world.json (map km, flat [x0, y0, x1, y1, ...] rings, holes included: filled even-odd). Lakes get the
+// lake blue with a darker rim and a pale shore line; spits get dune sand with a wooded interior when wide enough.
+
+const outlineCache = new WeakMap(); // world.json raw -> {lakes: [{bbox, path, area}], spits: [...]}
+
+function prepOutlines(w) {
+  const raw = w.raw || {};
+  let o = outlineCache.get(raw);
+  if (o) return o;
+  const prep = (list) => (list || []).map((it) => {
+    const P = new Path2D();
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const ring of it.rings || []) {
+      if (ring.length < 6) continue;
+      P.moveTo(ring[0], ring[1]);
+      for (let k = 2; k < ring.length; k += 2) {
+        P.lineTo(ring[k], ring[k + 1]);
+        x0 = Math.min(x0, ring[k]); x1 = Math.max(x1, ring[k]);
+        y0 = Math.min(y0, ring[k + 1]); y1 = Math.max(y1, ring[k + 1]);
+      }
+      P.closePath();
+    }
+    return { path: P, bbox: [x0, y0, x1, y1], area: it.area_km2 || 0, foreign: !!it.foreign };
+  });
+  o = { lakes: prep(raw.lakes), spits: prep(raw.spits) };
+  outlineCache.set(raw, o);
+  return o;
+}
+
+export function drawOutlines(ctx, w, { s, Rpx, lod, lens = false }) {
+  const { lakes, spits } = prepOutlines(w);
+  if (!lakes.length && !spits.length) return;
+  Rpx = Rpx ?? (w.grid?.R ?? 5) * s;
+  const view = visibleRect(ctx);
+  const seen = (it, pad) => !view || !(it.bbox[2] < view[0] - pad || it.bbox[0] > view[2] + pad
+    || it.bbox[3] < view[1] - pad || it.bbox[1] > view[3] + pad);
+  // Below ~1.5 css px a lake is a speck: skip the smallest ones as the map zooms out.
+  const minArea = Math.min(4, 2.2 / (s * s));
+  const px = 1 / s;
+  ctx.save();
+  ctx.lineJoin = "round";
+  for (const sp of spits) {
+    if (!seen(sp, 2)) continue;
+    if (!lens && sp.foreign) {
+      // Neighbouring countries stay under the fog of war, like their hexes.
+      ctx.fillStyle = "rgba(88,96,92,.92)";
+      ctx.fill(sp.path, "evenodd");
+      ctx.strokeStyle = "rgba(170,170,150,.45)";
+      ctx.lineWidth = Math.max(0.6, Math.min(1.6, Rpx * 0.04)) * px;
+      ctx.stroke(sp.path);
+    } else if (!lens) {
+      ctx.fillStyle = "rgba(236,222,170,.95)";
+      ctx.fill(sp.path, "evenodd");
+      ctx.strokeStyle = "rgba(255,250,225,.75)";
+      ctx.lineWidth = Math.max(0.8, Math.min(2.4, Rpx * 0.05)) * px;
+      ctx.stroke(sp.path);
+      if (Rpx > 14 && sp.area > 3) {
+        // Pine woods on the dunes (Hel, the Vistula Spit): a green core inset from the sandy shore.
+        ctx.save();
+        ctx.clip(sp.path, "evenodd");
+        ctx.strokeStyle = "rgba(236,222,170,1)";
+        ctx.fillStyle = "rgba(64,98,60,.85)";
+        ctx.fill(sp.path, "evenodd");
+        ctx.lineWidth = Math.max(2, Rpx * 0.16) * px;
+        ctx.stroke(sp.path);
+        ctx.restore();
+      }
+    } else {
+      ctx.fillStyle = "rgba(120,120,110,.7)";
+      ctx.fill(sp.path, "evenodd");
+    }
+  }
+  for (const lk of lakes) {
+    if (lk.area < minArea || !seen(lk, 2)) continue;
+    if (lens) {
+      ctx.fillStyle = "rgba(120,170,210,.55)";
+      ctx.fill(lk.path, "evenodd");
+      continue;
+    }
+    ctx.strokeStyle = "rgba(38,52,30,.45)";
+    ctx.lineWidth = Math.max(1, Math.min(3, Rpx * 0.07)) * px;
+    ctx.stroke(lk.path);
+    ctx.fillStyle = LAKE_CSS;
+    ctx.fill(lk.path, "evenodd");
+    if (atLeast(lod, "mid")) {
+      ctx.save();
+      ctx.clip(lk.path, "evenodd");
+      ctx.strokeStyle = "rgba(190,230,250,.45)";
+      ctx.lineWidth = Math.max(0.8, Math.min(2.2, Rpx * 0.05)) * px;
+      ctx.stroke(lk.path);
+      ctx.restore();
+    }
+  }
+  ctx.restore();
 }
 
 function strokePolyline(ctx, p) {

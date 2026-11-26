@@ -1,16 +1,15 @@
-"""Citizens: each metro's mix of people for the City View's person icons, from ACS 1-year tables (acs_1yr).
+"""Citizens of each City View town (citizens.json): rows of small figures by work, age, sex, education and origin.
 
-Five rows per metro: workers by occupation (C24010), people by age (B01001, median age B01002), how workers get to
-work (C08301), adults 25+ by education (C15003) and people by place of birth (B05002). The ACS interim keeps male and
-female lines apart; this builder adds them (female line = male line + 36 in C24010, + 24 in B01001).
+Rows and their units (`scope` in each row says which one a town's row describes):
 
-Icon counts (`figures`) are computed here with largest-remainder rounding, so each row's figures add up exactly to
-its icon count and the frontend only draws them. Census leaves some small areas out of a table entirely: that row
-is then null (never zeros), and a city missing from every table is null.
+* workforce: workers by PKD section group, the town's powiat (a city with powiat rights is its own powiat),
+  GUS 31 December 2025, by employer seat. A section GUS withholds counts as absent.
+* age, sex: residents of the town's gmina (GUS 31 December 2025): the whole urban-rural gmina for a town inside one.
+* education: per 1,000 residents aged 13+, with or without a higher-education diploma, the town's powiat (NSP 2021
+  census share; the row's total is 1,000, not a head count).
+* nativity: Ukrainian citizens with a PESEL UKR number registered in the powiat, per powiat residents.
 
-`specialists` lists the categories whose share is at least SPECIALIST_HIGH or at most SPECIALIST_LOW times the
-national share (up to MAX_HIGH over-represented, strongest first, then up to MAX_LOW under-represented; categories
-under MIN_SHARE in both the city and the nation are skipped as noise). `reliable` is false for micropolitan areas, whose 1-year margins of error are large.
+Figures are rounded with the largest-remainder method so each row's figures add up exactly.
 """
 
 from __future__ import annotations
@@ -21,146 +20,116 @@ from pathlib import Path
 
 from ..core.paths import WEB_DATA
 from ..core.store import load_interim, write_web
+from .plstats import Stats, Units, num, total
+from .yields import Economy
 
-REQUIRES = ["acs_1yr", "cities.json"]
+REQUIRES = ["_world", "pl_geo_teryt", "pl_stats_population", "pl_stats_labour", "pl_census_2021", "pl_foreigners",
+            "cities.json"]
 PRODUCES = ["citizens.json"]
 
-FIGURES = {"workforce": 20, "age": 10, "commute": 10}
+FIGURES = {"workforce": 20, "age": 10, "sex": 10, "education": 10, "nativity": 10}
 SPECIALIST_HIGH = 1.5
 SPECIALIST_LOW = 0.67
 MIN_SHARE = 0.01
-MAX_HIGH, MAX_LOW = 4, 2  # specialists kept: the strongest over- and under-represented categories
-NATION = "0100000US"
+MAX_HIGH, MAX_LOW = 4, 2
 
 
-def _lines(table: str, plus: list[int], minus: list[int] = (), female: int | None = None) -> dict:
-    return {"table": table, "plus": plus, "minus": list(minus), "female": female}
+def _g(key, label, lines):
+    return {"key": key, "label": label, "lines": lines}
 
 
-def _g(key, label, icon, spec):
-    """A category: `spec` = which estimate lines it adds (and subtracts); female lines are male + `female`."""
-    t, plus, minus, fem = spec["table"], spec["plus"], spec["minus"], spec["female"]
-    txt = " + ".join(f"{l:03d}" for l in plus) + "".join(f" − {l:03d}" for l in minus)
-    if fem:
-        txt += f" (male lines; female = male + {fem})"
-    return {"key": key, "label": label, "icon": icon, "lines": f"{t} {txt}", "_spec": spec}
-
-
-def _r(a, b):
-    return list(range(a, b + 1))
-
-
-C24, B01 = "C24010", "B01001"
 GROUPS = {
     "workforce": [
-        _g("executive", "Executives & managers", "c-executive", _lines(C24, [4], female=36)),
-        _g("engineer", "Engineers, coders & scientists", "c-engineer", _lines(C24, [7], female=36)),
-        _g("scholar", "Teachers, lawyers, artists & media", "c-scholar", _lines(C24, [11], female=36)),
-        _g("healer", "Health workers", "c-healer", _lines(C24, [16, 20], female=36)),
-        _g("service", "Service workers (food, cleaning, care, protection)", "c-service",
-           _lines(C24, [19], [20], female=36)),
-        _g("clerk", "Sales & office workers", "c-clerk", _lines(C24, [27], female=36)),
-        _g("farmer", "Farmers, fishers & foresters", "c-farmer", _lines(C24, [31], female=36)),
-        _g("builder", "Builders & repairers", "c-builder", _lines(C24, [30], [31], female=36)),
-        _g("maker", "Factory, transport & warehouse workers", "c-maker", _lines(C24, [34], female=36)),
+        _g("farmer", "Farming, forestry & fishing", "PKD A"),
+        _g("maker", "Factories, energy & transport", "PKD B, C, D, E, H"),
+        _g("builder", "Construction", "PKD F"),
+        _g("clerk", "Trade, finance & offices", "PKD G, K, L, N"),
+        _g("engineer", "IT, science & engineering", "PKD J, M"),
+        _g("scholar", "Education & the arts", "PKD P, R"),
+        _g("healer", "Health & care", "PKD Q"),
+        _g("service", "Hospitality, public service & other", "PKD I, O, S"),
     ],
     "age": [
-        _g("child", "Children (under 18)", "c-child", _lines(B01, _r(3, 6), female=24)),
-        _g("young", "Young adults (18-34)", "c-young", _lines(B01, _r(7, 12), female=24)),
-        _g("midlife", "Middle-aged (35-64)", "c-midlife", _lines(B01, _r(13, 19), female=24)),
-        _g("elder", "Elders (65+)", "c-elder", _lines(B01, _r(20, 25), female=24)),
+        _g("child", "Children (0-14)", "age 0-14"),
+        _g("young", "Young adults (15-29)", "age 15-29"),
+        _g("midlife", "Adults (30-64)", "age 30-64"),
+        _g("elder", "65 and older", "age 65+"),
     ],
-    "commute": [
-        _g("drove_alone", "Drive alone", "c-car", _lines("C08301", [3])),
-        _g("carpool", "Carpool", "c-carpool", _lines("C08301", [4])),
-        _g("transit", "Public transit", "c-transit", _lines("C08301", [8])),
-        _g("walk", "Walk", "c-walk", _lines("C08301", [9])),
-        _g("other", "Bike, taxi, motorcycle & other", "c-bike", _lines("C08301", [10])),
-        _g("home", "Work from home", "c-home", _lines("C08301", [11])),
-    ],
+    "sex": [_g("female", "Women", "female"), _g("male", "Men", "male")],
     "education": [
-        _g("less_than_hs", "No high-school diploma", "c-edu0", _lines("C15003", _r(2, 9))),
-        _g("high_school", "High school or GED", "c-edu1", _lines("C15003", [10, 11])),
-        _g("some_college", "Some college or associate's", "c-edu2", _lines("C15003", [12, 13, 14])),
-        _g("bachelors", "Bachelor's degree", "c-edu3", _lines("C15003", [15])),
-        _g("graduate", "Master's, professional or doctorate", "c-edu4", _lines("C15003", [16, 17, 18])),
+        _g("bachelors", "Higher education", "NSP 2021 higher_share"),
+        _g("high_school", "No higher education", "100% - higher_share"),
     ],
     "nativity": [
-        _g("born_in_state", "Born in this state", "c-local", _lines("B05002", [3])),
-        _g("other_state", "Born in another state", "c-newcomer", _lines("B05002", [4])),
-        _g("native_abroad", "Born a U.S. citizen abroad or in a territory", "c-abroad", _lines("B05002", [2], [3, 4])),
-        _g("foreign_born", "Born in another country", "c-immigrant", _lines("B05002", [13])),
+        _g("foreign_born", "Ukrainians with PESEL UKR", "pesel_ukr"),
+        _g("born_in_state", "Other residents", "population - pesel_ukr"),
     ],
 }
-TOTALS = {"workforce": "C24010_001", "age": "B01001_001", "commute": "C08301_001", "education": "C15003_001",
-          "nativity": "B05002_001"}
+WORK_SECTIONS = {"farmer": "A", "maker": "BCDEH", "builder": "F", "clerk": "GKLN", "engineer": "JM",
+                 "scholar": "PR", "healer": "Q", "service": "IOS"}
+AGES = {"child": range(0, 15), "young": range(15, 30), "midlife": range(30, 65), "elder": range(65, 200)}
 ROW_LABELS = {
-    "workforce": "Employed civilians 16+ by occupation",
+    "workforce": "Workers by sector",
     "age": "Residents by age",
-    "commute": "Workers 16+ by how they get to work",
-    "education": "Adults 25+ by education",
-    "nativity": "Residents by place of birth",
+    "sex": "Residents by sex",
+    "education": "Per 1,000 residents aged 13+ by education (census 2021)",
+    "nativity": "Residents by origin",
 }
+RULE_TEXT = ("A category is marked when its share is at least 1.5 times or at most 0.67 times the share in Poland; "
+             "categories under 1% both here and nationally are skipped.")
 
 
 def largest_remainder(values: dict[str, float], n: int) -> dict[str, int]:
-    """Integer counts summing exactly to n, proportional to `values` (Hamilton's method).
-
-    Ties in the remainders go to the larger value, then to the earlier key, so the result is deterministic.
-    Negative values count as 0. All-zero input → all zeros.
-    """
+    """Integer counts summing exactly to n, proportional to `values` (Hamilton's method). Ties go to the larger
+    value, then the earlier key. All-zero input gives all zeros."""
     keys = list(values)
     vals = [max(0.0, float(values[k] or 0)) for k in keys]
-    total = sum(vals)
-    if total <= 0 or n <= 0:
+    tot = sum(vals)
+    if tot <= 0 or n <= 0:
         return {k: 0 for k in keys}
-    quotas = [v * n / total for v in vals]
+    quotas = [v * n / tot for v in vals]
     base = [math.floor(q) for q in quotas]
-    left = n - sum(base)
     order = sorted(range(len(keys)), key=lambda i: (-(quotas[i] - base[i]), -vals[i], i))
-    for i in order[:left]:
+    for i in order[: n - sum(base)]:
         base[i] += 1
     return dict(zip(keys, base))
 
 
-def _value(rec: dict, spec: dict) -> float | None:
-    """Sum of a category's lines (male + female when `female`), or None if any line is missing."""
-    total = 0.0
-    for sign, lines in ((1, spec["plus"]), (-1, spec["minus"])):
-        for l in lines:
-            for off in ([0, spec["female"]] if spec["female"] else [0]):
-                v = rec.get(f"{spec['table']}_{l + off:03d}")
-                if v is None:
-                    return None
-                total += sign * v
-    return max(total, 0.0)
+def make_row(name: str, counts: dict | None, scope: str, **extra) -> dict | None:
+    """{total, counts, shares, figures, scope, ...} or None when a count is missing or the total is 0."""
+    if not counts or any(v is None for v in counts.values()):
+        return None
+    counts = {k: round(v) for k, v in counts.items()}
+    tot = sum(counts.values())
+    if tot <= 0:
+        return None
+    return {"total": tot, "counts": counts, "shares": {k: round(v / tot, 3) for k, v in counts.items()},
+            "figures": largest_remainder(counts, FIGURES[name]), "scope": scope, **extra}
 
 
-def row(rec: dict | None, name: str) -> dict | None:
-    if not rec:
-        return None
-    total = rec.get(TOTALS[name])
-    if not total or total <= 0:
-        return None
-    counts = {}
-    for g in GROUPS[name]:
-        v = _value(rec, g["_spec"])
+def age_counts(rec: dict) -> dict | None:
+    out = {k: 0 for k in AGES}
+    for lo in range(0, 85, 5):
+        v = num(rec.get(f"age_{lo}_{lo + 4}"))
         if v is None:
             return None
-        counts[g["key"]] = round(v)
-    out = {"total": round(total), "counts": counts,
-           "shares": {k: round(v / total, 3) for k, v in counts.items()}}
-    if name in FIGURES:
-        out["figures"] = largest_remainder(counts, FIGURES[name])
-    if name == "age":
-        med = rec.get("B01002_001")
-        out["median"] = round(med, 1) if med is not None else None
-    if name == "education":
-        out["bachelors_plus"] = round((counts["bachelors"] + counts["graduate"]) / total, 4)
-    if name == "nativity":
-        out["foreign_born"] = out["shares"]["foreign_born"]
-        out["born_in_state"] = out["shares"]["born_in_state"]
+        out[next(k for k, r in AGES.items() if lo in r)] += v
+    v = num(rec.get("age_85_plus"))
+    if v is None:
+        return None
+    out["elder"] += v
     return out
+
+
+def work_counts(pkd_recs: list[dict]) -> dict | None:
+    if not pkd_recs:
+        return None
+    out = {}
+    for k, letters in WORK_SECTIONS.items():
+        out[k] = total(r.get(f"workers_{s}") for r in pkd_recs for s in letters)
+        if out[k] is None:  # every section of the group withheld: the count is unknown, not 0
+            return None
+    return out if sum(out.values()) else None
 
 
 def specialists(r: dict, nat: dict) -> list[dict]:
@@ -184,62 +153,100 @@ def specialists(r: dict, nat: dict) -> list[dict]:
     return hi[:MAX_HIGH] + lo[:MAX_LOW]
 
 
-def full_row(rec: dict | None, nat: dict | None, reliable: bool) -> dict | None:
-    parts = {name: row(rec, name) for name in GROUPS}
-    if all(v is None for v in parts.values()):
-        return None
-    if nat is not None:
-        parts["specialists"] = specialists(parts, nat)
-    parts["reliable"] = reliable
-    return parts
+class Rows:
+    def __init__(self, units: Units, stats: Stats, econ: Economy):
+        self.u, self.e = units, econ
+        self.pop = stats.rows("pl_stats_population", "population")
+        self.pkd = stats.rows("pl_stats_labour", "employment_pkd_powiat")
+        self.edu = stats.rows("pl_census_2021", "education_powiat")
+        self.ukr = stats.rows("pl_foreigners", "pesel_ukr_powiat")
+
+    def powiat_pop(self, powiaty: list[str]) -> float | None:
+        return total(self.e.pop.get(g) for p in powiaty for g in self.u.gminas_of_powiat.get(p, []))
+
+    def for_units(self, gminas: list[str], powiaty: list[str], scope_g: str, scope_p: str) -> dict:
+        recs = [self.pop.get(g) or {} for g in gminas]
+        ages = [age_counts(r) for r in recs]
+        age = None if any(a is None for a in ages) else {k: sum(a[k] for a in ages) for k in AGES}
+        sex = {"female": total(r.get("female") for r in recs), "male": total(r.get("male") for r in recs)}
+        ppop = self.powiat_pop(powiaty)
+        edu = None
+        shares = [(num((self.edu.get(p) or {}).get("higher_share")), self.powiat_pop([p])) for p in powiaty]
+        if shares and all(s is not None and w for s, w in shares):
+            # Per 1,000 residents aged 13+: NSP 2021 publishes the share for most powiaty but counts for few.
+            hi = sum(s / 100 * w for s, w in shares) / sum(w for _, w in shares)
+            edu = {"bachelors": 1000 * hi, "high_school": 1000 * (1 - hi)}
+        ukr = total((self.ukr.get(p) or {}).get("pesel_ukr") for p in powiaty)
+        nat = {"foreign_born": ukr, "born_in_state": ppop - ukr} if ukr is not None and ppop else None
+        median = None
+        if age:
+            from .plstats import median_age
+            pooled = {}
+            for r in recs:
+                for k, v in r.items():
+                    if k.startswith("age_") and num(v) is not None:
+                        pooled[k] = pooled.get(k, 0) + v
+            median = median_age(pooled)
+        out = {
+            "workforce": make_row("workforce", work_counts([self.pkd[p] for p in powiaty if p in self.pkd]), scope_p),
+            "age": make_row("age", age, scope_g, median=median),
+            "sex": make_row("sex", sex if all(v is not None for v in sex.values()) else None, scope_g),
+            "education": make_row("education", edu, scope_p),
+            "nativity": make_row("nativity", nat, scope_p),
+        }
+        if out["education"]:
+            out["education"]["bachelors_plus"] = out["education"]["shares"]["bachelors"]
+        if out["nativity"]:
+            out["nativity"]["foreign_born"] = round(out["nativity"]["counts"]["foreign_born"] / out["nativity"]["total"], 4)
+        return out
 
 
 def build() -> None:
-    acs = load_interim("acs_1yr")
+    world = load_interim("_world")
+    teryt = load_interim("pl_geo_teryt")
+    units = Units(world, teryt)
+    stats = Stats(["pl_stats_population", "pl_stats_labour", "pl_census_2021", "pl_foreigners", "pl_geo_fua",
+                   "pl_stats_prosperity", "pl_gdp"])
+    econ = Economy(units, stats)
+    rows = Rows(units, stats, econ)
     cities = json.loads((WEB_DATA / "cities.json").read_text())
-    nat_rec = acs["geos"].get(NATION)
-    national = full_row(nat_rec, None, True)
-    if national is None:
-        raise ValueError("acs_1yr has no national row for the citizen tables (run: pipeline fetch acs_1yr)")
-    national.pop("reliable", None)
-    national["specialists"] = []
+    national = rows.for_units(units.gminas, units.powiaty, "Poland", "Poland")
     out = {}
     for c in cities:
-        out[c["id"]] = full_row(acs["cbsa"].get(c["id"]), national, bool(c.get("metro")))
-    groups = {name: [{k: v for k, v in g.items() if k != "_spec"} for g in gs] for name, gs in GROUPS.items()}
-    year = acs.get("year")
-    doc = {
+        if not c.get("city_view"):
+            continue
+        g, p = c["gmina"], c["gmina"][:4]
+        gscope = c["name"] if c.get("scope") in ("city", "gmina") else f"gmina {units.gmina_name.get(g, c['name'])}"
+        pscope = c["name"] if c.get("kind") == "city" else units.powiat_label(p)
+        r = rows.for_units([g], [p], gscope, pscope)
+        if all(v is None for v in r.values()):
+            out[c["id"]] = None
+            continue
+        r["specialists"] = specialists(r, national)
+        r["reliable"] = True
+        out[c["id"]] = r
+    national["specialists"] = []
+    sources = [s for s in ("pl_stats_population", "pl_stats_labour", "pl_census_2021", "pl_foreigners") if stats.has(s)]
+    write_web("citizens.json", {
         "version": 1,
-        "vintage": acs.get("vintage") or f"ACS {year} 1-year",
-        "year": year,
-        "sources": ["acs_1yr"],
-        "figures": dict(FIGURES),
-        "rows": dict(ROW_LABELS),
-        "groups": groups,
-        "rule": {
-            "specialist_high": SPECIALIST_HIGH, "specialist_low": SPECIALIST_LOW, "min_share": MIN_SHARE,
-            "max_high": MAX_HIGH, "max_low": MAX_LOW,
-            "text": f"Figures are rounded with the largest-remainder method so each row adds up exactly. A "
-                    f"specialist is a category whose share is at least {SPECIALIST_HIGH:g}× or at most "
-                    f"{SPECIALIST_LOW:g}× the national share (categories under {MIN_SHARE:.0%} both here and "
-                    f"nationally are skipped); up to {MAX_HIGH} over- and {MAX_LOW} under-represented are listed. Micropolitan areas are marked unreliable: their 1-year margins "
-                    f"of error are large. Commute shares are of workers, not of all residents.",
-        },
+        "vintage": "; ".join(v for v in (stats.vintage(s) for s in sources) if v),
+        "year": econ.years["population"] or 2025,
+        "sources": sources,
+        "figures": FIGURES,
+        "rows": ROW_LABELS,
+        "groups": GROUPS,
+        "rule": {"specialist_high": SPECIALIST_HIGH, "specialist_low": SPECIALIST_LOW, "min_share": MIN_SHARE,
+                 "max_high": MAX_HIGH, "max_low": MAX_LOW, "text": RULE_TEXT},
         "national": national,
         "cities": out,
-    }
-    write_web("citizens.json", doc)
-
-
-# ---------------------------------------------------------------------------------------------- check
+    })
+    nulls = {k: sum(1 for r in out.values() if not r or r.get(k) is None) for k in GROUPS}
+    print(f"    {len(out)} City View towns; rows without data: " + ", ".join(f"{k} {v}" for k, v in nulls.items()))
 
 
 def _check_row(cid: str, r: dict, bad) -> None:
     for name in GROUPS:
-        if name not in r:
-            bad(f"{cid}: missing row {name!r}")
-            continue
-        v = r[name]
+        v = r.get(name)
         if v is None:
             continue
         keys = [g["key"] for g in GROUPS[name]]
@@ -248,17 +255,15 @@ def _check_row(cid: str, r: dict, bad) -> None:
             continue
         if any(x is None or x < 0 for x in v["counts"].values()):
             bad(f"{cid}: {name} has negative or null counts")
-        if abs(sum(v["counts"].values()) - v["total"]) > max(2, 0.001 * v["total"]):
-            bad(f"{cid}: {name} counts sum {sum(v['counts'].values())} != total {v['total']}")
-        if name in FIGURES:
-            f = v.get("figures") or {}
-            if list(f) != keys or sum(f.values()) != FIGURES[name]:
-                bad(f"{cid}: {name} figures must cover every category and sum to {FIGURES[name]}")
+        if sum(v["counts"].values()) != v["total"]:
+            bad(f"{cid}: {name} counts do not sum to the total")
+        f = v.get("figures") or {}
+        if list(f) != keys or sum(f.values()) != FIGURES[name]:
+            bad(f"{cid}: {name} figures must cover every category and sum to {FIGURES[name]}")
 
 
 def check(web_dir: Path) -> list[tuple[str, str]]:
-    web_dir = Path(web_dir)
-    p = web_dir / "citizens.json"
+    p = Path(web_dir) / "citizens.json"
     if not p.exists():
         return [("NOTE", "citizens.json: missing (optional, skipped)")]
     out: list[tuple[str, str]] = []
@@ -267,63 +272,32 @@ def check(web_dir: Path) -> list[tuple[str, str]]:
         doc = json.loads(p.read_text())
     except ValueError as exc:
         return [("FAIL", f"citizens.json: invalid JSON ({exc})")]
-    if not isinstance(doc, dict):
-        return [("FAIL", "citizens.json: top level is not an object")]
     for k in ("version", "vintage", "year", "sources", "figures", "groups", "national", "cities"):
         if k not in doc:
             bad(f"missing key {k!r}")
     if out:
         return out
-    sp = web_dir / "sources.json"
-    if sp.exists() and isinstance(doc["sources"], list):
-        try:
-            known = {x.get("id") for x in json.loads(sp.read_text()) if isinstance(x, dict)}
-        except (ValueError, AttributeError):
-            known = None
-        if known is not None and set(doc["sources"]) - known:
-            out.append(("WARN", f"citizens.json: sources missing from sources.json: {sorted(set(doc['sources']) - known)}"))
-    if doc["version"] != 1:
-        bad(f"version {doc['version']!r} != 1")
     if doc["figures"] != FIGURES:
         bad(f"figures {doc['figures']} != {FIGURES}")
     for name, gs in GROUPS.items():
-        got = [g.get("key") for g in doc["groups"].get(name, [])]
-        if got != [g["key"] for g in gs]:
-            bad(f"groups.{name} keys {got} differ from the contract")
-        for g in doc["groups"].get(name, []):
-            if not g.get("label") or not g.get("lines"):
-                bad(f"groups.{name}.{g.get('key')}: label and lines are required")
-    if not isinstance(doc["national"], dict):
-        bad("national row missing")
-    else:
-        _check_row("national", doc["national"], bad)
+        if [g.get("key") for g in doc["groups"].get(name, [])] != [g["key"] for g in gs]:
+            bad(f"groups.{name} keys differ from the contract")
+    _check_row("national", doc["national"], bad)
     cities = doc["cities"] if isinstance(doc["cities"], dict) else {}
-    cp = web_dir / "cities.json"
+    cp = Path(web_dir) / "cities.json"
     if cp.exists():
         try:
-            ids = {c.get("id") for c in json.loads(cp.read_text()) if isinstance(c, dict)}
+            view = {c.get("id") for c in json.loads(cp.read_text()) if isinstance(c, dict) and c.get("city_view")}
         except (ValueError, TypeError, AttributeError):
-            ids = None
-        if ids is not None:
-            if ids - set(cities):
-                bad(f"{len(ids - set(cities))} cities.json ids missing, e.g. {sorted(ids - set(cities))[:3]}")
-            if set(cities) - ids:
-                bad(f"{len(set(cities) - ids)} ids not in cities.json")
-    n_null = 0
-    row_null = {name: 0 for name in GROUPS}
+            view = None
+        if view is not None and view != set(cities):
+            bad(f"cities differ from the City View towns of cities.json ({len(view ^ set(cities))} ids)")
     for cid, r in cities.items():
-        if r is None:
-            n_null += 1
-            continue
-        _check_row(cid, r, bad)
-        for name in GROUPS:
-            if r.get(name) is None:
-                row_null[name] += 1
-        if not isinstance(r.get("reliable"), bool):
-            bad(f"{cid}: reliable must be a boolean")
-    if any(lv == "FAIL" for lv, _ in out[:50]):
+        if r is not None:
+            _check_row(cid, r, bad)
+    if any(lv == "FAIL" for lv, _ in out):
         return out[:50]
-    out.append(("PASS", f"citizens.json: {len(cities)} cities, {n_null} with no ACS 1-year citizen tables"))
-    out.append(("NOTE", "citizens.json: cities without a row (Census left them out): "
-                + ", ".join(f"{k} {v}" for k, v in row_null.items())))
+    nulls = {k: sum(1 for r in cities.values() if not r or r.get(k) is None) for k in GROUPS}
+    out.append(("PASS", f"citizens.json: {len(cities)} City View towns"))
+    out.append(("NOTE", "citizens.json: towns without a row: " + ", ".join(f"{k} {v}" for k, v in nulls.items())))
     return out

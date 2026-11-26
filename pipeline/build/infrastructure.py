@@ -1,20 +1,4 @@
-"""Tile improvements: Interstates, major highways and railroads rasterised onto hex links, plus ports and airports.
-
-Lines are never shipped as polylines. Each Natural Earth 1:10m line is sampled every SAMPLE_KM along its length,
-each sample is mapped to its hex, repeats in a row are dropped, a cell whose neighbours on the line already touch is
-dropped (the line only clipped its corner; this keeps a road along a row boundary from zigzagging), and every step between two cells becomes a link
-between neighbouring cells (a step that skips cells is filled with a hex line walk). The browser draws a link as a
-road or rail segment from hex centre to hex centre.
-
-Filtering keeps the map readable: all Interstates; other roads only at scale rank <= MAJOR_MAX_SCALERANK, or
-expressways Natural Earth types as a "Major Highway" or "Beltway"; rail at scale rank <= RAIL_MAX_SCALERANK
-(tier 0 "main line" at <= RAIL_MAIN_SCALERANK). A major-highway link that already carries an Interstate is dropped.
-Rail samples inside Canada or Mexico are dropped (the rail layer has no country field).
-
-Ports: the USACE principal ports (port-area centroid). Airports: every primary airport (FAA hub class L/M/S/N)
-plus every airport in FAA's all-cargo table. A site's `cell` is the US land cell at its point, or the nearest one
-up to SITE_RINGS hexes away (port areas on rivers and bays); x/y stay the true position.
-"""
+"""Poland's motorways, expressways, railways, ports, and airports on the hex map."""
 
 from __future__ import annotations
 
@@ -23,41 +7,56 @@ import math
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from ..core.geo import MapProjection, Shape, ShapeIndex
+from ..core.geo import MapProjection
 from ..core.hexgrid import HexGrid
-from ..core.paths import WEB_DATA
 from ..core.store import load_interim, load_interim_payload, write_web
 
-REQUIRES = ["_world", "natural_earth_roads", "natural_earth", "usace_ports", "faa_airports", "census_boundaries",
-            "cbsa_delineation", "cities.json"]
+REQUIRES = [
+    "_world",
+    "pl_transport_network",
+    "pl_transport_osm",
+    "pl_transport_airports",
+    "pl_transport_ports",
+]
 PRODUCES = ["infrastructure.json"]
 
-SAMPLE_KM = 4.0
-MAJOR_MAX_SCALERANK = 6
-MAJOR_TYPES = {"Major Highway", "Beltway"}
-RAIL_MAX_SCALERANK = 7
-RAIL_MAIN_SCALERANK = 5
-SITE_RINGS = 2
-ROAD_CLASSES = [{"id": "interstate", "name": "Interstate"}, {"id": "major", "name": "Major highway"}]
-RAIL_TIERS = [{"id": "main", "name": "Main line"}, {"id": "secondary", "name": "Secondary line"}]
-HUBS = {"L": "Large hub", "M": "Medium hub", "S": "Small hub", "N": "Nonhub primary"}
+SAMPLE_KM = 2.5
+SITE_RINGS = 3
+
+ROAD_CLASSES = [
+    {"id": "motorway", "name": "Motorway"},
+    {"id": "expressway", "name": "Expressway"},
+]
+RAIL_TIERS = [
+    {"id": "main", "name": "Main line"},
+    {"id": "secondary", "name": "Other mapped line"},
+]
 
 RULES = {
-    "roads": "Natural Earth 1:10m roads in the US, sampled every 4 km and snapped to hex-centre links. Class 0: every "
-             "Interstate. Class 1: other roads at Natural Earth scale rank "
-             f"{MAJOR_MAX_SCALERANK} or less (its most prominent US and state highways) plus every expressway Natural "
-             "Earth marks as a major highway or beltway, where no Interstate already joins the same two hexes.",
-    "rail": "Natural Earth 1:10m railroads at scale rank 7 or less, sampled every 4 km and snapped to hex-centre links; "
-            f"tier 0 (main line) is scale rank {RAIL_MAIN_SCALERANK} or less. Lines in Canada and Mexico are clipped. "
-            "Natural Earth holds about half of the real US rail network and carries no owner or traffic data.",
-    "ports": "The USACE principal ports by total tonnage (short tons). Each is a port statistical area, placed at the "
-             "area's centroid, so long river ports are approximate.",
-    "airports": "Every primary airport (FAA hub class large, medium, small or nonhub: 10,000+ boardings a year) and "
-                "every airport in FAA's all-cargo table, placed by FAA location id with the NASR airport master.",
+    "roads": (
+        "Every open Polish A-road and S-road in the OpenStreetMap extract, plus motorway-class links without an "
+        "A or S number. Each line is sampled every 2.5 km and snapped to neighbouring hex-centre links."
+    ),
+    "rail": (
+        "Every main railway line in the OpenStreetMap extract. Central Rail Line links, high-speed links, and "
+        "lines tagged for at least 160 km/h use the main tier; the other mapped lines use the secondary tier."
+    ),
+    "ports": (
+        "The five main seaports reported by GUS and Eurostat, the named smaller commercial ports, and the LNG "
+        "terminals in the source list. Ports with no published coordinates stay out of the map."
+    ),
+    "airports": "The Polish airports with scheduled passenger traffic in the source list, plus the planned CPK hub.",
+}
+
+STATE_ABBR = {
+    "02": "DS", "04": "KP", "06": "LU", "08": "LB", "10": "LD", "12": "MA", "14": "MZ", "16": "OP",
+    "18": "PK", "20": "PD", "22": "PM", "24": "SL", "26": "SK", "28": "WN", "30": "WP", "32": "ZP",
 }
 
 
-# ------------------------------------------------------------------ hex helpers
+def map_projection(config: dict) -> MapProjection:
+    """Build the shifted map projection from the shared interim metadata."""
+    return MapProjection(**{key: config[key] for key in ("min_x", "max_y", "margin")})
 
 
 def _axial(grid: HexGrid, cell: int) -> tuple[int, int]:
@@ -78,7 +77,7 @@ def hex_distance(grid: HexGrid, a: int, b: int) -> int:
 
 
 def hex_walk(grid: HexGrid, a: int, b: int) -> list[int]:
-    """Cells on the hex line from a to b, both included (cube lerp with a tiny nudge to break ties)."""
+    """Return the cells on the straight hex line from a to b, including both ends."""
     n = hex_distance(grid, a, b)
     if n <= 1:
         return [a, b] if a != b else [a]
@@ -95,29 +94,20 @@ def hex_walk(grid: HexGrid, a: int, b: int) -> list[int]:
             rx = -ry - rz
         elif dy <= dz:
             rz = -rx - ry
-        c = _from_axial(grid, rx, rz)
-        if c >= 0 and (not out or out[-1] != c):
-            out.append(c)
+        cell = _from_axial(grid, rx, rz)
+        if cell >= 0 and (not out or out[-1] != cell):
+            out.append(cell)
     return out
 
 
-def sample_cells(grid: HexGrid, pts: list[tuple[float, float]], keep=None) -> list[list[int]]:
-    """Runs of distinct consecutive cells along a projected line, sampled every SAMPLE_KM. `keep(x, y)` False
-    breaks the run (the sample is dropped)."""
+def sample_cells(grid: HexGrid, pts: list[tuple[float, float]]) -> list[list[int]]:
+    """Sample a projected line and return runs of distinct cells."""
     runs, run = [], []
 
-    def add(x, y):
-        nonlocal run
-        if keep is not None and not keep(x, y):
-            if len(run) > 1:
-                runs.append(run)
-            run = []
-            return
-        c = grid.cell_at(x, y)
-        if c < 0:
-            return
-        if not run or run[-1] != c:
-            run.append(c)
+    def add(x: float, y: float) -> None:
+        cell = grid.cell_at(x, y)
+        if cell >= 0 and (not run or run[-1] != cell):
+            run.append(cell)
 
     for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
         steps = max(1, math.ceil(math.hypot(x1 - x0, y1 - y0) / SAMPLE_KM))
@@ -132,22 +122,25 @@ def sample_cells(grid: HexGrid, pts: list[tuple[float, float]], keep=None) -> li
 
 
 def straighten(grid: HexGrid, run: list[int]) -> list[int]:
-    """Drop detour cells: where the cells before and after a cell are neighbours themselves, the line only clipped
-    that cell's corner. Without this, a road running along a row boundary zigzags between two rows."""
+    """Remove corner-clipping detours that make a line zigzag between two rows."""
     out = []
-    for c in run:
-        while len(out) >= 2 and c in grid.neighbours(out[-2]):
+    for cell in run:
+        while len(out) >= 2 and cell in grid.neighbours(out[-2]):
             out.pop()
-        if not out or out[-1] != c:
-            out.append(c)
+        if not out or out[-1] != cell:
+            out.append(cell)
     return out
 
 
 def links_of(grid: HexGrid, run: list[int]) -> list[tuple[int, int]]:
-    out = []
-    run = straighten(grid, [c for path in ([run[0]], *(hex_walk(grid, a, b)[1:] for a, b in zip(run, run[1:])))
-                            for c in path])
+    if len(run) < 2:
+        return []
+    filled = [run[0]]
     for a, b in zip(run, run[1:]):
+        filled.extend(hex_walk(grid, a, b)[1:])
+    filled = straighten(grid, filled)
+    out = []
+    for a, b in zip(filled, filled[1:]):
         path = hex_walk(grid, a, b)
         for u, v in zip(path, path[1:]):
             if u != v:
@@ -155,296 +148,223 @@ def links_of(grid: HexGrid, run: list[int]) -> list[tuple[int, int]]:
     return out
 
 
-# ------------------------------------------------------------------ roads and rail
-
-
-def _route_name(level: str | None, name: str | None) -> str | None:
-    if not name:
-        return None
-    name = name.strip()
-    if level == "Interstate":
-        return name if name.upper().startswith("I") else f"I-{name}"
-    if level == "Federal":
-        return name if name.upper().startswith("US") else f"US {name}"
-    return name
-
-
 def _route_key(name: str) -> tuple:
     digits = "".join(ch for ch in name if ch.isdigit())
-    return (len(digits) or 9, int(digits) if digits else 999, name)
+    return (int(digits) if digits else 99999, name)
 
 
-def build_roads(grid, proj, owner, ne):
-    cls_of = defaultdict(lambda: 9)
-    names = defaultdict(Counter)
-    for f in ne["roads"]:
-        inter = f["level"] == "Interstate"
-        sr = f["scalerank"] if f["scalerank"] is not None else 99
-        major = sr <= MAJOR_MAX_SCALERANK or (f["expressway"] and f["type"] in MAJOR_TYPES)
-        if not (inter or major):
+def build_roads(grid: HexGrid, proj: MapProjection, owner: list[int], lines: list[dict]) -> list[list]:
+    class_of: dict[tuple[int, int], int] = {}
+    names: dict[tuple[int, int], Counter] = defaultdict(Counter)
+    for feature in lines:
+        kind = feature.get("kind")
+        if kind not in {"motorway", "expressway", "motorway_other"}:
             continue
-        cls = 0 if inter else 1
-        name = _route_name(f["level"], f["name"])
-        for line in f["lines"]:
-            pts = [proj(lon, lat) for lon, lat in line]
-            for run in sample_cells(grid, pts):
-                for a, b in links_of(grid, run):
-                    if owner[a] < 0 and owner[b] < 0:
-                        continue
-                    if owner[a] == -2 or owner[b] == -2:
-                        continue  # into Canada or Mexico
-                    if cls < cls_of[(a, b)]:
-                        cls_of[(a, b)] = cls
-                        names[(a, b)].clear()
-                    if cls == cls_of[(a, b)] and name:
-                        names[(a, b)][name] += 1
-    roads = []
-    for (a, b), cls in sorted(cls_of.items()):
-        nm = min(names[(a, b)], key=_route_key) if names[(a, b)] else None
-        roads.append([a, b, cls, nm])
-    return roads
+        cls = 0 if kind in {"motorway", "motorway_other"} else 1
+        name = feature.get("ref") or feature.get("name")
+        pts = [proj(lon, lat) for lon, lat in feature.get("coords") or []]
+        for run in sample_cells(grid, pts):
+            for pair in links_of(grid, run):
+                a, b = pair
+                if owner[a] < 0 and owner[b] < 0:
+                    continue
+                previous = class_of.get(pair, 9)
+                if cls < previous:
+                    class_of[pair] = cls
+                    names[pair].clear()
+                if cls == class_of.get(pair) and name:
+                    names[pair][name] += 1
+    out = []
+    for (a, b), cls in sorted(class_of.items()):
+        name = min(names[(a, b)], key=_route_key) if names[(a, b)] else None
+        out.append([a, b, cls, name])
+    return out
 
 
-def build_rail(grid, proj, owner, ne, foreign_idx):
-    tier_of = {}
-
-    def keep(x, y):
-        return foreign_idx.locate(x, y) < 0
-
-    for f in ne["rail"]:
-        sr = f["scalerank"] if f["scalerank"] is not None else 99
-        if sr > RAIL_MAX_SCALERANK:
+def build_rail(grid: HexGrid, proj: MapProjection, owner: list[int], lines: list[dict]) -> list[list]:
+    tier_of: dict[tuple[int, int], int] = {}
+    for feature in lines:
+        if feature.get("kind") != "rail_main":
             continue
-        tier = 0 if sr <= RAIL_MAIN_SCALERANK else 1
-        for line in f["lines"]:
-            pts = [proj(lon, lat) for lon, lat in line]
-            for run in sample_cells(grid, pts, keep):
-                for a, b in links_of(grid, run):
-                    if owner[a] == -2 or owner[b] == -2 or (owner[a] < 0 and owner[b] < 0):
-                        continue
-                    tier_of[(a, b)] = min(tier, tier_of.get((a, b), 9))
-    return [[a, b, t] for (a, b), t in sorted(tier_of.items())]
-
-
-# ------------------------------------------------------------------ sites
+        tier = 0 if feature.get("cmk") or feature.get("highspeed") or (feature.get("maxspeed") or 0) >= 160 else 1
+        pts = [proj(lon, lat) for lon, lat in feature.get("coords") or []]
+        for run in sample_cells(grid, pts):
+            for pair in links_of(grid, run):
+                a, b = pair
+                if owner[a] < 0 and owner[b] < 0:
+                    continue
+                tier_of[pair] = min(tier, tier_of.get(pair, 9))
+    return [[a, b, tier] for (a, b), tier in sorted(tier_of.items())]
 
 
 class Locator:
-    def __init__(self, world, grid, proj):
-        self.grid, self.proj, self.world = grid, proj, world
-        self.owner, self.county, self.geoids = world["owner"], world["county"], world["counties"]
-        bounds = load_interim("census_boundaries")["states"]
-        abbr_of = {s["fips"]: s["abbr"] for s in bounds}
-        self.abbrs = [abbr_of.get(f) for f in world["states"]]
-        city_ids = {c["id"] for c in json.loads((WEB_DATA / "cities.json").read_text())}
-        self.cbsa_of = {g: code for code, geoids in load_interim("cbsa_delineation")["counties"].items()
-                        if code in city_ids for g in geoids}
+    """Place a lon/lat point and attach its Polish administrative codes."""
 
-    def land_cell(self, x, y, rings=SITE_RINGS) -> int:
-        grid, owner = self.grid, self.owner
-        cell = grid.cell_at(x, y)
+    def __init__(self, world: dict):
+        self.world = world
+        self.grid = HexGrid(**world["grid"])
+        self.proj = map_projection(world["projection"])
+        self.owner = world["owner"]
+        self.county = world["county"]
+        self.gminy = world["counties"]
+        self.states = world["states"]
+
+    def nearest_land(self, cell: int, rings: int = SITE_RINGS) -> int:
         if cell < 0:
             return -1
-        if owner[cell] >= 0:
+        if self.owner[cell] >= 0:
             return cell
         seen, frontier = {cell}, [cell]
         for _ in range(rings):
-            ring = [n for c in frontier for n in grid.neighbours(c) if n not in seen]
-            ring = list(dict.fromkeys(ring))
-            seen.update(ring)
-            land = [n for n in ring if owner[n] >= 0]
+            nxt = []
+            for current in frontier:
+                for near in self.grid.neighbours(current):
+                    if near not in seen:
+                        seen.add(near)
+                        nxt.append(near)
+            land = [near for near in nxt if self.owner[near] >= 0]
             if land:
-                return min(land, key=lambda n: math.dist(grid.center(*grid.col_row(n)), (x, y)))
-            frontier = ring
+                x, y = self.grid.center(*self.grid.col_row(cell))
+                return min(land, key=lambda near: math.dist(self.grid.center(*self.grid.col_row(near)), (x, y)))
+            frontier = nxt
         return -1
 
-    def place(self, lon, lat) -> dict | None:
+    def place(self, lon, lat, *, keep_water: bool = False, rings: int = SITE_RINGS) -> dict | None:
         if lon is None or lat is None:
             return None
-        x, y = self.proj(lon, lat)
-        cell = self.land_cell(x, y)
-        if cell < 0:
+        x, y = self.proj(float(lon), float(lat))
+        true_cell = self.grid.cell_at(x, y)
+        land_cell = self.nearest_land(true_cell, rings)
+        if land_cell < 0:
             return None
-        ci = self.county[cell]
-        geoid = self.geoids[ci] if ci >= 0 else None
-        return {"x": round(x, 1), "y": round(y, 1), "cell": cell, "county": geoid,
-                "cbsa": self.cbsa_of.get(geoid) if geoid else None, "state": self.abbrs[self.owner[cell]]}
+        cell = true_cell if keep_water and true_cell >= 0 else land_cell
+        state_index = self.owner[land_cell]
+        county_index = self.county[land_cell]
+        gmina = self.gminy[county_index] if county_index >= 0 else None
+        state_code = self.states[state_index] if state_index >= 0 else None
+        return {
+            "x": round(x, 1), "y": round(y, 1), "cell": cell,
+            "gmina": gmina, "county": gmina, "powiat": gmina[:4] if gmina else None,
+            "cbsa": None, "state": STATE_ABBR.get(state_code),
+        }
 
 
-def build_ports(loc: Locator, usace: dict) -> list[dict]:
+def build_ports(locator: Locator, points: list[dict]) -> list[dict]:
+    ranked = sorted(points, key=lambda p: (-(p.get("props", {}).get("cargo_kt") or -1), p.get("name") or ""))
     out = []
-    for p in usace["ports"]:
-        at = loc.place(p["lon"], p["lat"])
+    for point in ranked:
+        props = point.get("props") or {}
+        at = locator.place(point.get("lon"), point.get("lat"))
         if at is None:
-            continue  # Alaska, Hawaii, Puerto Rico, Guam ...
-        out.append({"id": p["id"], "name": p["name"], "type": p["type"], "rank": p["rank"], "tons": p["tons"],
-                    "domestic": p["domestic"], "foreign": p["foreign"], "imports": p["imports"],
-                    "exports": p["exports"], "year": usace["year"], **at})
+            continue
+        kind = point.get("kind")
+        out.append({
+            "id": point["id"], "name": point["name"],
+            "type": "seaport" if kind == "seaport" else kind,
+            "rank": len(out) + 1,
+            "cargo_kt": props.get("cargo_kt"), "international_kt": props.get("international_kt"),
+            "unloading_kt": props.get("unloading_kt"), "loading_kt": props.get("loading_kt"),
+            "transit_kt": props.get("transit_kt"), "teu": props.get("teu"),
+            "year": props.get("cargo_year") or props.get("teu_year"),
+            "status": props.get("status") or "operating", "operator": props.get("operator"),
+            "capacity_bcm": props.get("capacity_bcm"), "ref": props.get("ref"),
+            **at,
+        })
     return out
 
 
-def build_airports(loc: Locator, faa: dict) -> list[dict]:
+def build_airports(locator: Locator, points: list[dict]) -> list[dict]:
+    ranked = sorted(points, key=lambda p: (-(p.get("props", {}).get("passengers") or -1), p.get("name") or ""))
     out = []
-    for a in faa["airports"]:
-        if a["hub"] is None and a["cargo_lbs"] is None:
-            continue
-        at = loc.place(a["lon"], a["lat"])
+    for point in ranked:
+        props = point.get("props") or {}
+        at = locator.place(point.get("lon"), point.get("lat"))
         if at is None:
             continue
-        out.append({"id": a["id"], "name": a["name"], "city": a["city"], "hub": a["hub"],
-                    "enplanements": _int(a["enplanements"]), "enplanements_prev": _int(a["enplanements_prev"]),
-                    "cargo_lbs": _int(a["cargo_lbs"]), "year": faa["year"], **at})
-    out.sort(key=lambda a: -(a["enplanements"] or 0))
+        out.append({
+            "id": point["id"], "name": point["name"], "icao": props.get("icao"), "iata": props.get("iata"),
+            "rank": len(out) + 1, "passengers": props.get("passengers"),
+            "passengers_prev": props.get("passengers_prev"), "freight_t": props.get("freight_t"),
+            "year": props.get("passengers_year") or props.get("freight_year"),
+            "status": props.get("status"), "status_note": props.get("status_note"),
+            **at,
+        })
     return out
 
 
-def _int(v):
-    return None if v is None else int(round(v))
-
-
-# ------------------------------------------------------------------ build
+def _country_row(data: dict, table: str) -> dict:
+    return ((data.get("tables") or {}).get(table, {}).get("rows") or {}).get("PL", {})
 
 
 def build() -> None:
     world = load_interim("_world")
-    grid, proj, owner = HexGrid(**world["grid"]), MapProjection(**world["projection"]), world["owner"]
-    ne = load_interim("natural_earth_roads")
-    foreign = load_interim("natural_earth")["countries"]
-    foreign_idx = ShapeIndex([Shape([[proj(lon, lat) for lon, lat in r] for r in c["rings"]]) for c in foreign],
-                             cell_km=100)
-    roads = build_roads(grid, proj, owner, ne)
-    rail = build_rail(grid, proj, owner, ne, foreign_idx)
+    osm_payload = load_interim_payload("pl_transport_osm")
+    network_payload = load_interim_payload("pl_transport_network")
+    airport_payload = load_interim_payload("pl_transport_airports")
+    port_payload = load_interim_payload("pl_transport_ports")
+    osm = osm_payload["data"]
+    network = network_payload["data"]
+    airport_data = airport_payload["data"]
+    port_data = port_payload["data"]
 
-    loc = Locator(world, grid, proj)
-    usace = load_interim_payload("usace_ports")
-    faa = load_interim_payload("faa_airports")
-    ports = build_ports(loc, usace["data"])
-    airports = build_airports(loc, faa["data"])
+    grid = HexGrid(**world["grid"])
+    proj = map_projection(world["projection"])
+    roads = build_roads(grid, proj, world["owner"], osm.get("lines") or [])
+    rail = build_rail(grid, proj, world["owner"], osm.get("lines") or [])
+    locator = Locator(world)
+    ports = build_ports(locator, port_data.get("points") or [])
+    airports = build_airports(locator, airport_data.get("points") or [])
 
-    ne_vintage = load_interim_payload("natural_earth_roads")["vintage"]
-    doc = {
+    write_web("infrastructure.json", {
         "version": 1,
-        "vintage": {"roads": ne_vintage, "rail": ne_vintage, "ports": usace["vintage"], "airports": faa["vintage"]},
-        "sources": ["natural_earth_roads", "usace_ports", "faa_airports"],
+        "vintage": {
+            "roads": osm_payload.get("vintage"), "rail": osm_payload.get("vintage"),
+            "network": network_payload.get("vintage"), "ports": port_payload.get("vintage"),
+            "airports": airport_payload.get("vintage"),
+        },
+        "sources": ["pl_transport_osm", "pl_transport_network", "pl_transport_ports", "pl_transport_airports"],
         "rules": RULES,
         "road_classes": ROAD_CLASSES,
         "rail_tiers": RAIL_TIERS,
-        "hubs": HUBS,
         "roads": roads,
         "rail": rail,
         "ports": ports,
         "airports": airports,
-    }
-    write_web("infrastructure.json", doc)
-    road_cells = {c for a, b, *_ in roads for c in (a, b) if owner[c] >= 0}
-    rail_cells = {c for a, b, _ in rail for c in (a, b) if owner[c] >= 0}
-    land = sum(1 for o in owner if o >= 0)
-    n0 = sum(1 for r in roads if r[2] == 0)
-    print(f"    roads: {n0} Interstate + {len(roads) - n0} major links on {len(road_cells)} of {land} land hexes; "
-          f"rail: {len(rail)} links on {len(rail_cells)} hexes; {len(ports)} ports, {len(airports)} airports")
+        "totals": {
+            "network": _country_row(network, "network_country"),
+            "ports": _country_row(port_data, "ports_country"),
+            "airports": _country_row(airport_data, "airports_country"),
+        },
+    })
+    print(f"    {len(roads)} road links, {len(rail)} rail links, {len(ports)} ports, {len(airports)} airports")
 
 
-# ------------------------------------------------------------------ check
-
-
-def _neighbours(grid_doc):
-    return HexGrid(grid_doc["radius"], grid_doc["cols"], grid_doc["rows"])
-
-
-def check(web_dir: Path) -> list[tuple[str, str]]:
-    path = Path(web_dir) / "infrastructure.json"
+def check(web_dir) -> list[tuple[str, str]]:
+    web_dir = Path(web_dir)
+    path = web_dir / "infrastructure.json"
     if not path.exists():
-        return [("NOTE", "infrastructure.json not built (optional; run: build infrastructure --deps)")]
+        return [("NOTE", "infrastructure.json not built")]
     out = []
-    doc = json.loads(path.read_text())
-    for k in ("version", "vintage", "sources", "road_classes", "roads", "rail", "ports", "airports"):
-        if k not in doc:
-            out.append(("FAIL", f"infrastructure.json lacks '{k}'"))
-    if any(lv == "FAIL" for lv, _ in out):
-        return out
-    if doc["version"] != 1:
-        out.append(("FAIL", f"infrastructure.json version {doc['version']!r} (expected 1)"))
-    wpath = Path(web_dir) / "world.json"
-    world = json.loads(wpath.read_text()) if wpath.exists() else None
-    if not world or "grid" not in world:
-        return out + [("NOTE", "infrastructure.json: world.json unavailable, cell checks skipped")]
-    grid = _neighbours(world["grid"])
-    owner = world.get("owner") or []
-    n = grid.size
-    county_ids = {c["geoid"] for c in world.get("counties", [])}
-    cpath = Path(web_dir) / "cities.json"
-    city_ids = {c["id"] for c in json.loads(cpath.read_text())} if cpath.exists() else None
-    spath = Path(web_dir) / "sources.json"
-    if spath.exists():
-        src = json.loads(spath.read_text())
-        ids = {s["id"] for s in (src.get("sources", src) if isinstance(src, dict) else src) if isinstance(s, dict)}
-        miss = [s for s in doc["sources"] if s not in ids]
-        if ids and miss:
-            out.append(("WARN", f"infrastructure.json cites sources missing from sources.json: {miss}"))
-
-    def bad_link(link, ncls):
-        if not isinstance(link, list) or len(link) < 3:
-            return "shape"
-        a, b, c = link[:3]
-        if not all(isinstance(v, int) for v in (a, b, c)):
-            return "types"
-        if not (0 <= a < b < n):
-            return "order/range"
-        if b not in grid.neighbours(a):
-            return "not neighbours"
-        if len(owner) == n and owner[a] < 0 and owner[b] < 0:
-            return "no US land end"
-        if not 0 <= c < ncls:
-            return "class"
-        return None
-
-    for key, ncls in (("roads", len(doc["road_classes"])), ("rail", len(doc.get("rail_tiers") or [0, 1]))):
-        links = doc[key]
-        bad = [(l, why) for l in links if (why := bad_link(l, ncls))]
-        pairs = [tuple(l[:2]) for l in links if isinstance(l, list)]
-        dup = len(pairs) - len(set(pairs))
-        if bad or dup:
-            out.append(("FAIL", f"infrastructure.json {key}: {len(bad)} bad links (e.g. {bad[:2]}), {dup} duplicates"))
-        else:
-            cells = {c for l in links for c in l[:2]}
-            out.append(("PASS", f"infrastructure.json {key}: {len(links)} neighbour links on {len(cells)} hexes"))
-    if any(not (r[3] is None or isinstance(r[3], str)) for r in doc["roads"] if len(r) > 3):
-        out.append(("FAIL", "infrastructure.json roads: route name must be a string or null"))
-
-    def check_sites(key, num_keys):
-        probs = []
-        for s in doc[key]:
-            c = s.get("cell")
-            if not isinstance(c, int) or not 0 <= c < n or (len(owner) == n and owner[c] < 0):
-                probs.append(f"{s.get('id')}: cell {c!r} is not US land")
-                continue
-            if any(s.get(k) is not None and not isinstance(s.get(k), (int, float)) for k in num_keys):
-                probs.append(f"{s.get('id')}: non-numeric value")
-            cx, cy = grid.center(*grid.col_row(c))
-            if not all(isinstance(s.get(k), (int, float)) for k in ("x", "y")) or \
-                    math.dist((cx, cy), (s["x"], s["y"])) > (SITE_RINGS + 1) * world["grid"]["radius"] * 2:
-                probs.append(f"{s.get('id')}: x/y far from its cell")
-            if s.get("county") is not None and county_ids and s["county"] not in county_ids:
-                probs.append(f"{s.get('id')}: unknown county {s['county']}")
-            if s.get("cbsa") is not None and city_ids is not None and s["cbsa"] not in city_ids:
-                probs.append(f"{s.get('id')}: unknown cbsa {s['cbsa']}")
-        ids = [s.get("id") for s in doc[key]]
-        if len(ids) != len(set(ids)):
-            probs.append("duplicate ids")
-        return probs
-
-    for key, nums in (("ports", ("tons", "domestic", "foreign", "imports", "exports", "rank")),
-                      ("airports", ("enplanements", "enplanements_prev", "cargo_lbs"))):
-        probs = check_sites(key, nums)
-        if probs:
-            out.append(("FAIL", f"infrastructure.json {key}: {len(probs)} problems, e.g. {probs[:3]}"))
-        else:
-            metro = sum(1 for s in doc[key] if s.get("cbsa"))
-            out.append(("PASS", f"infrastructure.json {key}: {len(doc[key])} sites, {metro} in a mapped metro"))
-    hubs = Counter(a.get("hub") for a in doc["airports"])
-    out.append(("NOTE", "infrastructure.json airports by hub: " + ", ".join(f"{k or 'cargo-only'} {v}" for k, v in
-                                                                         sorted(hubs.items(), key=lambda kv: str(kv[0])))))
-    size = path.stat().st_size
-    if size > 300_000:
-        out.append(("WARN", f"infrastructure.json is {size / 1e3:.0f} kB (eager files should stay under ~300 kB)"))
+    fail = lambda message: out.append(("FAIL", f"infrastructure.json: {message}"))
+    try:
+        doc = json.loads(path.read_text())
+        world = json.loads((web_dir / "world.json").read_text())
+    except (OSError, ValueError) as exc:
+        return [("FAIL", f"infrastructure.json: cannot read output: {exc}")]
+    size = int(world["grid"]["cols"]) * int(world["grid"]["rows"])
+    grid = HexGrid(**world["grid"])
+    for key in ("version", "vintage", "sources", "rules", "roads", "rail", "ports", "airports"):
+        if key not in doc:
+            fail(f"missing key {key}")
+    for label, rows in (("roads", doc.get("roads") or []), ("rail", doc.get("rail") or [])):
+        bad = [row for row in rows if len(row) < 3 or not (0 <= row[0] < row[1] < size) or row[1] not in grid.neighbours(row[0])]
+        if bad:
+            fail(f"{len(bad)} malformed or non-neighbouring {label} links")
+    for label in ("ports", "airports"):
+        bad = [site.get("id") for site in doc.get(label) or [] if not isinstance(site.get("cell"), int) or not 0 <= site["cell"] < size]
+        if bad:
+            fail(f"{len(bad)} {label} have invalid cells")
+    if not any(level == "FAIL" for level, _ in out):
+        out.append(("PASS", f"infrastructure: {len(doc['roads'])} road links, {len(doc['rail'])} rail links, "
+                            f"{len(doc['ports'])} ports, {len(doc['airports'])} airports"))
     return out

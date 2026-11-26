@@ -3,9 +3,9 @@
 //   app mode "advisor", params {id, ...}  (id = an advisor id, or none for the council picker)
 //   URL hash: #advisor=<id> ("council" for the picker)
 //   top-bar button "Advisors"
-// Each advisor is a module in views/ exporting mount(ctx) → {onMapHover?, onMapClick?, onEscape?, destroy?}.
+// Each advisor is a module in views/ exporting mount(ctx) -> {onMapHover?, onMapClick?, onEscape?, destroy?}.
 // ctx = {app, data, el, link, params, on(name, fn), bubbles(id, opts), tip, setResourceFilter, setShowResources,
-//        switchTo(id, params)} — everything registered through ctx is undone when the view goes away.
+//        switchTo(id, params)} - everything registered through ctx is undone when the view goes away.
 import { buildData } from "./core/data.js";
 import { createLinker, createBubbles, createMapTip } from "./core/link.js";
 import { emblem } from "./core/emblems.js";
@@ -14,16 +14,16 @@ import { esc, el } from "./core/util.js";
 import { icon } from "../../ui/icon.js";
 
 export const ADVISORS = [
-  { id: "energy", name: "Energy & Resources", role: "Minister of Power", color: "#d98a2b", dark: "#3a1f08", blurb: "Where the power comes from, and what lies underground.", load: () => import("./views/energy.js") },
-  { id: "economy", name: "Economy", role: "Treasurer", color: "#c9a43a", dark: "#3a2c08", blurb: "Who makes what: GDP by industry and the metros that lead it.", load: () => import("./views/economy.js") },
-  { id: "people", name: "People", role: "Keeper of the Census", color: "#c46a4f", dark: "#3a140c", blurb: "Where people live, where they are moving, how old and how new.", load: () => import("./views/people.js") },
-  { id: "prosperity", name: "Prosperity & Housing", role: "Steward of the Hearth", color: "#3f9c82", dark: "#082a22", blurb: "Incomes, home prices, rents and who is being left behind.", load: () => import("./views/prosperity.js") },
-  { id: "knowledge", name: "Knowledge", role: "Royal Scholar", color: "#4a86d6", dark: "#0a1c3a", blurb: "Degrees, broadband and the science workforce.", load: () => import("./views/knowledge.js") },
-  { id: "land", name: "Land", role: "Surveyor General", color: "#6e9a3c", dark: "#18280a", blurb: "Forest, farmland, desert and city: what covers the country.", load: () => import("./views/land.js") },
-  { id: "military", name: "Military", role: "General", color: "#8796ab", dark: "#141b26", blurb: "Bases and ranges, troops and defense dollars by state, and where veterans live.", load: () => import("./views/military.js") },
-  { id: "commerce", name: "Commerce", role: "Master of Trade", color: "#2fa4b8", dark: "#062630", blurb: "The great freight routes between metros, and the busiest ports and airports.", load: () => import("./views/commerce.js") },
-  { id: "culture", name: "Culture", role: "Keeper of Wonders", color: "#c25b9a", dark: "#2e0c22", blurb: "Wonders of the land, faith and wellbeing, and the disasters places endure.", load: () => import("./views/culture.js") },
-  { id: "explorer", name: "Explorer", role: "Cartographer", color: "#9a7bc9", dark: "#1e1236", blurb: "Slice and dice every number: any level, any columns, any chart.", load: () => import("./views/explorer.js") },
+  { id: "energy", name: "Żupnik", role: "Keeper of the Salt Mines and Power", color: "#d98a2b", dark: "#3a1f08", blurb: "Where the power comes from, and what lies underground.", load: () => import("./views/energy.js") },
+  { id: "economy", name: "Podskarbi", role: "Treasurer", color: "#c9a43a", dark: "#3a2c08", blurb: "Who makes what: output by industry and the regions that lead it.", load: () => import("./views/economy.js") },
+  { id: "people", name: "Lustrator", role: "Keeper of the Census", color: "#c46a4f", dark: "#3a140c", blurb: "Where people live, where they are moving, how old and how new.", load: () => import("./views/people.js") },
+  { id: "prosperity", name: "Ochmistrz", role: "Steward", color: "#3f9c82", dark: "#082a22", blurb: "Wages, work, homes and who is being left behind.", load: () => import("./views/prosperity.js") },
+  { id: "knowledge", name: "Rektor", role: "Royal Scholar", color: "#4a86d6", dark: "#0a1c3a", blurb: "Schooling, universities and the science workforce.", load: () => import("./views/knowledge.js") },
+  { id: "land", name: "Geometra", role: "Royal Surveyor", color: "#6e9a3c", dark: "#18280a", blurb: "Forest, farmland, lakes and towns: what covers the country.", load: () => import("./views/land.js") },
+  { id: "military", name: "Hetman", role: "Commander of the Army", color: "#8796ab", dark: "#141b26", blurb: "Garrisons, training grounds, troops and defence spending.", load: () => import("./views/military.js") },
+  { id: "commerce", name: "Gdańsk Merchant", role: "Master of Trade", color: "#2fa4b8", dark: "#062630", blurb: "The great freight routes, and the busiest ports and airports.", load: () => import("./views/commerce.js") },
+  { id: "culture", name: "Kustosz", role: "Keeper of Wonders", color: "#c25b9a", dark: "#2e0c22", blurb: "Heritage and wonders of the land, faith and wellbeing, and the disasters places endure.", load: () => import("./views/culture.js") },
+  { id: "explorer", name: "Kartograf", role: "Cartographer", color: "#9a7bc9", dark: "#1e1236", blurb: "Slice and dice every number: any level, any columns, any chart.", load: () => import("./views/explorer.js") },
 ];
 const byId = new Map(ADVISORS.map((a) => [a.id, a]));
 // The council picker groups its advisors (any advisor not listed here is added to the last group).
@@ -31,7 +31,7 @@ const COUNCIL = (() => {
   const g = [
     { label: "Wealth and work", ids: ["economy", "prosperity", "commerce", "energy"] },
     { label: "People and land", ids: ["people", "knowledge", "culture", "land"] },
-    { label: "Defense", ids: ["military"] },
+    { label: "Defence", ids: ["military"] },
     { label: "Your own questions", ids: ["explorer"] },
   ];
   const listed = new Set(g.flatMap((x) => x.ids));
@@ -90,7 +90,7 @@ export function install(app) {
       <header class="adv-head">
         <button type="button" class="adv-council-btn" data-adv="council" title="All advisors">${icon("g-people", "👥", { size: 14 })}<span>Council</span></button>
         <nav class="adv-tabs" role="tablist" aria-label="Advisors">${ADVISORS.map((a) => `<button type="button" role="tab" data-adv="${a.id}" aria-selected="false" title="${esc(`${a.name}: ${a.role}`)}" style="--adv:${a.color}">${emblem(a, 30)}<span class="sr-only">${esc(a.name)}</span></button>`).join("")}</nav>
-        <button type="button" class="icon-btn adv-close" aria-label="Close the advisors (Esc)" title="Close (Esc)">${icon("close", "✕", { size: 12 })}</button>
+        <button type="button" class="icon-btn adv-close" aria-label="Close the advisors (Esc)" title="Close (Esc)">${icon("close", "\u2715", { size: 12 })}</button>
       </header>
       <div class="adv-main" tabindex="-1"></div>`;
     dock.appendChild(root);
@@ -164,7 +164,7 @@ export function install(app) {
       main.querySelectorAll(".adv-card").forEach((c) => c.addEventListener("click", () => switchTo(c.dataset.adv)));
       return;
     }
-    main.innerHTML = `${titleHtml(adv)}<div class="adv-body"><div class="adv-loading">The ${esc(adv.role.toLowerCase())} is gathering the figures…</div></div>`;
+    main.innerHTML = `${titleHtml(adv)}<div class="adv-body"><div class="adv-loading">${esc(adv.name)} is gathering the figures...</div></div>`;
     let mod;
     try {
       [mod] = await Promise.all([adv.load(), ensureData()]);
@@ -228,7 +228,7 @@ export function install(app) {
       dispose(a);
       return;
     }
-    // Map hover → dashboard, only while a view that wants it is open (the app skips hover work without listeners).
+    // Map hover -> dashboard, only while a view that wants it is open (the app skips hover work without listeners).
     if (a.api.onMapHover && active === a) {
       a.cleanup.push(app.on("hover", (h) => {
         try { a.api.onMapHover(h); } catch (err) { console.error(err); }
@@ -239,19 +239,18 @@ export function install(app) {
   function titleHtml(adv) {
     return `<div class="adv-title" style="--adv:${adv.color}">
       ${emblem(adv, 64)}
-      <div class="adv-titles"><div class="adv-kind">${esc(adv.role)}</div><h2>${esc(adv.name)}</h2><p>${esc(adv.blurb)}</p></div>
+      <div class="adv-titles"><h2>${esc(adv.name)}</h2><div class="adv-role">${esc(adv.role)}</div><p>${esc(adv.blurb)}</p></div>
     </div>`;
   }
 
   function councilHtml() {
-    return `<div class="adv-title council"><div class="adv-titles"><div class="adv-kind">Your council</div><h2>Advisors</h2>
-      <p>Each advisor opens a dashboard on one part of the real economy. Hover anything to see it on the map; hover the map to find it in the charts; click to drill in.</p></div></div>
+    return `<div class="adv-title council"><div class="adv-titles"><h2>Advisors</h2><div class="adv-role">Your council</div>
+      <p>Each advisor keeps one ledger of the country. Hover a figure to find it on the map, hover the map to find it in the charts, click to look closer.</p></div></div>
       ${COUNCIL.map((g) => `<h4 class="adv-council-h">${esc(g.label)}</h4><div class="adv-council">${g.ids.map((id) => byId.get(id)).filter(Boolean).map((a) => `<button type="button" class="adv-card" data-adv="${a.id}" style="--adv:${a.color}">
-        ${emblem(a, 48)}<span class="t"><span class="r">${esc(a.role)}</span><b>${esc(a.name)}</b><span class="d">${esc(a.blurb)}</span></span></button>`).join("")}</div>`).join("")}
-      <p class="adv-note pad">All figures are public data: Census ACS and population estimates, BEA GDP, BLS QCEW, EIA and MSHA site lists, USGS land cover, DoD installation and spending files, FHWA freight flows, USACE and FAA traffic, NPS visits, NSF research spending, the U.S. Religion Census, CDC PLACES, FEMA and NOAA. Each dashboard lists its sources and caveats at the bottom.</p>`;
+        ${emblem(a, 48)}<span class="t"><b>${esc(a.name)}</b><span class="r">${esc(a.role)}</span><span class="d">${esc(a.blurb)}</span></span></button>`).join("")}</div>`).join("")}`;
   }
 
-  // --- map → dashboard --------------------------------------------------------------------------------------------
+  // --- map -> dashboard --------------------------------------------------------------------------------------------
   let lastBubble = null;
   canvas?.addEventListener("pointermove", (e) => {
     if (app.mode !== "advisor" || !active || e.pointerType !== "mouse" || e.buttons) return;

@@ -3,11 +3,11 @@ import { compact, dollars, esc, int, money, pct, yieldValue } from "../format.js
 import { icon, glyph } from "./icon.js";
 
 // Industry → a "district" glyph: SVG icons i-<key> from icons.js; these emoji are only the fallback.
+// Keys are the PKD sections of nation.json industries (pipeline/build/yields.py SECTIONS).
 export const DISTRICT_ICON = {
-  agriculture: "🌾", mining: "⛏️", construction: "🏗️", manufacturing: "🏭", wholesale: "📦", retail: "🛍️",
-  transportation: "🚢", utilities: "⚡", information: "📡", finance: "🏦", real_estate: "🏘️", professional: "🔬",
-  management: "🏢", admin: "🗂️", education: "🎓", health: "🏥", arts: "🎭", accommodation: "🍽️", other: "🔧",
-  public_admin: "🏛️",
+  agriculture: "🌾", mining: "⛏️", manufacturing: "🏭", energy: "⚡", water: "💧", construction: "🏗️", trade: "🛍️",
+  transport: "🚚", accommodation: "🍽️", information: "📡", finance: "🏦", real_estate: "🏘️", professional: "🔬",
+  admin: "🗂️", public_admin: "🏛️", education: "🎓", health: "🏥", arts: "🎭", other: "🔧",
 };
 
 const panelEl = () => document.getElementById("city-panel");
@@ -28,26 +28,26 @@ export function yieldGrid(nation, yields, ranks = null, rankOf = 0) {
     .join("");
 }
 
-// One "value ▲ US value" row. higherIsGood: true / false / null (neutral).
+// One "value ▲ Poland value" row. higherIsGood: true / false / null (neutral).
 export function statRow(ic, fallback, label, v, nv, fmt, higherIsGood) {
   let cmp = "";
   if (v != null && nv != null && nv !== 0) {
     const ratio = v / nv;
     const cls = Math.abs(ratio - 1) < 0.03 || higherIsGood == null ? "" : (higherIsGood ? ratio >= 1 : ratio <= 1) ? "good" : "bad";
-    // Within 3% of the U.S. value reads as level: no arrow, no colour (the colour uses the same band).
+    // Within 3% of the national value reads as level: no arrow, no colour (the colour uses the same band).
     const arrow = Math.abs(ratio - 1) < 0.03 ? "≈" : ratio > 1 ? "▲" : "▼";
-    cmp = `<span class="cmp ${cls}">${arrow} US ${fmt(nv)}</span>`;
+    cmp = `<span class="cmp ${cls}">${arrow} PL ${fmt(nv)}</span>`;
   }
   return `<div class="stat-row"><span class="sl">${icon(ic, fallback, { size: 14 })}${esc(label)}</span><span><b>${fmt(v)}</b>${cmp}</span></div>`;
 }
 
+// Prosperity rows: wage and unemployment are published per powiat (the town's powiat), PIT per gmina.
 export function amenities(o, n) {
+  const powiat = o.scope && o.scope !== "city" && o.wage_exact === false ? " (powiat)" : "";
   return `
-    ${statRow("unemployment", "😐", "Unemployment", o.unemployment, n.unemployment, (x) => pct(x), false)}
-    ${statRow("l-income", "💵", "Median household income", o.median_income, n.median_income, dollars, true)}
-    ${statRow("l-home", "🏠", "Median home value", o.home_value, n.home_value, dollars, null)}
-    ${statRow("l-homeownership", "🔑", "Median gross rent / mo", o.median_rent, n.median_rent, dollars, false)}
-    ${statRow(null, "⚖️", "Rent ÷ income", o.rent_burden, n.rent_burden, (x) => pct(x), false)}`;
+    ${statRow("l-wage", "💵", `Average wage${powiat}`, o.wage, n.wage, (x) => (x == null ? "–" : `${dollars(x)}/mo`), true)}
+    ${statRow("unemployment", "😐", `Unemployment${powiat}`, o.unemployment, n.unemployment, (x) => pct(x), false)}
+    ${statRow("l-income", "💰", "PIT revenue per person", o.pit_per_person, n.pit_per_person, dollars, true)}`;
 }
 
 // Workforce by industry with location quotients vs. the nation ("specialisation"). limit = max rows (0 = all).
@@ -59,14 +59,14 @@ export function industries(o, nation, limit = 0) {
     .filter(([, v]) => v > 0)
     .sort((a, b) => b[1] - a[1]);
   if (limit) rows = rows.slice(0, limit);
-  if (!rows.length) return `<p class="muted">No industry data.</p>`;
+  if (!rows.length) return "";
   const maxShare = rows[0][1] / total;
   return rows
     .map(([k, v]) => {
       const share = v / total;
       const nShare = (n.jobs?.[k] || 0) / nTotal;
       const lq = nShare > 0 ? share / nShare : 1;
-      const tip = `Share of jobs is ${lq.toFixed(1)}× the national share`;
+      const tip = `Share of workers is ${lq.toFixed(1)}× the share in Poland`;
       const badge = lq >= 1.3 ? `<span class="lq hi" title="${tip}">×${lq.toFixed(1)}</span>`
         : lq <= 0.6 ? `<span class="lq lo" title="${tip}">×${lq.toFixed(1)}</span>` : "";
       return `<div class="ind"><span aria-hidden="true">${icon(`i-${k}`, DISTRICT_ICON[k] || "•")}</span>
@@ -78,26 +78,26 @@ export function industries(o, nation, limit = 0) {
 
 export const gdpRow = (o) =>
   o.gdp != null
-    ? `<div class="stat-row"><span class="sl">${icon("y-gold", "💰", { size: 14 })}GDP${o.gdp_year ? ` (${o.gdp_year})` : ""}</span><span><b>${money(o.gdp)}</b>${
+    ? `<div class="stat-row"><span class="sl">${icon("y-gold", "💰", { size: 14 })}GDP${o.gdp_estimated ? " share" : ""}${o.gdp_year ? ` (${o.gdp_year})` : ""}</span><span><b>${money(o.gdp)}</b>${
         o.population ? `<span class="cmp">${money(o.gdp / o.population)} per person</span>` : ""}</span></div>`
     : "";
 
-// " · ▲ 3.4% since 2021" from growth / growth_years (cities and states), compared with the U.S. in the tooltip.
+// " · ▲ 3.4% since 2015" from growth / growth_years (towns and voivodeships), compared with Poland in the tooltip.
 // Empty when growth is missing (null means "not measured", never zero).
 export function growthSpan(o, n = null) {
   if (!Number.isFinite(o?.growth)) return "";
   const yrs = Array.isArray(o.growth_years) && o.growth_years.length === 2 ? o.growth_years : null;
   const p = (g) => `${g >= 0 ? "+" : "−"}${Math.abs(g * 100).toFixed(1)}%`;
   const period = yrs ? `${yrs[0]}–${yrs[1]}` : "the last few years";
-  const us = Number.isFinite(n?.growth) ? ` (U.S. ${p(n.growth)})` : "";
-  const tip = `Population change ${period}, Census population estimates: ${p(o.growth)}${us}`;
+  const pl = Number.isFinite(n?.growth) ? ` (Poland ${p(n.growth)})` : "";
+  const tip = `Population change ${period}: ${p(o.growth)}${pl}`;
   const cls = o.growth >= 0 ? "good" : "bad";
   return ` · <span class="growth ${cls}" title="${esc(tip)}">${o.growth >= 0 ? "▲" : "▼"} ${Math.abs(o.growth * 100).toFixed(1)}%${
     yrs ? ` <span class="since">since ${yrs[0]}</span>` : ""}</span>`;
 }
 
 export const popLine = (o, extra = "") =>
-  `<div class="cp-pop">${icon("pop", "👥", { size: 16 })} <b>${int(o.population)}</b> people · ${int(o.employed)} employed${extra}</div>`;
+  `<div class="cp-pop">${icon("pop", "👥", { size: 16 })} <b>${int(o.population)}</b> people${o.employed != null ? ` · ${int(o.employed)} workers` : ""}${extra}</div>`;
 
 /**
  * Fill and show the panel.
@@ -106,19 +106,19 @@ export const popLine = (o, extra = "") =>
 export function showPanel(spec) {
   const panel = panelEl();
   panel.dataset.kind = spec.kind;
-  panel.setAttribute("aria-label", `${spec.kind === "state" ? "State" : "City"}: ${spec.title}`);
+  panel.setAttribute("aria-label", `${spec.kind === "state" ? "Voivodeship" : "Town"}: ${spec.title}`);
   panel.innerHTML = `
     <div class="sheet-grip" aria-hidden="true"></div>
     <div class="cp-head">
       <div class="stripe" style="background:${spec.stripe}"></div>
       <button class="icon-btn cp-close" aria-label="Close panel (Esc)" title="Close (Esc)">${icon("close", "✕", { size: 13 })}</button>
-      <div class="cp-kind">${spec.kind === "state" ? "State" : "City"}</div>
+      <div class="cp-kind">${spec.kindLabel || (spec.kind === "state" ? "Voivodeship" : "Town")}</div>
       <h2 class="cp-name">${spec.titleHtml ?? esc(spec.title)}</h2>
       ${spec.sub ? `<div class="cp-full">${spec.sub}</div>` : ""}
       ${spec.headExtra || ""}
     </div>
     ${spec.sections.filter(Boolean).map((s) => `<section class="cp-section"><h3>${s.title}</h3>${s.html}</section>`).join("")}
-    <div class="cp-foot">${spec.foot || ""} <a href="#" data-pedia>Almanac ›</a></div>`;
+    <div class="cp-foot">${spec.foot || ""} <a href="#" data-pedia>Almanac</a></div>`;
   panel.hidden = false;
   panel.scrollTop = 0;
   panel.classList.remove("dragging-sheet");

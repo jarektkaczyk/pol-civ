@@ -3,38 +3,38 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>usaciv — the United States as a strategy game</title>
-  <meta name="description" content="The real United States drawn like a 4X strategy map: hex terrain, cities with yields, lenses and resources, all from public data.">
-  <meta name="theme-color" content="#131e2a">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='31' fill='%23120d06'/%3E%3Ccircle cx='32' cy='32' r='29' fill='%23c9a45c'/%3E%3Ccircle cx='32' cy='32' r='24' fill='%232a4d8f'/%3E%3Cpath fill='%23f8f0d8' d='M32 14l4.9 11.3 12.2 1.1-9.3 8.1 2.8 12-10.6-6.4-10.6 6.4 2.8-12-9.3-8.1 12.2-1.1z'/%3E%3C/svg%3E">
-  <!-- Social cards. Crawlers need absolute URLs: if you host your own copy, change https://karpathy.ai/usaciv/ to its address
-       (og:url, og:image, twitter:image, canonical). og-image.png is a 1200x630 render of the home view. -->
-  <link rel="canonical" href="https://karpathy.ai/usaciv/">
+  <title>POLSKA, as a strategy game built from real public data</title>
+  <meta name="description" content="Real Poland drawn like a 4X strategy map: hex terrain, towns with yields, lenses and resources, all from public data.">
+  <meta name="theme-color" content="#0f2233">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M8 6h48v24c0 15-10 24-24 30C18 54 8 45 8 30z' fill='%23120d06'/%3E%3Cpath d='M11 9h42v21c0 13-9 21-21 26.5C20 51 11 43 11 30z' fill='%23c9a45c'/%3E%3Cpath d='M14.5 12.5h35V30c0 11-7.5 18-17.5 22.8C22 48 14.5 41 14.5 30z' fill='%23B3262E'/%3E%3Cpath d='M14.5 12.5h35V28c-6 3-11.5-3-17.5 0s-11.5 3-17.5 0z' fill='%23f4ecd8'/%3E%3Cpath d='M14.5 28c6 3 11.5 3 17.5 0s11.5-3 17.5 0' fill='none' stroke='%23c9a45c' stroke-width='3'/%3E%3C/svg%3E">
+  <!-- Social cards need absolute URLs (canonical, og:url, og:image, twitter:image). They repeat SITE_URL from js/app/share.js:
+       change both together. og-image.png is a 1200x630 render of the home view. -->
+  <link rel="canonical" href="https://softonsofa.com/pol-civ/">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="usaciv">
-  <meta property="og:title" content="The United States as a strategy-game map">
-  <meta property="og:description" content="The real U.S. economy drawn like a 4X strategy map: hex terrain, cities with yields, lenses and resources, all from public data (Census ACS, BEA, NOAA, USGS, EIA).">
-  <meta property="og:url" content="https://karpathy.ai/usaciv/">
-  <meta property="og:image" content="https://karpathy.ai/usaciv/og-image.png">
+  <meta property="og:site_name" content="POLSKA">
+  <meta property="og:title" content="POLSKA, as a strategy game">
+  <meta property="og:description" content="Real Poland drawn like a 4X strategy map: hex terrain, towns with yields, lenses and resources, built from real public data.">
+  <meta property="og:url" content="https://softonsofa.com/pol-civ/">
+  <meta property="og:image" content="https://softonsofa.com/pol-civ/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Hex map of the contiguous United States with city banners, in the style of a strategy game">
+  <meta property="og:image:alt" content="Hex map of Poland with town banners, in the style of a strategy game">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="The United States as a strategy-game map">
-  <meta name="twitter:description" content="The real U.S. economy drawn like a 4X strategy map, from public data.">
-  <meta name="twitter:image" content="https://karpathy.ai/usaciv/og-image.png">
-  <meta name="twitter:image:alt" content="Hex map of the contiguous United States with city banners, in the style of a strategy game">
+  <meta name="twitter:title" content="POLSKA, as a strategy game">
+  <meta name="twitter:description" content="Real Poland drawn like a 4X strategy map, built from real public data.">
+  <meta name="twitter:image" content="https://softonsofa.com/pol-civ/og-image.png">
+  <meta name="twitter:image:alt" content="Hex map of Poland with town banners, in the style of a strategy game">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header id="topbar">
-    <div class="brand" title="United States"><span class="brand-emblem" aria-hidden="true">★</span><span class="brand-text">United States</span></div>
+    <div class="brand" title="POLSKA, as a strategy game, built from real public data"><svg class="brand-emblem" aria-hidden="true" viewBox="0 0 64 64" width="26" height="26"><path d="M8 6h48v24c0 15-10 24-24 30C18 54 8 45 8 30z" fill="#120d06"/><path d="M11 9h42v21c0 13-9 21-21 26.5C20 51 11 43 11 30z" fill="#c9a45c"/><path d="M14.5 12.5h35V30c0 11-7.5 18-17.5 22.8C22 48 14.5 41 14.5 30z" fill="#B3262E"/><path d="M14.5 12.5h35V28c-6 3-11.5-3-17.5 0s-11.5 3-17.5 0z" fill="#f4ecd8"/><path d="M14.5 28c6 3 11.5 3 17.5 0s11.5-3 17.5 0" fill="none" stroke="#e2bf6e" stroke-width="2.6"/><path d="M11 9h42" stroke="#f6dc8a" stroke-width="1.2" opacity=".7"/></svg><span class="brand-words"><span class="brand-text">Polska</span><i class="brand-tag">as a strategy game, built from real public data</i></span></div>
     <div id="yields" class="yields" aria-label="National yields"></div>
     <div class="spacer"></div>
     <div class="search" role="search">
       <span class="search-ic" aria-hidden="true"></span>
-      <input id="search-input" type="search" placeholder="Search cities &amp; states" autocomplete="off" spellcheck="false"
-        role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results" aria-label="Search cities and states (/ or Ctrl K)">
+      <input id="search-input" type="search" placeholder="Search towns and voivodeships" autocomplete="off" spellcheck="false"
+        role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results" aria-label="Search towns and voivodeships (/ or Ctrl K)">
       <kbd class="search-kbd" aria-hidden="true">/</kbd>
     </div>
     <div id="turn" class="turn"></div>
@@ -45,7 +45,7 @@
     </div>
   </header>
 
-  <canvas id="map" role="img" aria-label="Hex map of the contiguous United States"></canvas>
+  <canvas id="map" role="img" aria-label="Hex map of Poland"></canvas>
 
   <div id="tooltip" class="tooltip" hidden></div>
   <aside id="city-panel" class="panel" hidden role="region" aria-label="Details"></aside>
@@ -71,7 +71,7 @@
 
   <div id="pedia" class="modal" hidden>
     <div class="modal-card panel" role="dialog" aria-modal="true" aria-label="Almanac">
-      <button class="close icon-btn" data-close aria-label="Close the Almanac">✕</button>
+      <button class="close icon-btn" data-close aria-label="Close the Almanac">&#x2715;</button>
       <nav id="pedia-nav" aria-label="Almanac pages"></nav>
       <article id="pedia-body"></article>
     </div>
@@ -81,7 +81,7 @@
     <div class="help-card panel" role="dialog" aria-modal="true" aria-labelledby="help-title"></div>
   </div>
 
-  <div id="loading">Surveying the land…</div>
+  <div id="loading"><span class="ld-title">Polska</span><i>Surveying the land...</i></div>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

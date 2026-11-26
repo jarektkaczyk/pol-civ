@@ -26,16 +26,16 @@ export function openCityPanel(city, ctx) {
     kind: "city",
     stripe: col,
     title: city.name,
-    titleHtml: `${isCapital(city) ? `<span class="cap" title="National capital">★</span> ` : ""}${esc(city.name)}`,
+    kindLabel: city.kind === "city" ? "City with powiat rights" : "Town",
+    titleHtml: `${isCapital(city) ? `<span class="cap" title="Capital of Poland">★</span> ` : ""}${esc(city.name)}`,
     sub: `${esc(city.full || "")}${states ? `<div class="chips">${states}</div>` : ""}`,
     headExtra: popLine(city, growth),
     sections: [
       { title: "Yields", html: `<div class="yield-grid">${yieldGrid(nation, city.yields)}</div>` },
-      { title: "Amenities &amp; Housing", html: amenities(city, n) + gdpRow(city) },
-      { title: "Districts · where people work", html: industries(city, nation) },
+      { title: city.scope === "urban-rural gmina" ? "Prosperity · whole gmina" : "Prosperity", html: amenities(city, n) + gdpRow(city) },
+      Object.keys(city.jobs || {}).length && { title: "Workers by sector", html: industries(city, nation) },
     ],
-    foot: `Source: ${esc(nation.vintage)} (tables C24030, B19025, B19013, B25064, B25077, B23025)${nation.gdp_vintage ? `; GDP: ${esc(nation.gdp_vintage)}` : ""}.
-      Green ×N = this industry's share of jobs is N× the U.S. share.`,
+    foot: "",
     onClose: ctx.onClose,
     onPedia: ctx.onPedia,
     wire(panel) {

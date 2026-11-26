@@ -1,6 +1,6 @@
 // Land-tile art: a painterly texture over the flat tile colours, then per-cell "stamps" for land cover (forests,
-// farmland patchwork, pasture, prairie grass, desert scrub, marsh, suburbs, barren rock, ice) and relief (rolling
-// hills, mountain ranges, snowy peaks, desert mesas), combined sensibly (forested hills, desert mountains...).
+// farmland patchwork and strip fields, meadows, scrub, marsh, suburbs, bare rock, ice) and relief (rolling hills,
+// forested ranges, snowy peaks), combined sensibly (forested hills, alpine peaks...).
 //
 // Interface (used by render/map.js and web/dev/gallery.js):
 //
@@ -22,20 +22,19 @@
 // How it is drawn (fast enough to re-render the static layer on every zoom settle):
 //   1. Texture: one world-anchored repeating pattern per texture family (grass strokes, canopy dapples, sand
 //      ripples, rock speckle, marsh streaks, snow), filled through one Path2D of hexes per family.
-//   2. Fields: cropland is one world-anchored patchwork pattern (big fields, furrows, windbreaks), so fields run on
-//      across neighbouring hexes. Its orientation follows the survey grid: west of ~82.5°W the fields are squared
-//      to the meridians (the township-and-range grid), rotated per 3° band by the projection's convergence; in the
-//      East each ~280 km region gets its own irregular direction.
+//   2. Fields: cropland is one world-anchored patchwork pattern (fields, furrows, windbreaks), so fields run on
+//      across neighbouring hexes, painted at half a hex per field whatever the hex size. Each ~11-hex region gets
+//      its own irregular direction; the old Galician and Congress Poland farmland (Malopolskie, Podkarpackie,
+//      Swietokrzyskie, Lubelskie) gets the narrow strip fields instead.
 //   3. Stamps: every piece of art is a sprite (render/art/sprites.js) painted once per (kind, variant, zoom
 //      bucket) in "R units" (1 unit = the hex radius) and blitted with drawImage. Ground-level stamps (pastures,
 //      marsh pools, centre pivots) go first; upright stamps (trees, hills, mountains, houses) are then sorted by
 //      their base line so nearer things overlap farther ones, also across cells.
-//   Relief is composed per cell, not stamped once: 1–3 jittered, rescaled massifs or mounds, plus "bridge"
+//   Relief is composed per cell, not stamped once: 1-3 jittered, rescaled massifs or mounds, plus "bridge"
 //   stamps on the edges shared with neighbours of the same relief so ranges run on across hexes. Wooded hills
-//   are earthy mounds strung along the local ridge direction (Appalachian Valley-and-Ridge) with single trees on
-//   their crests and flanks; desert ranges are grey-brown fault-block mountains, lined up north–south and broken
-//   by sage basins in the Great Basin; snow follows the highest sample (elev_max); mesas and buttes only appear on
-//   the Colorado Plateau between 1,400 and 2,400 m.
+//   are earthy mounds strung along the local ridge direction with single trees on their crests and flanks;
+//   massifs grow with height, and the peaks class (summits above the tree line: the Tatra, the Karkonosze, Babia
+//   Gora) gets the big snow-capped peaks; snow also follows the highest sample (elev_max) above 1,900 m.
 //   Sprites are never mirrored: the light always comes from the upper left, so variety comes from variants,
 //   jitter, scale and composition instead.
 //   LOD: far = texture, fields, mountains, hills and one clump per forest; mid = + marsh, suburbs, sparse scrub;
@@ -43,8 +42,8 @@
 //   windows, cattails) also scales with the sprite's pixel size.
 //   Everything is deterministic per cell (hash01(cell, salt)), so tiles never shimmer between renders.
 //
-// Geography: lon/lat come from the world projection (world.json `projection` {min_x, max_y, margin} when present,
-// else the constants of the shipped grid). Worlds without one (the dev gallery) fall back to hash-based choices.
+// Geography: the strip-field region comes from the voivodeship that owns the cell (world.json states); worlds
+// without states (the dev gallery) get the plain patchwork.
 import { hash01 } from "../../hex.js";
 import { COVER } from "../../terrain.js";
 import { FOREIGN } from "../../world.js";
@@ -54,12 +53,13 @@ import { lodFor, atLeast } from "./lod.js";
 import { bucketPx, deviceScale, getSprite, drawSprite, makePattern, wrapDraw, rng, spriteStats } from "./sprites.js";
 
 /** Below this hex radius (css px) no terrain art is drawn at all (map.js checks it too). */
-export const GLYPHS_MIN_RPX = 7;
+export const GLYPHS_MIN_RPX = 4.5;
 
 /** Sprite cache counters, for profiling ({count, pixels, hits, misses, painted ms}). */
 export const terrainArtStats = spriteStats;
 
 const TAU = Math.PI * 2;
+const RAD = Math.PI / 180;
 const FOREIGN_ALPHA = 0.4;
 const C = parseHex;
 const WARM = [255, 241, 196], COOL = [38, 52, 86];
@@ -368,75 +368,32 @@ function speckle(g, S, r, n, dark, light) {
   }
 }
 
-// --- geography (lon/lat of a cell) ---------------------------------------------------------------------------------
+// --- geography ------------------------------------------------------------------------------------------------------
 
-// Albers equal-area conic of the pipeline (pipeline/core/geo.py Albers + MapProjection); keep in sync.
-const RAD = Math.PI / 180;
-const ALBERS = (() => {
-  const RE = 6371.0088, p1 = 29.5 * RAD, p2 = 45.5 * RAD, p0 = 37.5 * RAD;
-  const n = (Math.sin(p1) + Math.sin(p2)) / 2;
-  const c = Math.cos(p1) ** 2 + 2 * n * Math.sin(p1);
-  return { RE, n, c, rho0: (RE * Math.sqrt(c - 2 * n * Math.sin(p0))) / n, lon0: -96 };
-})();
-// The shipped grid's projection (data/interim/_world.json), used when world.json does not carry `projection`.
-const SHIPPED_PROJ = { min_x: -2350.109311515341, max_y: 1559.2228881834299, margin: 200, grid: [25, 117, 90] };
-const geoTables = new WeakMap();
+// The US-only heuristics of the original art (Colorado Plateau mesas, Great Basin ranges and playas, centre-pivot
+// irrigation, township-and-range fields) have no place in Poland: they are switched off here and their code paths
+// stay unused.
+const onPlateau = () => false;
+const inGreatBasin = () => false;
+const pivotCountry = () => false;
 
-function geoTable(w) {
-  let t = geoTables.get(w);
-  if (t === undefined) {
-    const raw = w.raw, g = w.grid, sp = SHIPPED_PROJ;
-    const p = raw.projection
-      || (raw.margin === sp.margin && g.R === sp.grid[0] && g.cols === sp.grid[1] && g.rows === sp.grid[2] ? sp : null);
-    t = p ? { p, lon: new Float32Array(g.size).fill(NaN), lat: new Float32Array(g.size) } : null;
-    geoTables.set(w, t);
-  }
-  return t;
-}
-
-/** The geo table with cell i's lon/lat filled in, or null when the world has no known projection. */
-function geo(w, i) {
-  const t = geoTable(w);
-  if (t && Number.isNaN(t.lon[i])) {
-    const { RE, n, c, rho0, lon0 } = ALBERS;
-    const X = w.grid.cx(i) + t.p.min_x - t.p.margin, Y = t.p.max_y + t.p.margin - w.grid.cy(i);
-    const dy = rho0 - Y, rho = Math.hypot(X, dy);
-    const s = (c - ((rho * n) / RE) ** 2) / (2 * n);
-    t.lon[i] = lon0 + Math.atan2(X, dy) / n / RAD;
-    t.lat[i] = Math.asin(Math.max(-1, Math.min(1, s))) / RAD;
-  }
-  return t;
-}
-
-/** Colorado Plateau (canyon country): the only place mesas and buttes are drawn. */
-function onPlateau(w, i) {
-  const e = w.raw.elev[i];
-  if (e < 1400 || e > 2400) return false; // tablelands, not the high ranges or the low desert
-  const t = geo(w, i);
-  if (!t) return hash01(i, 97) < 0.5; // synthetic worlds (the dev gallery): some high desert
-  const lon = t.lon[i], lat = t.lat[i];
-  return lat > 35.8 && lat < 38.6 && lon > -112.6 && lon < -107.8;
-}
-
-/** The Great Basin (Nevada, western Utah, eastern Oregon and California): basin-and-range country. */
-function inGreatBasin(w, i) {
-  const t = geo(w, i);
-  if (!t) return false;
-  const lon = t.lon[i], lat = t.lat[i];
-  return lat > 36.2 && lat < 43.6 && lon > -120.3 && lon < -111.8;
-}
-
-/** Centre-pivot irrigation belongs to the dry High Plains and the West (west of ~98°W). */
-function pivotCountry(w, i) {
-  const t = geo(w, i);
-  return !t || t.lon[i] < -98;
+/** Strip-field country: the narrow, fragmented field strips of the old Galician and Congress Poland farmland
+ *  (Malopolskie 12, Podkarpackie 18, Swietokrzyskie 26, Lubelskie 06), by the voivodeship that owns the cell. */
+const STRIP_VOIVODESHIPS = new Set(["12", "18", "26", "06"]);
+function stripCountry(w, i) {
+  const o = w.raw.owner[i];
+  const st = o >= 0 && w.raw.states ? w.raw.states[o] : null;
+  return !!st && STRIP_VOIVODESHIPS.has(st.fips);
 }
 
 // --- 2. cropland patchwork ----------------------------------------------------------------------------------------
 
-const FIELD_T = 256; // km per pattern tile (about six hexes across, so the repeat is hard to spot)
+// The field tile is painted in "field units" (25 per hex radius, the scale the patchwork was designed at) and drawn
+// scaled by fieldScale(w) = R / 25 km, so a field is about half a hex at any hex size.
+const FIELD_T = 256; // field units per pattern tile (about six hexes across, so the repeat is hard to spot)
+const fieldScale = (w) => w.grid.R / 25;
 const FIELD_TILE_MAX_PX = 2048;
-const FIELD_ALPHA = { far: 0.6, mid: 0.9, near: 1, close: 1 };
+const FIELD_ALPHA = { far: 0.45, mid: 0.9, near: 1, close: 1 };
 
 /** Cells that get the field patchwork: cropland on flat or hilly ground, not under a full city tile. */
 function isFieldCell(w, i, Rpx) {
@@ -445,21 +402,15 @@ function isFieldCell(w, i, Rpx) {
   return !city || cityIsDot(city, Rpx);
 }
 
-/** Field orientation region of a cell: {key, ang (rad), ox, oy (km pattern offset)}. */
+/** Field orientation region of a cell: {key, ang (rad), ox, oy (field-unit pattern offset), strips}. An irregular
+ *  direction per region of about 11 hexes; strip-field country gets the narrow-strip tile. */
 function fieldRegion(w, i) {
-  const t = geo(w, i);
-  if (t && t.lon[i] < -82.5) {
-    // Township-and-range country: fields squared to the meridians. Rotating north by the Albers convergence
-    // n·(lon − lon0) per 3° band keeps them aligned with the real section lines.
-    const band = Math.floor((t.lon[i] + 130) / 3);
-    const lonMid = band * 3 - 130 + 1.5;
-    return { key: `p${band}`, ang: -ALBERS.n * (lonMid - ALBERS.lon0) * RAD, ox: band * 37.3, oy: band * 23.9 };
-  }
-  // Metes-and-bounds country (or no projection): an irregular direction per ~280 km region.
-  const bx = Math.floor(w.grid.cx(i) / 280), by = Math.floor(w.grid.cy(i) / 280);
+  const span = 280 * fieldScale(w);
+  const bx = Math.floor(w.grid.cx(i) / span), by = Math.floor(w.grid.cy(i) / span);
   const id = bx * 7919 + by * 104729;
   const ang = [-0.42, -0.2, 0.12, 0.3, 0.52, -0.08][Math.floor(hash01(id, 5) * 6)];
-  return { key: `e${bx},${by}`, ang, ox: hash01(id, 6) * FIELD_T, oy: hash01(id, 7) * FIELD_T };
+  const strips = stripCountry(w, i);
+  return { key: `${strips ? "s" : "e"}${bx},${by}`, ang, strips, ox: hash01(id, 6) * FIELD_T, oy: hash01(id, 7) * FIELD_T };
 }
 
 function drawFields(ctx, cells, w, s, dpr, lod, Rpx) {
@@ -473,17 +424,22 @@ function drawFields(ctx, cells, w, s, dpr, lod, Rpx) {
     gr.cells.push(i);
   }
   if (!groups.size) return;
-  // Pattern pixels per km: the power-of-two bucket of the zoom, capped so the tile canvas stays small.
-  let sb = 2 ** Math.round(Math.log2(s));
+  // Pattern pixels per field unit: the power-of-two bucket of the zoom, capped so the tile canvas stays small.
+  // Zoomed far out, fields of half a hex would be a few pixels of noise: draw them bigger until a hex is ~10 px.
+  const fs = fieldScale(w) * Math.max(1, Math.min(2.2, 10 / Rpx));
+  let sb = 2 ** Math.round(Math.log2(s * fs));
   while (FIELD_T * sb * dpr > FIELD_TILE_MAX_PX && sb > 1 / 64) sb /= 2;
   const dpx = sb * dpr;
   const base = FIELD_ALPHA[lod] ?? 1;
-  const pat = makePattern(ctx, `terrain-fields@${base}`, FIELD_T * sb, dpr, bakedAlpha(base, (g, size) => {
-    g.scale(size / FIELD_T, size / FIELD_T);
-    paintFieldTile(g, dpx);
-  }));
+  const pats = {};
+  const pattern = (strips) => (pats[strips] ??= makePattern(ctx, `terrain-fields${strips ? "-strips" : ""}@${base}`,
+    FIELD_T * sb, dpr, bakedAlpha(base, (g, size) => {
+      g.scale(size / FIELD_T, size / FIELD_T);
+      (strips ? paintStripTile : paintFieldTile)(g, dpx);
+    })));
   for (const { reg, foreign, cells: list } of groups.values()) {
-    pat.setTransform(new DOMMatrix().translateSelf(reg.ox, reg.oy).rotateSelf(reg.ang / RAD).scaleSelf(1 / dpx));
+    const pat = pattern(!!reg.strips);
+    pat.setTransform(new DOMMatrix().translateSelf(reg.ox * fs, reg.oy * fs).rotateSelf(reg.ang / RAD).scaleSelf(fs / dpx));
     ctx.globalAlpha = foreign ? FOREIGN_ALPHA : 1;
     ctx.fillStyle = pat;
     ctx.fill(hexRunsPath(w.grid, list));
@@ -540,7 +496,43 @@ function paintFieldTile(g, dpx) {
   }
 }
 
-function paintField(g, r, x, y, fw, fh, px, furrows) {
+/** Strip fields: long, narrow strips side by side (the fragmented smallholdings of south-eastern Poland), in blocks
+ *  whose strips run alternately across and along, with a few balks of grass and a tree line. */
+function paintStripTile(g, dpx) {
+  const r = rng(7331);
+  const T = FIELD_T, px = 1 / dpx;
+  g.fillStyle = "#9c8e5c";
+  g.fillRect(0, 0, T, T);
+  const lane = Math.max(0.3, px * 0.8);
+  const furrows = dpx >= 2.4;
+  for (let y = 0; y < T; ) {
+    let bh = 22 + r() * 30;
+    if (T - y - bh < 16) bh = T - y;
+    for (let x = 0; x < T; ) {
+      let bw = 26 + r() * 40;
+      if (T - x - bw < 18) bw = T - x;
+      const across = r() < 0.6; // strips run north-south in this block (else east-west)
+      const L = across ? bw : bh;
+      for (let t = 0; t < L; ) {
+        let sw = 1.6 + r() * 2.8;
+        if (L - t - sw < 1.4) sw = L - t;
+        const fx = across ? x + t : x, fy = across ? y : y + t;
+        const fw = across ? sw : bw, fh = across ? bh : sw;
+        paintField(g, r, fx + lane / 2, fy + lane / 2, fw - lane, fh - lane, px, furrows, true);
+        t += sw;
+      }
+      x += bw;
+    }
+    if (dpx >= 1.2 && r() < 0.35) {
+      const pts = [];
+      for (let t = 2; t < T - 2; t += 0.5) pts.push([t, y + bh]);
+      if (y + bh > 2 && y + bh < T - 2) treeLine(g, pts.slice(0, 40 + Math.floor(r() * 200)), 0.38, px, rng(Math.floor(y * 13)));
+    }
+    y += bh;
+  }
+}
+
+function paintField(g, r, x, y, fw, fh, px, furrows, thin = false) {
   const c = CROPS[pickWeighted(r, CROP_W)][0];
   g.fillStyle = css(c);
   g.fillRect(x, y, fw, fh);
@@ -551,6 +543,11 @@ function paintField(g, r, x, y, fw, fh, px, furrows) {
   gr.addColorStop(1, "rgba(40,30,0,.12)");
   g.fillStyle = gr;
   g.fillRect(x, y, fw, fh);
+  if (thin) {
+    g.fillStyle = "rgba(255,246,210,.18)";
+    g.fillRect(x, y, fw > fh ? fw : Math.max(px, 0.12), fw > fh ? Math.max(px, 0.12) : fh);
+    return;
+  }
   if (furrows) {
     const step = Math.max(0.7, px * 3.2);
     const alongX = fw > fh ? r() < 0.8 : r() < 0.2;
@@ -675,10 +672,13 @@ function planCell(env, i) {
   // Snow from absolute height: the highest sample in the hex (world.json elev_max) catches ranges like the Sierra
   // Nevada whose mean is held down by their valleys. Arid ranges stay bare below ~3200 m.
   const emax = w.raw.elev_max ? w.raw.elev_max[i] : elev;
-  const snowy = cv === COVER.ICE || rel === 3 || (desert ? elev > 3000 || emax > 3200 : elev > 2400 || emax > 3000);
-  const alpine = rel === 3 || (rel === 2 && emax > 3500); // the tallest summits get the big snow-capped peak
+  // Snow: the peaks class (summits above the tree line, world.json relief 3) and any hex reaching 1,900 m.
+  const snowy = cv === COVER.ICE || rel === 3 || emax > 1900;
+  const alpine = rel === 3; // the summits above the tree line get the big snow-capped peak
   const near = atLeast(lod, "near"), mid = atLeast(lod, "mid"), close = lod === "close";
-  const c = { w, i, h, vary, up, rel, cv, elev, alpine, isForest, forestPct, desert, snowy, near, lod, city, bridges: env.bridges };
+  // At the whole-country zoom (hexes under ~9 px) mountain stamps are drawn larger so the ranges read as ranges.
+  const farBoost = env.Rpx < 9 ? 1.45 : 1;
+  const c = { w, i, h, vary, up, rel, cv, elev, alpine, isForest, forestPct, desert, snowy, near, lod, city, farBoost, bridges: env.bridges };
 
   // Basin and range: in the Great Basin about a third of the "mountain" hexes are drawn as the basin between two
   // ranges (sage flats and a dry lake), so the ranges read as separate north–south ridges, not a carpet of peaks.
@@ -712,7 +712,7 @@ function planCell(env, i) {
   // Forests on flat ground: clumps of trees, more and smaller as the zoom grows.
   if (isForest && forestPct >= 20 && !onHill) {
     const d = forestPct / 100;
-    const n = lod === "far" ? (d >= 0.45 ? 1 : 0) : lod === "mid" ? (d >= 0.6 ? 3 : 2) : lod === "near" ? (d >= 0.6 ? 4 : d >= 0.4 ? 3 : 2) : d >= 0.6 ? 5 : 3;
+    const n = lod === "far" ? (d >= 0.45 && env.Rpx >= 10 ? 1 : 0) : lod === "mid" ? (d >= 0.6 ? 3 : 2) : lod === "near" ? (d >= 0.6 ? 4 : d >= 0.4 ? 3 : 2) : d >= 0.6 ? 5 : 3;
     const kind = cv === COVER.DECIDUOUS ? "decid" : cv === COVER.EVERGREEN ? (elev > 2200 ? "conifsnow" : "conif") : "mixed";
     const L = CLUMPS[n] || [];
     const f = lod === "far" ? 1.3 : 1;
@@ -802,6 +802,10 @@ function planCell(env, i) {
       break;
   }
 
+  // River marshes inside meadow and farm hexes (the Biebrza and Narew valleys): WorldCover maps most of them as
+  // grassland, so a hex gets marsh pools once its herbaceous-wetland share reaches 12%.
+  if (cv !== COVER.WETLAND && !onHill && (w.pct?.wetland?.[i] || 0) >= 12) flat("marsh", "", vary(125, 8), 0, 0.05, 0.85);
+
   // Scattered trees in non-forest cells (woodlots, hedgerows, riparian strips).
   if (forestPct >= 20) {
     const kind = cv === COVER.SCRUB || elev > 1500 ? "conif" : "decid";
@@ -818,7 +822,10 @@ function planCell(env, i) {
 function planMountains(c) {
   const { w, i, h, vary, up, cv, elev, desert, isForest, snowy, near, city, lod, bridges } = c;
   const plateau = desert && !snowy && onPlateau(w, i);
-  const hf = Math.min(1.14, Math.max(0.82, 0.8 + (elev - 1200) / 6000)); // higher ground, taller peaks
+  // Higher ground, taller massifs: Poland's ranges are low (Beskidy 600-1,000 m, the Tatra 1,500 m and more), so the
+  // stamps grow with height from the foothills up and the alpine peaks get a bonus, so the Tatra and the Karkonosze
+  // stand out over the forested Beskidy.
+  const hf = Math.min(1.45, Math.max(0.92, 0.9 + (elev - 450) / 1400)) * (c.alpine ? 1.3 : 1) * (c.farBoost || 1);
   if (plateau && h(3) < 0.34) {
     // Canyon country: a table mesa, sometimes with a butte standing off it.
     const jx = (h(1) - 0.5) * 0.4, jy = (h(2) - 0.5) * 0.16;
@@ -831,7 +838,7 @@ function planMountains(c) {
     // Great Basin ranges vary more in size and line up north–south; elsewhere massifs cluster side by side.
     const f0 = basin ? 0.6 + h(5) * 0.55 : 0.8 + h(5) * 0.3;
     up("mtn", style, vary(4, NV_MTN), jx * (basin ? 0.5 : 1), (basin ? 0.02 : 0.26) + jy, f0 * hf);
-    const extra = lod === "far" ? 0 : h(8) < 0.3 ? 0 : h(8) < 0.78 ? 1 : 2;
+    const extra = lod === "far" ? (c.alpine ? 1 : 0) : c.alpine ? 2 : h(8) < 0.3 ? 0 : h(8) < 0.78 ? 1 : 2;
     const side = h(9) < 0.5 ? -1 : 1;
     for (let k = 0; k < extra; k++) {
       const sd = k ? -side : side;

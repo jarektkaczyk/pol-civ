@@ -1,13 +1,13 @@
 // City banners, drawn in screen space with greedy de-cluttering (selected city first, then biggest cities win).
 //
-//   ┌────────────┬────────────────────────────┬───┐
-//   │ 4.9M ▲    ›  ★ PHOENIX        +9.0%      │ ⚙ │   upper tier: bevelled bronze frame, state-coloured cap with
-//   └────────────┴────────────────────────────┴───┘   the population and a growth chevron (▲, ▲▲, ▼, ▼▼ or ◆ flat),
-//          └─ 🌾 12K · ⚙ 310K · 💰 420B · … ─┘           name in small caps, the most specialised industry as a medallion
-//                        ▾                               lower tier (zoomed in, big cities only): the yield row
+//   +------------+----------------------------+---+
+//   | 4.9M ^    >  * PHOENIX        +9.0%      | (gear) |   upper tier: bevelled bronze frame, state-coloured cap with
+//   +------------+----------------------------+---+   the population and a growth chevron (^, ^^, v, vv or <> flat),
+//          +- (wheat) 12K . (gear) 310K . (coins) 420B . ... -+           name in small caps, the most specialised industry as a medallion
+//                        v                               lower tier (zoomed in, big cities only): the yield row
 //
-//        ╭──────────╮
-//        │TECH CITY │                                      city-type tab (only on banners that show the yield row,
+//        +----------+
+//        |TECH CITY |                                      city-type tab (only on banners that show the yield row,
 //                                                         when state.cityBadges has one: the City View extension
 //                                                         fills it from districts.json once the map is zoomed in)
 //
@@ -20,7 +20,7 @@
 // blitted, so panning costs one drawImage per banner.
 import { css, luminance, shade } from "../color.js";
 import { drawIcon, hasIcon } from "../icons.js";
-import { compact, popShort } from "../ext/cityView/fmt.js"; // format.js plus a 1000K → 1.0M roll-over fix
+import { compact, popShort } from "../ext/cityView/fmt.js"; // format.js plus a 1000K -> 1.0M roll-over fix
 import { isCapital } from "../world.js";
 import { cityIsDot } from "./art/city.js";
 
@@ -40,7 +40,7 @@ const LAYOUTS = {
 };
 const POINTER = 4; // height of the little pointer under the banner
 const TAB_H = 11; // the city-type tab above the plate (its foot tucks under the plate's top rim)
-const TAB_FONT = `700 7.6px ${SANS}`;
+const TAB_FONT = `italic 600 9px ${SERIF}`; // sentence case: no letter-spaced capitals
 const PAD = 6; // sprite margin for the shadow and the selection glow
 const GROWTH_FLAT = 0.005; // |growth| (fraction) under this reads as flat
 const GROWTH_FAST = 0.05; // ...and at or over this as fast (a double chevron)
@@ -57,7 +57,7 @@ const BRONZE = ["#ecd08a", "#a8833f", "#4f3a1b"];
 const GOLD = ["#fff4c4", "#e6bd55", "#8d6418"];
 const INK = "rgba(6,8,12,0.75)";
 
-// Industry → icon (+ medallion colour) for the "most specialised industry" badge. An `i-<industry>` icon from
+// Industry -> icon (+ medallion colour) for the "most specialised industry" badge. An `i-<industry>` icon from
 // icons.js wins when one exists; industries without a fitting glyph are skipped.
 const INDUSTRY_ICON = {
   agriculture: ["y-food", "#4f7a2a"], mining: ["r-coal_mine", "#6a5038"], construction: ["y-production", "#8a5426"],
@@ -153,7 +153,7 @@ function measure(ctx, city, yields, nation, L) {
     return { yd, t, w: ctx.measureText(t).width };
   });
   const yieldsW = parts.reduce((a, p) => a + L.yieldIcon + 2 + p.w + L.yieldGap, 0) - L.yieldGap;
-  const growthTxt = growth == null ? "" : `${growth >= 0 ? "+" : "−"}${Math.abs(growth * 100).toFixed(1)}%`;
+  const growthTxt = growth == null ? "" : `${growth >= 0 ? "+" : "-"}${Math.abs(growth * 100).toFixed(1)}%`;
   const growthW = growthTxt ? ctx.measureText(growthTxt).width : 0;
   ctx.restore();
   const spec = specialty(city, nation);
@@ -216,12 +216,17 @@ function bevelFrame(ctx, x, y, w, h, r, metal, well) {
   return inner;
 }
 
+/** The capital's mark: a small three-pointed gold crown (a plain crown, not a state emblem), r = half width. */
 function star(ctx, cx, cy, r) {
+  const b = cy + r * 0.62, t = cy - r * 0.78, m = cy - r * 0.05;
   ctx.beginPath();
-  for (let i = 0; i < 10; i++) {
-    const a = -Math.PI / 2 + (i * Math.PI) / 5, rr = i % 2 ? r * 0.45 : r;
-    ctx[i ? "lineTo" : "moveTo"](cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
-  }
+  ctx.moveTo(cx - r, b);
+  ctx.lineTo(cx - r, t + r * 0.25);
+  ctx.lineTo(cx - r * 0.5, m);
+  ctx.lineTo(cx, t);
+  ctx.lineTo(cx + r * 0.5, m);
+  ctx.lineTo(cx + r, t + r * 0.25);
+  ctx.lineTo(cx + r, b);
   ctx.closePath();
 }
 
@@ -275,22 +280,22 @@ function liftedText(ctx, t, x, y, color, dark) {
   ctx.fillText(t, x, y);
 }
 
-const tabWidths = new Map(); // label → measured text width (the font is fixed)
+const tabWidths = new Map(); // label -> measured text width (the font is fixed)
 function tabTextWidth(ctx, label) {
   let w = tabWidths.get(label);
   if (w == null) {
     ctx.save();
     ctx.font = TAB_FONT;
-    w = ctx.measureText(label.toUpperCase()).width + label.length * 0.5; // + the letter spacing
+    w = ctx.measureText(label).width;
     ctx.restore();
     tabWidths.set(label, w);
   }
   return w;
 }
 
-/** The city-type tab: a small coloured ribbon above the plate, centred on it (W wide), its text in capitals. */
+/** The city-type tab: a small coloured ribbon above the plate, centred on it (W wide). */
 function paintTab(ctx, ox, oy, W, badge) {
-  const txt = badge.label.toUpperCase();
+  const txt = badge.label;
   const tw = Math.min(W - 16, Math.ceil(tabTextWidth(ctx, badge.label) + 12));
   const x = ox + (W - tw) / 2, y = oy - TAB_H + 1;
   const col = badge.rgb;
@@ -312,7 +317,6 @@ function paintTab(ctx, ox, oy, W, badge) {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   const dark = luminance(col) > 0.36;
-  if ("letterSpacing" in ctx) ctx.letterSpacing = "0.5px";
   liftedText(ctx, txt, x + tw / 2, y + 1.2 + (TAB_H - 1.2) / 2 + 0.3, dark ? "#17110a" : "#fff8e6", dark);
   ctx.restore();
 }
@@ -542,7 +546,7 @@ function inFocus(focus, city, sel) {
   return focus === city.id;
 }
 
-const badgeRGB = new Map(); // "#rrggbb" → [r, g, b]
+const badgeRGB = new Map(); // "#rrggbb" -> [r, g, b]
 /** The city's type badge from state.cityBadges, with its colour as rgb; null when it has none. */
 function badgeFor(badges, city) {
   const b = badges.get?.(city.id);
@@ -558,7 +562,8 @@ function badgeFor(badges, city) {
 
 /** Population floor for a hex radius in screen px: national view shows the big metros, close zoom everything. */
 function popFloor(Rpx) {
-  return Rpx < 5 ? 2e6 : Rpx < 8 ? 7e5 : Rpx < 14 ? 2.5e5 : Rpx < 24 ? 1.5e5 : Rpx < 40 ? 1e5 : Rpx < 70 ? 4e4 : 0;
+  // Polish towns: the national view shows the cities of about 100K+, close zoom every town.
+  return Rpx < 5 ? 5e5 : Rpx < 8 ? 2e5 : Rpx < 14 ? 9e4 : Rpx < 24 ? 5e4 : Rpx < 40 ? 2e4 : Rpx < 70 ? 8e3 : 0;
 }
 
 /**
@@ -569,7 +574,7 @@ function popFloor(Rpx) {
  * cell's city gets the yield tier when its banner is shown, at full opacity), and bannerFocus (optional: true for the
  * selected city, or a city / id / array / Set; while set, the other banners fade to 35% and only focus cities get
  * the yield tier, for the City View). A tiered banner that would collide falls back to the one-line plate.
- * cityBadges (optional Map id → {label, color "#rrggbb"}): a tiered banner of such a city carries its city-type tab
+ * cityBadges (optional Map id -> {label, color "#rrggbb"}): a tiered banner of such a city carries its city-type tab
  * above the plate (the hit rect includes it).
  * bannerBounds (optional {x0, x1} css px): plates of cities near or just past those edges (default: the screen) are
  * slid inside them, with the pointer still aimed at the city.
@@ -594,7 +599,7 @@ export function drawBanners(ctx, cam, w, state, yields, nation = state.nation) {
   const cities = state.cities;
   // Horizontal room for plates: the screen, or state.bannerBounds {x0, x1} (css px) beside an open dock.
   const bx0 = state.bannerBounds?.x0 ?? 0, bx1 = state.bannerBounds?.x1 ?? cam.w;
-  const badges = state.cityBadges || null; // Map id → {label, color}: the city-type tab on tiered banners
+  const badges = state.cityBadges || null; // Map id -> {label, color}: the city-type tab on tiered banners
   const blocked = (r) => placed.some((p) => r.x < p.x + p.w && p.x < r.x + r.w && r.y < p.y + p.h && p.y < r.y + r.h);
   let shown = 0, tiers = 0;
 

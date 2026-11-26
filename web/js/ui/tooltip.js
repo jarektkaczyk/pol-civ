@@ -25,7 +25,8 @@ export function showCellTooltip(mx, my, w, i, lens, showResources = true) {
   }
   const o = raw.owner[i];
   if (o >= 0) {
-    const county = raw.county[i] >= 0 ? raw.counties[raw.county[i]].name + ", " : "";
+    const g = raw.county[i] >= 0 ? raw.counties[raw.county[i]] : null;
+    const county = g ? (g.type === "urban" ? g.name : `gmina ${g.name}`) + ", " : "";
     lines.push(`${esc(county)}${esc(raw.states[o].name)}`);
     if (lens) lines.push(`${glyph(lens, 13)} ${esc(lens.name)}: <b>${formatLensValue(lens, lens.values[i])}</b>`);
   } else if (o === FOREIGN) {
@@ -42,7 +43,7 @@ export function showCellTooltip(mx, my, w, i, lens, showResources = true) {
     }
     if (res.length > 4) lines.push(`<span class="muted">+${res.length - 4} more</span>`);
   }
-  if (city) lines.push(`<span class="muted">Click to open the city</span>`);
+  if (city) lines.push(`<span class="muted">Click to open the town</span>`);
   else if (o >= 0) lines.push(`<span class="muted">Click to open ${esc(raw.states[o].name)}</span>`);
   show(mx, my, lines.join("<br>"));
 }
@@ -58,7 +59,7 @@ export function showHtmlTooltip(mx, my, content) {
 }
 
 export function showCityTooltip(mx, my, city) {
-  show(mx, my, `<b>${esc(city.full)}</b><br><span class="muted">Click to open the city</span>`);
+  show(mx, my, `<b>${esc(city.full)}</b><br><span class="muted">Click to open the town</span>`);
 }
 
 function show(mx, my, html) {

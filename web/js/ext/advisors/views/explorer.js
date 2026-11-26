@@ -9,41 +9,45 @@ import { section, segmented, selectBox, sourcesHtml, frameBtn } from "../core/vi
 import { rowsHighlight, extendData } from "../core/data.js";
 
 const DEFAULT_COLS = {
-  states: ["population", "growth", "gdp_pc", "median_income", "unemployment"],
-  metros: ["states", "population", "growth", "gdp_pc", "median_income"],
-  counties: ["state", "population", "density", "income", "poverty"],
+  states: ["population", "growth", "gdp_pc", "wage", "unemployment"],
+  metros: ["states", "population", "growth", "gdp_pc", "wage"],
+  powiaty: ["state", "population", "wage", "unemployment", "president_2025"],
+  counties: ["state", "population", "density", "pit", "president_2025"],
+  towns: ["state", "population", "growth", "wage", "pit"],
 };
 const DEFAULT_XY = {
-  states: { x: "median_income", y: "growth", s: "population", c: "unemployment" },
-  metros: { x: "gdp_pc", y: "growth", s: "population", c: "median_income" },
-  counties: { x: "income", y: "bachelors", s: "population", c: "density" },
+  states: { x: "gdp_pc", y: "growth", s: "population", c: "wage" },
+  metros: { x: "gdp_pc", y: "growth", s: "population", c: "wage" },
+  powiaty: { x: "pit", y: "president_2025", s: "population", c: "higher_ed" },
+  counties: { x: "pit", y: "president_2025", s: "population", c: "density" },
+  towns: { x: "pit", y: "growth", s: "population", c: "unemployment" },
 };
 // Table headers: short enough for a ~60 px column (they wrap to two lines; &shy; marks where a long word may break).
 const SHORT = {
-  population: "People", gdp_pc: "GDP per person", median_income: "Income", median_rent: "Rent", unemployment: "Unemploy&shy;ment",
-  affordability: "Home ÷ income", rent_burden: "Rent ÷ income", homeownership: "Home&shy;owners", land_km2: "Land area",
-  energy_mw: "Mapped power", foreign_born: "Born abroad", median_age: "Median age", uninsured: "Unin&shy;sured", broadband: "Broad&shy;band",
-  // county lenses, military, industry districts, citizens
-  faith_tradition: "Largest tradition", amenities: "Amen&shy;ities", mhlth: "Mental distress", loneliness: "Lone&shy;liness", disasters: "Disas&shy;ters",
-  veterans_pct: "Veterans share", armed_forces: "Armed forces", armed_forces_pct: "Armed forces share", mil_active: "Active duty",
-  mil_guard_reserve: "Guard & Reserve", mil_civilian: "DoD civilians", def_spending: "Defense $", def_per_resident: "Defense $ per resident",
-  def_pct_gdp: "Defense % of GDP", installations: "Instal&shy;lations", encampment: "Garrison", city_type: "City type", n_districts: "Districts (n)",
-  qcew_jobs: "Jobs (QCEW)", qcew_pay: "Pay (QCEW)", top_industry: "Top industry", top_lq: "Top LQ", cz_median_age: "Median age (1-yr)",
-  cz_degree: "Degree (1-yr)", cz_specialist: "Top citizen", cz_drove_alone: "Drive alone", cz_transit: "Transit", cz_home: "Work from home",
+  population: "People", gdp_pc: "GDP per person", pit: "PIT per person", unemployment: "Unemploy&shy;ment", area_km2: "Area",
+  energy_mw: "Mapped power", median_age: "Median age", net_migration: "Net migr&shy;ation", elderly: "Aged 65+",
+  ukrainians: "Ukrain&shy;ians", dwellings: "New dwell&shy;ings", higher_ed: "Higher educ&shy;ation", students: "Stud&shy;ents",
+  tourism: "Tourist nights", life_f: "Life exp. women", life_m: "Life exp. men", catholic: "Catholic", no_religion: "No relig&shy;ion",
+  mass: "Mass attend&shy;ance", president_2025: "Nawrocki 2025", turnout_2025: "Turnout 2025", sejm_2023: "Sejm 2023",
+  flood_2024: "Flood 2024", air_station: "Air station", n_towns: "Towns", n_gminas: "Gminas", core: "Core town",
+  // towns: industry districts, citizens
+  city_type: "City type", n_districts: "Districts (n)", dist_workers: "Workers (district basis)", dist_scope: "Counted over",
+  top_industry: "Top industry", top_lq: "Top LQ", cz_median_age: "Median age (gmina)", cz_degree: "Higher educ&shy;ation",
+  cz_specialist: "Top citizen", cz_foreign_born: "Ukrain&shy;ians", encampment: "Garrison",
 };
-const OPS = { num: [">", "≥", "<", "≤", "="], text: ["=", "contains", "≠"] };
+const OPS = { num: [">", "\u2265", "<", "\u2264", "="], text: ["=", "contains", "\u2260"] };
 
 // Remember the explorer's setup per viewer (a convenience; the page works without it).
-const STORE = "advisors.explorer.v1";
+const STORE = "advisors.explorer.pl1";
 const load = () => { try { return JSON.parse(localStorage.getItem(STORE) || "null"); } catch { return null; } };
 const save = (s) => { try { localStorage.setItem(STORE, JSON.stringify(s)); } catch { /* private mode */ } };
 
 export async function mount(ctx) {
   const { app, data, el, link } = ctx;
-  // Columns from the optional files (garrisons and defense $, industry districts, citizen mixes): loaded on demand,
-  // only when the Explorer opens, and added to the levels once.
+  // Columns from the optional files (garrisons, industry districts, citizen mixes): loaded on demand, only when the
+  // Explorer opens, and added to the towns level once.
   await extendData(data, ["military", "districts", "citizens"]);
-  const avail = ["states", "metros", "counties"].filter((k) => data.levels[k]);
+  const avail = ["states", "metros", "powiaty", "counties", "towns"].filter((k) => data.levels[k]);
   const saved = load() || {};
   const st = {
     level: avail.includes(ctx.params.level) ? ctx.params.level : avail.includes(saved.level) ? saved.level : "metros",
@@ -131,14 +135,14 @@ export async function mount(ctx) {
         if (!fin(v)) return false;
         const t = f.value;
         if (f.op === ">" && !(v > t)) return false;
-        if (f.op === "≥" && !(v >= t)) return false;
+        if (f.op === "\u2265" && !(v >= t)) return false;
         if (f.op === "<" && !(v < t)) return false;
-        if (f.op === "≤" && !(v <= t)) return false;
+        if (f.op === "\u2264" && !(v <= t)) return false;
         if (f.op === "=" && !(Math.abs(v - t) <= Math.abs(t) * 0.005 + 1e-9)) return false;
       } else {
         const s = String(v ?? "").toLowerCase(), t = String(f.value).toLowerCase();
         if (f.op === "=" && s !== t) return false;
-        if (f.op === "≠" && s === t) return false;
+        if (f.op === "\u2260" && s === t) return false;
         if (f.op === "contains" && !s.includes(t)) return false;
       }
     }
@@ -174,7 +178,7 @@ export async function mount(ctx) {
     ops.setAttribute("aria-label", "Comparison");
     const valIn = document.createElement("input");
     valIn.type = "text";
-    valIn.placeholder = "e.g. 1M, 25%, TX";
+    valIn.placeholder = "e.g. 1M, 25%, MA";
     valIn.setAttribute("aria-label", "Value");
     const add = document.createElement("button");
     add.type = "button";
@@ -183,7 +187,7 @@ export async function mount(ctx) {
     const syncOps = () => {
       const f = L().field(fsel.value);
       ops.innerHTML = (numeric(f) ? OPS.num : OPS.text).map((o) => `<option>${esc(o)}</option>`).join("");
-      valIn.placeholder = numeric(f) ? (f.format === "pct" || f.format === "signed" ? "e.g. 25%" : f.format === "usd" || f.format === "money" ? "e.g. 80K" : "e.g. 1M") : st.level === "counties" ? "e.g. TX" : "text";
+      valIn.placeholder = numeric(f) ? (f.format === "pct" || f.format === "signed" ? "e.g. 25%" : f.format === "pln" || f.format === "usd" || f.format === "money" ? "e.g. 8K" : "e.g. 1M") : ["counties", "powiaty", "towns"].includes(st.level) ? "e.g. MA" : "text";
     };
     fsel.select.addEventListener("change", syncOps);
     syncOps();
@@ -203,7 +207,12 @@ export async function mount(ctx) {
     // quick presets
     const presets = document.createElement("span");
     presets.className = "adv-presets";
-    const P = st.level === "counties" ? [["population", "≥", 1e5, "100K+ people"]] : [["population", "≥", 1e6, "1M+ people"], ["population", "≥", 2.5e5, "250K+"]];
+    const GE = OPS.num[1];
+    const P = {
+      counties: [["population", GE, 2e4, "20K+ people"], ["population", GE, 1e5, "100K+"]],
+      powiaty: [["population", GE, 1e5, "100K+ people"], ["population", GE, 2.5e5, "250K+"]],
+      towns: [["population", GE, 2e4, "20K+ people"], ["population", GE, 1e5, "100K+"]],
+    }[st.level] || [["population", GE, 1e6, "1M+ people"], ["population", GE, 2.5e5, "250K+"]];
     presets.innerHTML = P.map((p, i) => `<button type="button" class="adv-mini" data-preset="${i}">${esc(p[3])}</button>`).join("");
     presets.addEventListener("click", (e) => {
       const i = e.target.closest("[data-preset]")?.dataset.preset;
@@ -220,7 +229,7 @@ export async function mount(ctx) {
     chipsRow.innerHTML = st.filters.map((f, i) => {
       const fd = L().field(f.key);
       const txt = `${fd?.label || f.key} ${f.op} ${numeric(fd) ? fmtShort(fd.format, f.value) : f.value}`;
-      return `<span class="adv-fchip">${esc(txt)}<button type="button" data-rm="${i}" aria-label="Remove filter ${esc(txt)}">✕</button></span>`;
+      return `<span class="adv-fchip">${esc(txt)}<button type="button" data-rm="${i}" aria-label="Remove filter ${esc(txt)}">\u2715</button></span>`;
     }).join("") + (st.filters.length > 1 ? `<button type="button" class="adv-mini" data-rm="all">Clear all</button>` : "") + (st.filters.length && filterHighlight() ? frameBtn() : "");
   }
   chipsRow.addEventListener("click", (e) => {
@@ -242,11 +251,11 @@ export async function mount(ctx) {
         const f = lv.field(k);
         const title = `${f.label}${f.unit ? ` (${f.unit})` : ""}. Click to sort.`;
         const short = SHORT[k] || (k.startsWith("y_") ? esc(f.label.replace(/ workers$/, "")) : null);
-        // The name column already carries the state as a suffix, so a state column goes first when space is short.
+        // The name column already carries the voivodeship as a suffix, so a voivodeship column goes first when space is short.
         const isState = k === "state" || k === "states";
         return numeric(f)
           ? { key: k, label: f.label, short, title, value: (r) => val(r, k), text: (r) => fmtCell(f.format, val(r, k), f.unit), tip: (r) => fmtF(f, val(r, k)), bar: k === sortKey ? { max: maxOf(k), color: "rgba(154,123,201,.32)" } : null }
-          : { key: k, label: f.label, short, title, align: "l", width: isState ? "minmax(0,.55fr)" : "minmax(0,.8fr)", hideBelow: isState ? 480 : 0, value: (r) => val(r, k), text: (r) => val(r, k) ?? "–" };
+          : { key: k, label: f.label, short, title, align: "l", width: isState ? "minmax(0,.55fr)" : "minmax(0,.8fr)", hideBelow: isState ? 480 : 0, value: (r) => val(r, k), text: (r) => val(r, k) ?? "\u2013" };
       }),
     ];
     if (!table) {
@@ -319,7 +328,7 @@ export async function mount(ctx) {
         const m = new Map(cats.map((c, i) => [c, pal[i]]));
         color = (c) => m.get(c) || "#8b8070";
         const more = new Set(rows.map((r) => val(r, fc.key))).size > cats.length;
-        legendEl.innerHTML = swatchLegend([...cats.map((c) => ({ label: c ?? "–", color: m.get(c) })), ...(more ? [{ label: "others", color: "#8b8070" }] : [])], fc.label);
+        legendEl.innerHTML = swatchLegend([...cats.map((c) => ({ label: c ?? "\u2013", color: m.get(c) })), ...(more ? [{ label: "others", color: "#8b8070" }] : [])], fc.label);
       }
     }
     const big = [...rows].sort((a, b) => (val(b, "population") || 0) - (val(a, "population") || 0)).slice(0, st.level === "states" ? 10 : 6).map((r) => r.key);
@@ -328,7 +337,7 @@ export async function mount(ctx) {
       x: { label: fx.label, fmt: (v) => fmtShort(fx.format, v), log: lx },
       y: { label: fy.label, fmt: (v) => fmtShort(fy.format, v), log: ly },
       size: fs && numeric(fs) ? { label: fs.label, fmt: (v) => fmtF(fs, v), max: st.level === "counties" ? 13 : 15, min: 1.6 } : null,
-      radius: st.level === "counties" ? 2.2 : 3.5,
+      radius: st.level === "counties" ? 2.2 : st.level === "powiaty" || st.level === "towns" ? 2.8 : 3.5,
       color, colorLabel: fc?.label, colorFmt: (v) => (fc && numeric(fc) ? fmtF(fc, v) : String(v)),
       labels: big,
       refLines: [], refX: [], refY: [],
@@ -352,11 +361,11 @@ export async function mount(ctx) {
     if (!lensFields.length) lensRow.innerHTML = `<span class="adv-note">No map lens for these columns: hover and brush to see places on the map.</span>`;
     fieldInfo.innerHTML = [fx, fy, fs, fc].filter((f, i, a) => f && a.indexOf(f) === i).map((f) => `<p><b>${esc(f.label)}</b>${f.unit ? ` <span class="sub">${esc(f.unit)}</span>` : ""}: ${esc(f.description || "")}</p>`).join("");
     const srcIds = [fx, fy, fs, fc].filter(Boolean).map((f) => f.source).filter(Boolean);
-    srcEl.innerHTML = sourcesHtml(data, [...srcIds, st.level === "counties" ? "acs_5yr" : "acs_1yr"], [
-      "Columns marked ≈ are population-weighted means of county values: a fair guide, not the true median of the area.",
-      `Metro and state data are ${esc(data.vintage)}; county data are ${esc(data.countyVintage)}. GDP is BEA, counted where the work is done; jobs are counted where people live.`,
-      "Alaska and Hawaii are not on the map, so they are not in the tables.",
-      ...(st.level === "counties" && data.countiesOffMap ? [`${int(data.countiesOffMap)} small counties are smaller than one hex: they are in the table and chart but cannot be outlined on the map.`] : []),
+    srcEl.innerHTML = sourcesHtml(data, [...srcIds, "pl_stats_population"], [
+      "Columns marked \u2248 are population-weighted means of gmina values: a fair guide, not the area's own figure.",
+      "Below the voivodeship, GDP is an estimate: a share of the GDP Eurostat publishes per NUTS 3 subregion.",
+      "Workers and wages are counted where the employer is; PIT per person follows where taxpayers live.",
+      ...(st.level === "counties" && data.countiesOffMap ? [`${int(data.countiesOffMap)} small gminas are smaller than one hex: they are in the table and chart but cannot be outlined on the map.`] : []),
     ]);
   }
 
@@ -365,7 +374,7 @@ export async function mount(ctx) {
     const sel = st.sel ? lv.rows.filter((r) => st.sel.has(r.key)) : [];
     link.base(sel.length ? rowsHighlight(lv, sel, { dim: true }) : filterHighlight(), { frame: sel.length > 1 || (!sel.length && st.filters.length > 0) });
     table?.setSelected(st.sel);
-    selRow.innerHTML = st.sel ? `<span class="adv-fchip">${int(st.sel.size)} selected on the chart<button type="button" data-clear-sel aria-label="Clear the selection">✕</button></span>${frameBtn()}
+    selRow.innerHTML = st.sel ? `<span class="adv-fchip">${int(st.sel.size)} selected on the chart<button type="button" data-clear-sel aria-label="Clear the selection">\u2715</button></span>${frameBtn()}
       <label class="adv-check"><input type="checkbox" data-only${st.onlySel ? " checked" : ""}> Only show the selection</label>` : `<span class="adv-note">Tip: drag across the chart below to select a group.</span>`;
     refreshRows();
     updateSummary();
@@ -377,7 +386,7 @@ export async function mount(ctx) {
   function filterHighlight() {
     if (!st.filters.length) return null;
     const rows = filtered();
-    if (!rows.length || rows.length > (st.level === "counties" ? 1500 : 300)) return null;
+    if (!rows.length || rows.length > (st.level === "counties" ? 1500 : 400)) return null;
     return rowsHighlight(L(), rows, { dim: true, ringMax: 12 });
   }
 
@@ -390,7 +399,7 @@ export async function mount(ctx) {
   function updateSummary() {
     const rows = filtered();
     const pop = rows.reduce((a, r) => a + (val(r, "population") || 0), 0);
-    summary.innerHTML = `<b>${int(rows.length)}</b> of ${int(L().rows.length)} ${esc(L().label.toLowerCase())} · ${count3(pop)} people${st.sel ? ` · <b>${int(st.sel.size)}</b> selected` : ""}`;
+    summary.innerHTML = `<b>${int(rows.length)}</b> of ${int(L().rows.length)} ${esc(L().label.toLowerCase())} \u00b7 ${count3(pop)} people${st.sel ? ` \u00b7 <b>${int(st.sel.size)}</b> selected` : ""}`;
   }
   function refresh() {
     renderChips();

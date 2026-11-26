@@ -1,327 +1,284 @@
-"""The game-concept → real-data mapping, in one place.
+"""The game-concept to real-data mapping for Poland, in one place (a helper, not a builder).
 
-Each yield is defined once here and exported to the browser, so the UI and the
-Almanac always describe exactly what was computed. Gold is GDP (BEA); the
-other yields count workers by industry where they live (ACS C24030).
+Each yield is defined once here and exported to the browser (nation.json `yields`), so the UI and the Almanac
+always describe exactly what was computed.
+
+Yield rules (blueprint section 8), all GUS workers counted where the employer is, on 31 December 2025:
+
+* Food = workers in agriculture, forestry and fishing (PKD section A). Whole powiaty (and the cities with powiat
+  rights) use the PKD sections; other gminas the GUS "agriculture" sector of the gmina table.
+* Production = workers in industry and construction (PKD sections B-F; a withheld section counts as absent).
+  Other gminas: the GUS "industry and construction" sector.
+* Science = workers in information and communication (J) plus professional, scientific and technical activities
+  (M). Published per powiat; a gmina gets its powiat's J + M in proportion to its share of the powiat's service
+  workers (exact for the 66 cities with powiat rights, which are one gmina each).
+* Culture = workers in accommodation and food service (I) plus arts, entertainment and recreation (R); shared to
+  gminas like Science.
+* Gold = GDP in current PLN. Poland: GDP 2025 (Eurostat). Voivodeship: GDP 2024 (Eurostat NUTS 2; Mazowieckie
+  = PL91 + PL92). Powiat: the GDP 2023 of its NUTS 3 subregion, shared among the subregion's powiaty by their wage
+  bill (average gross monthly wage x workers). Gmina: its powiat's GDP in proportion to its workers.
+  Town and metro: the sum of their gminas.
 """
 
 from __future__ import annotations
 
-import re
+from .growth import rate
+from .plstats import Stats, Units, num, ratio, total
 
-# C24030 (Sex by Industry): line numbers in the "Male" block; the "Female"
-# block repeats them 27 lines later.
-INDUSTRY_LINES = {
-    "agriculture": (4, "Agriculture, forestry, fishing & hunting"),
-    "mining": (5, "Mining, quarrying, oil & gas"),
-    "construction": (6, "Construction"),
-    "manufacturing": (7, "Manufacturing"),
-    "wholesale": (8, "Wholesale trade"),
-    "retail": (9, "Retail trade"),
-    "transportation": (11, "Transportation & warehousing"),
-    "utilities": (12, "Utilities"),
-    "information": (13, "Information"),
-    "finance": (15, "Finance & insurance"),
-    "real_estate": (16, "Real estate"),
-    "professional": (18, "Professional, scientific & technical"),
-    "management": (19, "Management of companies"),
-    "admin": (20, "Administrative & waste services"),
-    "education": (22, "Educational services"),
-    "health": (23, "Health care & social assistance"),
-    "arts": (25, "Arts, entertainment & recreation"),
-    "accommodation": (26, "Accommodation & food services"),
-    "other": (27, "Other services"),
-    "public_admin": (28, "Public administration"),
+# PKD 2007 sections -> (jobs key, label). GUS publishes them per powiat (pl_stats_labour employment_pkd_powiat).
+SECTIONS = {
+    "A": ("agriculture", "Agriculture, forestry & fishing"),
+    "B": ("mining", "Mining & quarrying"),
+    "C": ("manufacturing", "Manufacturing"),
+    "D": ("energy", "Electricity, gas & heat supply"),
+    "E": ("water", "Water supply & waste"),
+    "F": ("construction", "Construction"),
+    "G": ("trade", "Trade & vehicle repair"),
+    "H": ("transport", "Transport & storage"),
+    "I": ("accommodation", "Accommodation & food service"),
+    "J": ("information", "Information & communication"),
+    "K": ("finance", "Finance & insurance"),
+    "L": ("real_estate", "Real estate"),
+    "M": ("professional", "Professional, scientific & technical"),
+    "N": ("admin", "Administrative & support services"),
+    "O": ("public_admin", "Public administration & defence"),
+    "P": ("education", "Education"),
+    "Q": ("health", "Health & social work"),
+    "R": ("arts", "Arts, entertainment & recreation"),
+    "S": ("other", "Other services"),
 }
-FEMALE_OFFSET = 27
-
-# BEA CAGDP2 line codes for the same industries (NAICS sectors). ACS "public
-# administration" has no GDP twin: BEA's "government" line also covers public
-# schools, hospitals and utilities run by governments, so it gets its own key.
-GDP_LINES = {
-    "agriculture": "3",
-    "mining": "6",
-    "construction": "11",
-    "manufacturing": "12",
-    "wholesale": "34",
-    "retail": "35",
-    "transportation": "36",
-    "utilities": "10",
-    "information": "45",
-    "finance": "51",
-    "real_estate": "56",
-    "professional": "60",
-    "management": "64",
-    "admin": "65",
-    "education": "69",
-    "health": "70",
-    "arts": "76",
-    "accommodation": "79",
-    "other": "82",
-    "government": "83",
-}
-GDP_INDUSTRIES = {k: INDUSTRY_LINES[k][1] for k in GDP_LINES if k in INDUSTRY_LINES} | {
-    "government": "Government & government enterprises (federal, state & local, incl. public schools & hospitals)"
-}
+JOB_KEYS = [k for k, _ in SECTIONS.values()]
+SECTION_OF = {k: s for s, (k, _) in SECTIONS.items()}
 
 YIELDS = [
     {
-        "key": "food",
-        "icon": "y-food",
-        "emoji": "🌾",
-        "label": "Food",
-        "color": "#7fbf3f",
-        "unit": "workers",
+        "key": "food", "icon": "y-food", "emoji": "🌾", "label": "Food", "color": "#7fbf3f", "unit": "workers",
         "industries": ["agriculture"],
-        "description": "Workers in agriculture, forestry, fishing & hunting, counted where they live (ACS C24030).",
+        "description": "Workers in agriculture, forestry and fishing (PKD section A), counted where the employer is "
+        "(GUS, 31 December 2025). Powiaty and cities with powiat rights: PKD section A; other gminas: the GUS "
+        "agriculture sector of the gmina table.",
     },
     {
-        "key": "production",
-        "icon": "y-production",
-        "emoji": "⚙️",
-        "label": "Production",
-        "color": "#d9823b",
-        "unit": "workers",
-        "industries": ["manufacturing", "construction", "mining"],
-        "description": "Workers in manufacturing, construction and mining, counted where they live (ACS C24030).",
+        "key": "production", "icon": "y-production", "emoji": "⚙️", "label": "Production", "color": "#d9823b",
+        "unit": "workers", "industries": ["mining", "manufacturing", "energy", "water", "construction"],
+        "description": "Workers in industry and construction (PKD sections B-F), counted where the employer is "
+        "(GUS, 31 December 2025). Powiaty and cities with powiat rights: the PKD sections (a section GUS withholds "
+        "counts as absent); other gminas: the GUS industry and construction sector of the gmina table.",
     },
     {
-        "key": "gold",
-        "icon": "y-gold",
-        "emoji": "💰",
-        "label": "Gold",
-        "color": "#f2c94c",
-        "unit": "usd",
+        "key": "gold", "icon": "y-gold", "emoji": "💰", "label": "Gold", "color": "#f2c94c", "unit": "pln",
         "industries": [],
-        "description": "Gross domestic product per year in current dollars, counted where the work is done (BEA "
-        "CAGDP2, all industries). Metro GDP is the sum of the metro's counties (OMB 2023 delineations); for "
-        "Virginia's combined county + independent city areas BEA reports one figure, split here by population "
-        "only where the parts fall in different metros.",
+        "description": "Gross domestic product per year in current złoty. Poland: 2025 (GUS, through Eurostat). "
+        "Voivodeships: 2024 (Eurostat NUTS 2). Powiaty: the 2023 GDP of their NUTS 3 subregion, shared among the "
+        "subregion's powiaty by their wage bill (average wage x workers). Gminas: their powiat's GDP in proportion "
+        "to their workers. Towns and metros: the sum of their gminas. Below the voivodeship level the figure is "
+        "a share of a published total, not a published GDP.",
     },
     {
-        "key": "science",
-        "icon": "y-science",
-        "emoji": "🔬",
-        "label": "Science",
-        "color": "#4fa3e0",
-        "unit": "workers",
-        "industries": ["professional", "information"],
-        "description": "Workers in professional, scientific & technical services and the information sector, counted "
-        "where they live (ACS C24030).",
+        "key": "science", "icon": "y-science", "emoji": "🔬", "label": "Science", "color": "#4fa3e0",
+        "unit": "workers", "industries": ["information", "professional"],
+        "description": "Workers in information and communication (J) and in professional, scientific and technical "
+        "activities (M), counted where the employer is (GUS, 31 December 2025). Published per powiat; a gmina "
+        "gets its powiat's figure in proportion to its service workers (exact for cities with powiat rights).",
     },
     {
-        "key": "culture",
-        "icon": "y-culture",
-        "emoji": "🎭",
-        "label": "Culture",
-        "color": "#b07ce0",
-        "unit": "workers",
-        "industries": ["arts"],
-        "description": "Workers in arts, entertainment & recreation, counted where they live (ACS C24030).",
+        "key": "culture", "icon": "y-culture", "emoji": "🎭", "label": "Culture", "color": "#b07ce0",
+        "unit": "workers", "industries": ["accommodation", "arts"],
+        "description": "Workers in accommodation and food service (I) and in arts, entertainment and recreation "
+        "(R), counted where the employer is (GUS, 31 December 2025). Shared to gminas like Science.",
     },
 ]
+YIELD_KEYS = [y["key"] for y in YIELDS]
+INDUSTRIES = {k: label for k, label in SECTIONS.values()}
 
 
-def industries(rec: dict) -> dict[str, int | None]:
-    """Workers per industry; None when the table is missing for this geography."""
-    out = {}
-    for key, (line, _) in INDUSTRY_LINES.items():
-        m = rec.get(f"C24030_{line:03d}")
-        f = rec.get(f"C24030_{line + FEMALE_OFFSET:03d}")
-        out[key] = None if m is None and f is None else int((m or 0) + (f or 0))
-    return out
+class Economy:
+    """Per-gmina yields and profiles, and sums over any set of gminas (town, metro, powiat, voivodeship, nation)."""
 
+    def __init__(self, units: Units, stats: Stats):
+        self.u, self.s = units, stats.rekey(units)
+        pop = stats.rows("pl_stats_population", "population")
+        self.pop = {g: num((pop.get(g) or {}).get("population")) for g in units.gminas}
+        self.pop2015 = {g: num((pop.get(g) or {}).get("population_2015")) for g in units.gminas}
+        self.pop2020 = {g: num((pop.get(g) or {}).get("population_2020")) for g in units.gminas}
+        sec = stats.rows("pl_stats_labour", "employment_sectors_gmina")
+        self.sec = {g: sec.get(g) or {} for g in units.gminas}
+        self.pkd = stats.rows("pl_stats_labour", "employment_pkd_powiat")
+        self.lab = stats.rows("pl_stats_labour", "labour_powiat")
+        self.pit = stats.rows("pl_stats_prosperity", "income_gmina")
+        self.years = {
+            "population": stats.field_year("pl_stats_population", "population", "population"),
+            "workers": stats.field_year("pl_stats_labour", "employment_pkd_powiat", "workers_total"),
+            "gdp_nuts3": stats.field_year("pl_gdp", "gdp_nuts3", "gdp_pln"),
+            "gdp_voiv": stats.field_year("pl_gdp", "gdp_voivodeship", "gdp_pln"),
+            "gdp_nation": stats.field_year("pl_gdp", "gdp_country", "gdp_pln"),
+            "wage": stats.field_year("pl_stats_labour", "labour_powiat", "average_gross_monthly_wage"),
+            "unemployment": stats.field_year("pl_stats_labour", "labour_powiat", "registered_unemployment_rate"),
+            "pit": stats.field_year("pl_stats_prosperity", "income_gmina", "pit_revenue_per_person"),
+        }
+        self._shares()
+        self._gdp()
 
-def economy(rec: dict, gdp: dict | None = None) -> dict:
-    """Yields + economic profile for one ACS geography record, plus optional GDP.
+    # -- gmina shares of powiat totals -------------------------------------------------------------------------
+    def _shares(self):
+        self.sci, self.cul = {}, {}
+        for p, gms in self.u.gminas_of_powiat.items():
+            rec = self.pkd.get(p) or {}
+            jm = _sum_sections(rec, "JM")
+            ir = _sum_sections(rec, "IR")
+            serv = [num(self.sec[g].get("workers_services")) for g in gms]
+            st = sum(v for v in serv if v is not None)
+            for g, sv in zip(gms, serv):
+                if len(gms) == 1:
+                    self.sci[g], self.cul[g] = jm, ir
+                elif sv is None or not st:
+                    self.sci[g] = self.cul[g] = None
+                else:
+                    self.sci[g] = round(jm * sv / st) if jm is not None else None
+                    self.cul[g] = round(ir * sv / st) if ir is not None else None
 
-    `gdp` is {"total": usd|None, "year": int, "by_industry": {key: usd|None}}.
-    """
-    jobs = industries(rec)
-    gdp = gdp or {}
-    yields = {}
-    for y in YIELDS:
-        if y["key"] == "gold":
-            yields["gold"] = gdp.get("total")
-        else:
-            vals = [jobs[k] for k in y["industries"]]
-            yields[y["key"]] = None if any(v is None for v in vals) else sum(vals)
-    labor = rec.get("B23025_003")
-    unemployed = rec.get("B23025_005")
-    income = rec.get("B19013_001")
-    rent = rec.get("B25064_001")
-    return {
-        "population": rec.get("B01003_001"),
-        "yields": yields,
-        "jobs": jobs,
-        "employed": rec.get("C24030_001"),
-        "median_income": income,
-        "median_rent": rent,
-        "home_value": rec.get("B25077_001"),
-        "unemployment": round(unemployed / labor, 4) if labor and unemployed is not None else None,
-        "rent_burden": round(rent * 12 / income, 4) if rent and income else None,
-        "gdp": gdp.get("total"),
-        "gdp_year": gdp.get("year"),
-        "gdp_by_industry": gdp.get("by_industry"),
-        "gdp_undisclosed": gdp.get("undisclosed"),
-        "gdp_estimated": gdp.get("estimated"),
-    }
-
-
-# CAGDP2 lines that are the sum of other lines. BEA withholds (D) a county's line to protect one business, but the
-# parent and the siblings are often published, so the withheld value follows by subtraction.
-GDP_IDENTITIES = [
-    ("1", ["2", "83"]),
-    ("2", ["91", "92"]),
-    ("91", ["87", "11", "12"]),
-    ("92", ["10", "88", "36", "45", "50", "59", "68", "75", "82"]),
-    ("87", ["3", "6"]),
-    ("88", ["34", "35"]),
-    ("89", ["36", "10"]),
-    ("90", ["12", "45"]),
-    ("12", ["13", "25"]),
-    ("50", ["51", "56"]),
-    ("59", ["60", "64", "65"]),
-    ("68", ["69", "70"]),
-    ("75", ["76", "79"]),
-]
-
-
-# Apportioning order: the finest groups first, so a sector's remainder is split among as few lines as possible.
-APPORTION_ORDER = ["87", "88", "89", "90", "12", "50", "59", "68", "75", "91", "92", "2", "1"]
-
-
-def _exact(out: dict) -> bool:
-    changed = False
-    for parent, kids in GDP_IDENTITIES:
-        terms = [parent, *kids]
-        if any(t not in out for t in terms):
-            continue
-        unknown = [t for t in terms if out[t] is None]
-        if len(unknown) != 1:
-            continue
-        u = unknown[0]
-        known = sum(out[k] for k in kids if k != u)
-        out[u] = round(out[parent] - known) if u != parent else round(known)
-        changed = True
-    return changed
-
-
-def fill_suppressed(lines: dict, ref: dict | None = None, estimated: set | None = None) -> dict:
-    """{line: usd|None} with withheld lines recovered.
-
-    First exactly: an identity (parent = sum of its lines) with one unknown term gives it by subtraction. BEA
-    suppresses complementary cells, so a county often has two or more unknown lines under a known parent; with
-    `ref` (a fully disclosed row set, e.g. the nation) that remainder is then split among them in proportion to
-    `ref`, and those lines are added to `estimated`.
-    """
-    out = dict(lines)
-    while _exact(out):
-        pass
-    if ref is None:
-        return out
-    idents = dict(GDP_IDENTITIES)
-    progress = True
-    while progress:
-        progress = False
-        for parent in APPORTION_ORDER:
-            kids = idents[parent]
-            if out.get(parent) is None or any(k not in out for k in kids):
+    def _gdp(self):
+        """GDP 2023 per powiat (NUTS 3 by wage bill) and per gmina (powiat by workers)."""
+        fua = self.s.data("pl_geo_fua").get("gminas") or {}
+        nuts3_of_p: dict[str, str] = {}
+        for g in self.u.gminas:
+            n3 = (fua.get(g[:6]) or {}).get("nuts3")
+            if n3:
+                nuts3_of_p.setdefault(g[:4], n3)
+        gdp3 = self.s.rows("pl_gdp", "gdp_nuts3")
+        members: dict[str, list[str]] = {}
+        for p, n3 in nuts3_of_p.items():
+            members.setdefault(n3, []).append(p)
+        self.powiat_gdp: dict[str, float | None] = {p: None for p in self.u.gminas_of_powiat}
+        self.by_workers_only: list[str] = []
+        for n3, ps in members.items():
+            g3 = num((gdp3.get(n3) or {}).get("gdp_pln"))
+            if g3 is None:
                 continue
-            unknown = [k for k in kids if out[k] is None]
-            if len(unknown) < 2:
-                continue
-            rest = max(0.0, out[parent] - sum(out[k] for k in kids if out[k] is not None))
-            weights = [max(0.0, ref.get(k) or 0.0) for k in unknown]
-            tw = sum(weights)
-            for k, wgt in zip(unknown, weights):
-                out[k] = round(rest * (wgt / tw if tw > 0 else 1 / len(unknown)))
-                if estimated is not None:
-                    estimated.add(k)
-            while _exact(out):
-                pass
-            progress = True
-    return out
-
-
-def gdp_profile(lines: dict | None, year: int, estimated: set | None = None) -> dict:
-    """A BEA row set {line: usd|None} → the `gdp` argument of economy(). Withheld lines are recovered from their
-    parent and sibling lines where possible; what stays withheld is reported as `undisclosed` (the total minus the
-    disclosed industries), so shares can be taken of the real total."""
-    if not lines:
-        return {"total": None, "year": year, "by_industry": None, "undisclosed": None, "estimated": None}
-    lines = fill_suppressed(lines)
-    by = {k: lines.get(line) for k, line in GDP_LINES.items()}
-    est = sorted(k for k, line in GDP_LINES.items() if estimated and line in estimated and by.get(k) is not None)
-    total = lines.get("1")
-    undisclosed = None
-    if total is not None and any(v is None for v in by.values()):
-        undisclosed = max(0, round(total - sum(v for v in by.values() if v is not None)))
-    return {"total": total, "year": year, "by_industry": by, "undisclosed": undisclosed, "estimated": est or None}
-
-
-def bea_combos(bea: dict, gaz_counties: dict) -> dict[str, list[str]]:
-    """BEA combination areas → component county FIPS, by matching names to the Gazetteer.
-
-    Virginia: 'Fairfax, Fairfax City + Falls Church, VA*' = Fairfax County + Fairfax city + Falls Church city.
-    Hawaii: 'Maui + Kalawao, HI*' = Maui County + Kalawao County.
-    """
-    by_name = {(g["usps"], g["name"].lower()): geoid for geoid, g in gaz_counties.items()}
-    out = {}
-    for fips, name in bea["county_names"].items():
-        if " + " not in name:
-            continue
-        body, _, st = name.rpartition(", ")
-        st = st.rstrip("*")
-        parts = re.split(r", | \+ ", body)
-        names = [f"{parts[0]} County"] + [
-            re.sub(r" City$", "", p) + (" city" if st == "VA" else " County") for p in parts[1:]
-        ]
-        comps = [by_name.get((st, n.lower())) for n in names]
-        if None in comps:
-            raise RuntimeError(f"cannot resolve BEA area {fips} {name!r} → {names}")
-        out[fips] = comps
-    return out
-
-
-def sum_counties(fips_list: list[str], bea: dict, combos: dict, pop: dict, estimated: set | None = None) -> tuple[dict, bool]:
-    """Add up BEA lines over counties. Returns ({line: usd|None}, split_used). Lines that needed an apportioned
-    county value are added to `estimated`.
-
-    Withheld county lines are first recovered from their parent and sibling lines (fill_suppressed: exactly where
-    possible, else the parent's remainder split in the nation's proportions); a line is None if any county's value
-    is still unknown. A combination area counts in full
-    when all its parts are in the list, otherwise by the parts' share of population.
-    """
-    wanted = set(fips_list)
-    part_of = {c: (combo, comps) for combo, comps in combos.items() for c in comps}
-    shares: dict[str, float] = {}
-    split = False
-    for f in wanted:
-        if f in bea["counties"]:
-            shares[f] = 1.0
-        elif f in part_of:
-            combo, comps = part_of[f]
-            if combo in shares:
-                continue
-            inside = [c for c in comps if c in wanted]
-            if len(inside) == len(comps):
-                shares[combo] = 1.0
+            workers = {p: self.powiat_workers(p) for p in ps}
+            wage = {p: num((self.lab.get(p) or {}).get("average_gross_monthly_wage")) for p in ps}
+            if all(workers[p] and wage[p] for p in ps):
+                w = {p: workers[p] * wage[p] for p in ps}
+            elif all(workers[p] for p in ps):
+                w = dict(workers)
+                self.by_workers_only.append(n3)
             else:
-                total = sum(pop.get(c) or 0 for c in comps)
-                shares[combo] = sum(pop.get(c) or 0 for c in inside) / total if total else None
-                split = True
+                continue
+            tw = sum(w.values())
+            for p in ps:
+                self.powiat_gdp[p] = g3 * w[p] / tw
+        self.gmina_gdp: dict[str, float | None] = {}
+        for p, gms in self.u.gminas_of_powiat.items():
+            pg = self.powiat_gdp.get(p)
+            wk = [num(self.sec[g].get("workers_total")) for g in gms]
+            tw = sum(v for v in wk if v is not None)
+            for g, v in zip(gms, wk):
+                self.gmina_gdp[g] = round(pg * v / tw) if pg is not None and v is not None and tw else None
+
+    def powiat_workers(self, p: str) -> float | None:
+        v = num((self.pkd.get(p) or {}).get("workers_total"))
+        if v is not None:
+            return v
+        return total(self.sec[g].get("workers_total") for g in self.u.gminas_of_powiat.get(p, []))
+
+    # -- profiles ----------------------------------------------------------------------------------------------
+    def powiat_yields(self, p: str) -> dict:
+        """Yields of a whole powiat from the PKD sections (a withheld section counts as absent)."""
+        rec = self.pkd.get(p) or {}
+        sec = lambda letters: total(rec.get(f"workers_{x}") for x in letters)
+        return {"food": sec("A"), "production": sec("BCDEF"), "gold": self.powiat_gdp.get(p),
+                "science": _sum_sections(rec, "JM"), "culture": _sum_sections(rec, "IR")}
+
+    def gmina_yields(self, g: str) -> dict:
+        if len(self.u.gminas_of_powiat.get(g[:4], [])) == 1 and g[:4] in self.pkd:  # a city with powiat rights
+            return self.powiat_yields(g[:4])
+        s = self.sec[g]
+        return {
+            "food": num(s.get("workers_agriculture")),
+            "production": num(s.get("workers_industry")),
+            "gold": self.gmina_gdp.get(g),
+            "science": self.sci.get(g),
+            "culture": self.cul.get(g),
+        }
+
+    def jobs_of_powiaty(self, powiaty: list[str]) -> dict:
+        """PKD jobs summed over whole powiaty; a section is null when it is withheld in every one of them."""
+        return {k: total((self.pkd.get(p) or {}).get(f"workers_{s}") for p in powiaty) for s, (k, _) in SECTIONS.items()}
+
+    def profile(self, gminas: list[str], *, powiaty: list[str] | None = None) -> dict:
+        """Economic fields of a set of gminas. `powiaty`: the set is exactly these whole powiaty (PKD jobs exact,
+        wage and unemployment from the powiat totals)."""
+        ys = [self.powiat_yields(p) for p in powiaty] if powiaty else [self.gmina_yields(g) for g in gminas]
+        yields = {k: _round(total(y[k] for y in ys)) if any(y[k] is not None for y in ys) else None for k in YIELD_KEYS}
+        pop = total(self.pop.get(g) for g in gminas)
+        # Whole powiaty: a gmina created since 2015 is covered by the 2015 figure of the gmina it was split from.
+        past = (lambda d: total(d.get(g) for g in gminas)) if powiaty else (lambda d: full(d, gminas))
+        growth = rate(pop, past(self.pop2015))
+        pit = total((self.pit.get(g) or {}).get("pit_revenue_total") for g in gminas)
+        pit_pop = total(self.pop.get(g) for g in gminas if num((self.pit.get(g) or {}).get("pit_revenue_total")) is not None)
+        # Powiat-level labour figures, weighted by the population each powiat contributes to the set.
+        weight: dict[str, float] = {}
+        for g in gminas:
+            weight[g[:4]] = weight.get(g[:4], 0) + (self.pop.get(g) or 0)
+        ps = powiaty or list(weight)
+        unemployed = [num((self.lab.get(p) or {}).get("registered_unemployed")) for p in ps]
+        rates = [num((self.lab.get(p) or {}).get("registered_unemployment_rate")) for p in ps]
+        if powiaty and all(u is not None and r for u, r in zip(unemployed, rates)):
+            force = sum(u / (r / 100) for u, r in zip(unemployed, rates))
+            unemployment = round(sum(unemployed) / force, 4) if force else None
         else:
-            shares[f] = None  # not in BEA at all
-    filled = {f: fill_suppressed(bea["counties"].get(f, {}), bea.get("nation"), estimated) for f in shares}
-    out: dict[str, float | None] = {}
-    for line in bea["lines"]:
-        acc = 0.0
-        for f, share in shares.items():
-            v = filled[f].get(line)
-            if v is None or share is None:
-                acc = None
-                break
-            acc += v * share
-        out[line] = round(acc) if acc is not None else None
-    return out, split
+            unemployment = _wmean({p: (r / 100 if r is not None else None) for p, r in zip(ps, rates)}, weight, 4)
+        wages = {p: num((self.lab.get(p) or {}).get("average_gross_monthly_wage")) for p in ps}
+        wk = {p: self.powiat_workers(p) for p in ps} if powiaty else weight
+        wage = _wmean(wages, wk, 0)
+        exact_one = powiaty is not None and len(powiaty) == 1
+        return {
+            "population": _round(pop),
+            "employed": _round(total(self.powiat_workers(p) for p in powiaty) if powiaty
+                               else total(self.powiat_workers(g[:4]) if len(self.u.gminas_of_powiat[g[:4]]) == 1
+                                          else self.sec[g].get("workers_total") for g in gminas)),
+            "yields": yields,
+            "jobs": self.jobs_of_powiaty(powiaty) if powiaty else {},
+            "wage": wage,
+            "wage_exact": exact_one,
+            "unemployment": unemployment,
+            "unemployment_exact": powiaty is not None,
+            "pit_per_person": round(pit / pit_pop, 2) if pit is not None and pit_pop else None,
+            "gdp": yields["gold"],
+            "gdp_year": self.years["gdp_nuts3"] if yields["gold"] is not None else None,
+            "gdp_estimated": yields["gold"] is not None,
+            "growth": growth,
+            "growth_years": [2015, self.years["population"] or 2025],
+            "pop_series": {
+                "2015": _round(past(self.pop2015)),
+                "2020": _round(past(self.pop2020)),
+                str(self.years["population"] or 2025): _round(pop),
+            },
+        }
+
+
+def full(d: dict, keys) -> float | None:
+    vals = [d.get(k) for k in keys]
+    return None if not vals or any(v is None for v in vals) else sum(vals)
+
+
+def _sum_sections(rec: dict, letters: str) -> float | None:
+    vals = [num(rec.get(f"workers_{s}")) for s in letters]
+    return None if any(v is None for v in vals) else sum(vals)
+
+
+def _wmean(values: dict, weights: dict, digits: int):
+    pairs = [(v, weights.get(k) or 0) for k, v in values.items() if v is not None]
+    w = sum(p for _, p in pairs)
+    if not pairs or not w:
+        return None
+    v = sum(x * p for x, p in pairs) / w
+    return round(v, digits) if digits else round(v)
+
+
+def _round(v):
+    return None if v is None else round(v)
+
+
+def share(a, b):
+    return ratio(a, b, 1, 4)

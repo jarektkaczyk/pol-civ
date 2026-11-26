@@ -1,75 +1,70 @@
-// City View "Citizens" rows: the metro's people as rows of small figures (citizens.json, ACS 1-year).
+// City View "Citizens" rows: the town's people as rows of small figures (citizens.json).
 //
-//   citizensHtml(m, data) → HTML      the rows (placeholders for the figure canvases)
+//   citizensHtml(m, data) -> HTML      the rows (placeholders for the figure canvases)
 //   mountCitizens(host, m, data)       paints the figures and wires the hover / focus read-out
 //
-// Each row: N figures (workforce 20, ages 10, commute 10 from the file; education and origins 10, rounded here with
-// the same largest-remainder method), a caption ("each figure ≈ 72K workers"), a read-out line that a hovered or
-// focused figure fills ("1 in 7 workers in San Jose is an engineer, coder or scientist (US: 1 in 14)"), and a thin
-// U.S. bar for comparison. A row Census left out is said so, never drawn as zeros.
+// Each row: N figures (from the file's `figures`, or rounded here with the same largest-remainder method), a
+// caption ("each figure ~ 27K workers"), a read-out line that a hovered or focused figure fills ("1 in 4 workers
+// in Krakow works in IT, science or engineering (Poland: 1 in 11)"), and a thin bar with Poland's mix. A row with
+// no data says so, never drawn as zeros. Each row describes its own unit (`scope`: the town, its gmina or its
+// powiat); the read-out names it.
 import { esc, int, pct } from "../../format.js";
 import { compact } from "./fmt.js";
 import { CATEGORY_COLOR, figureCanvas, loadPainter } from "./figures.js";
 
+// shares: the row's counts are per 1,000 residents (education), so no "about N people" read-out.
 const ROWS = [
-  { id: "workforce", title: "Workforce", sub: "by occupation", noun: ["worker", "workers"], n: null },
+  { id: "workforce", title: "Workforce", sub: "by sector", noun: ["worker", "workers"], n: null },
   { id: "age", title: "Generations", sub: "by age", noun: ["resident", "residents"], n: null },
-  { id: "commute", title: "Commute", sub: "how workers get to work", noun: ["worker", "workers"], n: null },
-  { id: "education", title: "Education", sub: "adults 25 and over", noun: ["adult", "adults 25+"], n: 10 },
-  { id: "nativity", title: "Origins", sub: "where residents were born", noun: ["resident", "residents"], n: 10 },
+  { id: "sex", title: "Women and men", sub: "", noun: ["resident", "residents"], n: null },
+  { id: "education", title: "Education", sub: "residents aged 13+", noun: ["resident aged 13+", "residents aged 13+"], n: 10, shares: true },
+  { id: "nativity", title: "Origins", sub: "Ukrainians with PESEL UKR status", noun: ["resident", "residents"], n: 10 },
 ];
 
-// [singular verb phrase, plural verb phrase] per category, for "1 in 7 workers in X is …" / "7 in 10 … are …".
+// [singular verb phrase, plural verb phrase] per category, for "1 in 4 workers in X works ..." / "7 in 10 ... are ...".
 const PHRASE = {
   workforce: {
-    executive: ["is an executive or manager", "are executives or managers"],
-    engineer: ["is an engineer, coder or scientist", "are engineers, coders or scientists"],
-    scholar: ["is a teacher, lawyer, artist or media worker", "are teachers, lawyers, artists or media workers"],
-    healer: ["works in health care", "work in health care"],
-    service: ["works in food, cleaning, care or protective service", "work in food, cleaning, care or protective service"],
-    clerk: ["works in sales or an office", "work in sales or offices"],
-    farmer: ["farms, fishes or works in forestry", "farm, fish or work in forestry"],
-    builder: ["builds, installs or repairs", "build, install or repair"],
-    maker: ["works in a factory, transport or a warehouse", "work in factories, transport or warehouses"],
+    farmer: ["works in farming, forestry or fishing", "work in farming, forestry or fishing"],
+    maker: ["works in a factory, energy, water or transport", "work in factories, energy, water or transport"],
+    builder: ["works in construction", "work in construction"],
+    clerk: ["works in trade, finance or an office", "work in trade, finance or offices"],
+    engineer: ["works in IT, science or engineering", "work in IT, science or engineering"],
+    scholar: ["works in education or the arts", "work in education or the arts"],
+    healer: ["works in health or social care", "work in health or social care"],
+    service: ["works in hospitality, public service or other services", "work in hospitality, public service or other services"],
   },
   age: {
-    child: ["is a child (under 18)", "are children (under 18)"],
-    young: ["is a young adult (18–34)", "are young adults (18–34)"],
-    midlife: ["is middle-aged (35–64)", "are middle-aged (35–64)"],
+    child: ["is a child (0-14)", "are children (0-14)"],
+    young: ["is a young adult (15-29)", "are young adults (15-29)"],
+    midlife: ["is 30 to 64", "are 30 to 64"],
     elder: ["is 65 or older", "are 65 or older"],
   },
-  commute: {
-    drove_alone: ["drives to work alone", "drive to work alone"],
-    carpool: ["carpools to work", "carpool to work"],
-    transit: ["takes public transit to work", "take public transit to work"],
-    walk: ["walks to work", "walk to work"],
-    other: ["bikes or takes a taxi, motorcycle or other way to work", "bike or take a taxi, motorcycle or other way to work"],
-    home: ["works from home", "work from home"],
+  sex: {
+    female: ["is a woman", "are women"],
+    male: ["is a man", "are men"],
   },
   education: {
-    less_than_hs: ["has no high-school diploma", "have no high-school diploma"],
-    high_school: ["finished high school (or a GED) but no college", "finished high school (or a GED) but no college"],
-    some_college: ["has some college or an associate's degree", "have some college or an associate's degree"],
-    bachelors: ["has a bachelor's degree (and no higher)", "have a bachelor's degree (and no higher)"],
-    graduate: ["has a master's, professional degree or doctorate", "have a master's, professional degree or doctorate"],
+    bachelors: ["has higher education", "have higher education"],
+    high_school: ["has no higher education", "have no higher education"],
   },
   nativity: {
-    born_in_state: ["was born in the state they live in", "were born in the state they live in"],
-    other_state: ["was born in another U.S. state", "were born in another U.S. state"],
-    native_abroad: ["was born a U.S. citizen abroad or in a U.S. territory", "were born U.S. citizens abroad or in U.S. territories"],
-    foreign_born: ["was born in another country", "were born in another country"],
+    foreign_born: ["is a Ukrainian with PESEL UKR status", "are Ukrainians with PESEL UKR status"],
+    born_in_state: ["is another resident", "are other residents"],
   },
 };
 
 // Short legend labels (the file's labels are long).
 const SHORT = {
-  workforce: { executive: "Executives", engineer: "Engineers", scholar: "Teachers & arts", healer: "Health", service: "Service",
-    clerk: "Sales & office", farmer: "Farm", builder: "Builders", maker: "Makers & movers" },
-  age: { child: "Under 18", young: "18–34", midlife: "35–64", elder: "65+" },
-  commute: { drove_alone: "Drive alone", carpool: "Carpool", transit: "Transit", walk: "Walk", other: "Bike & other", home: "From home" },
-  education: { less_than_hs: "No diploma", high_school: "High school", some_college: "Some college", bachelors: "Bachelor's", graduate: "Graduate" },
-  nativity: { born_in_state: "This state", other_state: "Other state", native_abroad: "U.S. citizen abroad", foreign_born: "Other country" },
+  workforce: { farmer: "Farming", maker: "Industry & transport", builder: "Construction", clerk: "Trade & offices",
+    engineer: "IT & science", scholar: "Education & arts", healer: "Health", service: "Hospitality & public" },
+  age: { child: "0-14", young: "15-29", midlife: "30-64", elder: "65+" },
+  sex: { female: "Women", male: "Men" },
+  education: { bachelors: "Higher education", high_school: "No higher education" },
+  nativity: { foreign_born: "Ukrainians", born_in_state: "Other residents" },
 };
+
+const DASH = "\u2013";
+const TIMES = "\u00d7";
 
 /** Largest-remainder rounding of counts into n figures (the pipeline's method, for rows without figures). */
 export function largestRemainder(counts, keys, n) {
@@ -96,13 +91,13 @@ export function oneIn(share) {
   return { text: `1 in ${int(n)}`, plural: false };
 }
 
-function sentence(rowId, key, share, natShare, cityName, noun) {
+function sentence(rowId, key, share, natShare, place, noun) {
   const a = oneIn(share);
   if (!a) return "";
   const ph = PHRASE[rowId]?.[key] || ["is in this group", "are in this group"];
-  const us = oneIn(natShare);
+  const pl = oneIn(natShare);
   const lead = a.text.charAt(0).toUpperCase() + a.text.slice(1);
-  return `${lead} ${noun[1]} in ${cityName} ${a.plural ? ph[1] : ph[0]}${us ? ` (US: ${us.text})` : ""}`;
+  return `${lead} ${noun[1]} in ${place} ${a.plural ? ph[1] : ph[0]}${pl ? ` (Poland: ${pl.text})` : ""}`;
 }
 
 function rowModel(rowDef, row, nat, groups, figuresN) {
@@ -120,42 +115,50 @@ function specMap(city) {
   return m;
 }
 
+// The unit a row describes, when it is not the town itself ("powiat bochenski").
+function scopeOf(row, city) {
+  const s = row?.scope;
+  return s && s !== city.name ? s : null;
+}
+
 /** The Citizens rows. data = citizens.json (or null / undefined while loading). */
 export function citizensHtml(m, data) {
   const c = m.city;
-  if (data === undefined) return `<p class="muted cv-note">Loading the citizen mix…</p>`;
+  if (data === undefined) return `<p class="muted cv-note">Loading the citizen mix...</p>`;
   if (!data || !data.cities) return `<p class="muted cv-note">The citizen mix is not available.</p>`;
   const row0 = data.cities[c.id];
-  if (!row0) {
-    return `<p class="muted cv-note">Census published none of the citizen tables for ${esc(c.name)} in the ${esc(data.vintage || "ACS 1-year")} release (it leaves out small areas), so there are no citizen figures here.</p>`;
-  }
+  if (!row0) return `<p class="muted cv-note">No citizen figures for ${esc(c.name)}.</p>`;
   const nat = data.national || {};
   const groups = data.groups || {};
   const specs = specMap(row0);
   const label = Object.fromEntries(Object.entries(groups).map(([r, gs]) => [r, Object.fromEntries(gs.map((g) => [g.key, g.label]))]));
+  const hi = data.rule?.specialist_high ?? 1.5, lo = data.rule?.specialist_low ?? 0.67;
 
-  // Headline: median age, degrees, foreign-born, and the "great person" call-out (the strongest specialist).
-  const med = row0.age?.median, usMed = nat.age?.median;
-  const ba = row0.education?.bachelors_plus, usBa = nat.education?.bachelors_plus;
+  // Headline: median age, higher education, Ukrainians, and the "great person" call-out (the strongest specialist).
+  const med = row0.age?.median, plMed = nat.age?.median;
+  const ba = row0.education?.bachelors_plus, plBa = nat.education?.bachelors_plus;
   const fb = row0.nativity?.foreign_born ?? row0.nativity?.shares?.foreign_born;
-  const usFb = nat.nativity?.foreign_born ?? nat.nativity?.shares?.foreign_born;
-  const chip = (v, us, fmt, lbl, tip) => (v == null ? "" : `<div class="cv-cz-chip" title="${esc(tip)}"><b>${fmt(v)}</b><span>${esc(lbl)}</span>${us != null ? `<small>US ${fmt(us)}</small>` : ""}</div>`);
-  const top = (row0.specialists || []).find((s) => s.ratio >= (data.rule?.specialist_high ?? 1.5));
+  const plFb = nat.nativity?.foreign_born ?? nat.nativity?.shares?.foreign_born;
+  const chip = (v, pl, fmt, lbl, tip) => (v == null ? "" : `<div class="cv-cz-chip" title="${esc(tip)}"><b>${fmt(v)}</b><span>${esc(lbl)}</span>${pl != null ? `<small>Poland ${fmt(pl)}</small>` : ""}</div>`);
+  const top = (row0.specialists || []).find((s) => s.ratio >= hi);
   const topRow = ROWS.find((r) => r.id === top?.row);
+  const topPlace = top ? scopeOf(row0[top.row], c) : null;
   const great = top && topRow ? `<div class="cv-great" style="--fc:${esc(CATEGORY_COLOR[top.row]?.[top.key] || "#c9a45c")}">
       <span class="cv-great-fig" data-great="${esc(top.row)}|${esc(top.key)}" aria-hidden="true"></span>
       <div><small>Standout citizens</small><b>${esc(label[top.row]?.[top.key] || top.key)}</b>
-      <span>${pct(top.share, 1)} of ${esc(topRow.noun[1])} here, ${pct(top.national, 1)} nationally: ${top.ratio.toFixed(1)}× the U.S. share.</span></div></div>` : "";
+      <span>${pct(top.share, 1)} of ${esc(topRow.noun[1])}${topPlace ? ` in ${esc(topPlace)}` : " here"}, ${pct(top.national, 1)} in Poland: ${top.ratio.toFixed(1)} times Poland's share.</span></div></div>` : "";
 
   const rows = ROWS.map((rd) => {
     const row = row0[rd.id];
-    const head = `<div class="cv-cz-h"><b>${esc(rd.title)}</b><span>${esc(rd.sub)}</span></div>`;
+    const scope = scopeOf(row, c);
+    const sub = [rd.sub, scope].filter(Boolean).join(" \u00b7 ");
+    const head = `<div class="cv-cz-h"><b>${esc(rd.title)}</b>${sub ? `<span>${esc(sub)}</span>` : ""}</div>`;
     if (!row) {
       return `<div class="cv-cz-row missing" data-row="${rd.id}">${head}
-        <p class="muted cv-note">Census did not publish this table for ${esc(c.name)} in the ${esc(data.vintage || "ACS 1-year")} release, so this row is left out.</p></div>`;
+        <p class="muted cv-note">No ${esc(rd.title.toLowerCase())} figures for ${esc(c.name)}.</p></div>`;
     }
-    const { keys, n, figs, natFigs } = rowModel(rd, row, nat[rd.id], groups, data.figures || {});
-    if (!figs) return `<div class="cv-cz-row missing" data-row="${rd.id}">${head}<p class="muted cv-note">No counts for this row.</p></div>`;
+    const { keys, n, figs } = rowModel(rd, row, nat[rd.id], groups, data.figures || {});
+    if (!figs) return `<div class="cv-cz-row missing" data-row="${rd.id}">${head}<p class="muted cv-note">No ${esc(rd.title.toLowerCase())} figures for ${esc(c.name)}.</p></div>`;
     const per = row.total / n;
     const cells = [];
     for (const k of keys) {
@@ -166,41 +169,44 @@ export function citizensHtml(m, data) {
         cells.push(`<span class="cv-fig${mark ? ` ${mark}` : ""}" tabindex="${j ? -1 : 0}" role="img" data-k="${esc(k)}" aria-label="${esc(label[rd.id]?.[k] || k)}"></span>`);
       }
     }
-    // Legend: every category, with its share, the U.S. share and a chevron for specialists. Categories that
-    // round to no figure are still listed (greyed), so nothing silently disappears.
+    // Legend: every category, with its share, Poland's share and a chevron for specialists. Categories that round
+    // to no figure are still listed (greyed), so nothing silently disappears.
+    const plShares = nat[rd.id]?.shares || null;
     const legend = keys.map((k) => {
-      const sh = row.shares?.[k], us = nat[rd.id]?.shares?.[k];
+      const sh = row.shares?.[k], pl = plShares?.[k];
       const sp = specs.get(`${rd.id}|${k}`);
-      const chev = sp ? `<em class="${sp.ratio >= 1 ? "up" : "down"}" title="${sp.ratio.toFixed(1)}× the U.S. share">${sp.ratio >= 1 ? "▲" : "▼"}</em>` : "";
-      return `<span class="cv-cz-k${figs[k] ? "" : " zero"}" data-k="${esc(k)}" title="${esc(label[rd.id]?.[k] || k)}: ${sh != null ? pct(sh, 1) : "–"}${us != null ? ` (US ${pct(us, 1)})` : ""}${figs[k] ? "" : ". Rounds to no figure."}"><i style="background:${esc(CATEGORY_COLOR[rd.id]?.[k] || "#888")}"></i>${esc(SHORT[rd.id]?.[k] || k)} <small>${sh != null ? pct(sh, 0) : "–"}</small>${chev}</span>`;
+      const chev = sp ? `<em class="${sp.ratio >= 1 ? "up" : "down"}" title="${sp.ratio.toFixed(1)} times Poland's share">${sp.ratio >= 1 ? "\u25b2" : "\u25bc"}</em>` : "";
+      return `<span class="cv-cz-k${figs[k] ? "" : " zero"}" data-k="${esc(k)}" title="${esc(label[rd.id]?.[k] || k)}: ${sh != null ? pct(sh, 1) : DASH}${pl != null ? ` (Poland ${pct(pl, 1)})` : ""}${figs[k] ? "" : ". Rounds to no figure."}"><i style="background:${esc(CATEGORY_COLOR[rd.id]?.[k] || "#888")}"></i>${esc(SHORT[rd.id]?.[k] || label[rd.id]?.[k] || k)} <small>${sh != null ? pct(sh, 0) : DASH}</small>${chev}</span>`;
     }).join("");
-    // U.S. comparison bar (shares), aligned with the figures' order.
-    const usBar = nat[rd.id]?.shares ? `<div class="cv-cz-us" title="U.S. mix, same order"><span>US</span><div>${keys.map((k) => {
-      const s = nat[rd.id].shares[k] || 0;
-      return s > 0 ? `<i style="flex:${s};background:${esc(CATEGORY_COLOR[rd.id]?.[k] || "#888")}" title="${esc(SHORT[rd.id]?.[k] || k)}: ${pct(s, 1)} in the U.S."></i>` : "";
+    // Poland's mix (shares), aligned with the figures' order; none when the file has no national row.
+    const plBar = plShares ? `<div class="cv-cz-us" title="Poland, same order"><span>PL</span><div>${keys.map((k) => {
+      const v = plShares[k] || 0;
+      return v > 0 ? `<i style="flex:${v};background:${esc(CATEGORY_COLOR[rd.id]?.[k] || "#888")}" title="${esc(SHORT[rd.id]?.[k] || k)}: ${pct(v, 1)} in Poland"></i>` : "";
     }).join("")}</div></div>` : "";
-    const cap = `Each figure ≈ ${compact(per)} ${rd.noun[1]} · ${compact(row.total)} in all${rd.n && !row.figures ? " · rounded here" : ""}`;
-    const extra = rd.id === "age" && med != null ? ` · median age ${med.toFixed(1)}${usMed != null ? ` (US ${usMed.toFixed(1)})` : ""}` : "";
+    const cap = rd.shares
+      ? `Each figure = ${Math.round(100 / n)}% of ${rd.noun[1]}`
+      : `Each figure \u2248 ${compact(per)} ${rd.noun[1]} \u00b7 ${compact(row.total)} in all`;
+    const extra = rd.id === "age" && med != null ? ` \u00b7 median age ${med.toFixed(1)}${plMed != null ? ` (Poland ${plMed.toFixed(1)})` : ""}` : "";
     return `<div class="cv-cz-row" data-row="${rd.id}" style="--n:${n}">${head}
       <div class="cv-figs" role="group" aria-label="${esc(rd.title)}: ${keys.filter((k) => figs[k]).map((k) => `${figs[k]} of ${n} ${SHORT[rd.id]?.[k] || k}`).join(", ")}">${cells.join("")}</div>
-      ${usBar}
+      ${plBar}
       <div class="cv-cz-out" aria-live="polite" data-default="${esc(cap + extra)}">${esc(cap + extra)}</div>
       <div class="cv-cz-legend">${legend}</div>
     </div>`;
   }).join("");
 
   const unreliable = row0.reliable === false
-    ? `<p class="cv-warn">Micropolitan area: the 1-year survey's margins of error are large here, so read these figures as rough.</p>` : "";
+    ? `<p class="cv-warn">Small numbers here: read these figures as rough.</p>` : "";
   return `
     <div class="cv-cz-top">
-      ${chip(med, usMed, (v) => v.toFixed(1), "median age", "Median age (ACS B01002)")}
-      ${chip(ba, usBa, (v) => pct(v, 0), "have a degree", "Adults 25+ with a bachelor's degree or higher (ACS C15003)")}
-      ${chip(fb, usFb, (v) => pct(v, 0), "born abroad", "Residents born in another country (ACS B05002)")}
+      ${chip(med, plMed, (v) => v.toFixed(1), "median age", "Median age of residents")}
+      ${chip(ba, plBa, (v) => pct(v, 0), "higher education", "Residents aged 13+ with higher education")}
+      ${chip(fb, plFb, (v) => pct(v, 1), "Ukrainians", "Ukrainians with PESEL UKR status, share of residents")}
     </div>
     ${great}
     ${unreliable}
     <div class="cv-cz${row0.reliable === false ? " unreliable" : ""}">${rows}</div>
-    <p class="cv-note">${esc(data.vintage || "ACS 1-year")}, tables C24010, B01001, C08301, C15003 and B05002. Figures are rounded (largest remainder) so each row adds up; hover or tap a figure for its share. ▲▼ = at least 1.5× or at most 0.67× the U.S. share. Commute counts workers, not all residents.</p>`;
+    <p class="cv-note">\u25b2\u25bc = at least ${hi} times or at most ${lo} times Poland's share.</p>`;
 }
 
 /** Paint the figure canvases and wire the read-outs. */
@@ -250,8 +256,9 @@ export function mountCitizens(host, m, data) {
         out.classList.remove("on");
         return;
       }
-      const sh = row.shares?.[k], us = nat[rid]?.shares?.[k];
-      out.innerHTML = `${esc(sentence(rid, k, sh, us, m.city.name, rd.noun))}<small>${sh != null ? pct(sh, 1) : "–"} here${us != null ? ` · ${pct(us, 1)} in the U.S.` : ""}${row.counts?.[k] != null ? ` · ≈${compact(row.counts[k])} people` : ""}</small>`;
+      const sh = row.shares?.[k], pl = nat[rid]?.shares?.[k];
+      const people = !rd.shares && row.counts?.[k] != null ? ` \u00b7 \u2248${compact(row.counts[k])} ${rd.noun[1]}` : "";
+      out.innerHTML = `${esc(sentence(rid, k, sh, pl, row.scope || m.city.name, rd.noun))}<small>${sh != null ? pct(sh, 1) : DASH} here${pl != null ? ` \u00b7 ${pct(pl, 1)} in Poland` : ""}${people}</small>`;
       out.classList.add("on");
     };
     let pinned = null;

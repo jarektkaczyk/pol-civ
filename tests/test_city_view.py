@@ -1,5 +1,5 @@
-"""Builder helpers for the City view, Explorer and Advisors: footprints, ranks, peers, pop series,
-resource summaries and state land shares / energy (pure functions on tiny inputs)."""
+"""Builder helpers for the City view, Explorer and Advisors: footprints, ranks, peers, metros,
+resource summaries and voivodeship land shares (pure functions on tiny inputs)."""
 
 import unittest
 
@@ -10,17 +10,16 @@ class FootprintTest(unittest.TestCase):
     def test_majority_of_samples(self):
         world = {
             "owner": [0, 0, 0, -1],
-            "counties": ["01001", "01003", "01005"],
-            # cell 0: 4 of 7 in CBSA A → A; cell 1: 3 A + 3 B + 1 none → nobody; cell 2: all B; cell 3: water
+            "counties": ["1261011", "1206011", "1206022"],
+            # cell 0: 4 of 7 in A -> A; cell 1: 3 A + 3 B + 1 none -> nobody; cell 2: all B; cell 3: water
             "county_samples": [[0, 0, 1, 1, -1, 0, 0], [0, 0, 0, 2, 2, 2, -1], [2] * 7, []],
         }
-        members = {"A": ["01001", "01003"], "B": ["01005"]}
-        # samples in 01001 or 01003 count for A: cell 0 has 6, cell 1 has 3
+        members = {"A": ["1261011", "1206011"], "B": ["1206022"]}
         self.assertEqual(cities.footprints(world, members), {"A": {0}, "B": {2}})
 
     def test_water_cell_never_in_footprint(self):
-        world = {"owner": [-1], "counties": ["01001"], "county_samples": [[0] * 7]}
-        self.assertEqual(cities.footprints(world, {"A": ["01001"]}), {})
+        world = {"owner": [-1], "counties": ["1261011"], "county_samples": [[0] * 7]}
+        self.assertEqual(cities.footprints(world, {"A": ["1261011"]}), {})
 
 
 class RanksTest(unittest.TestCase):
@@ -31,7 +30,7 @@ class RanksTest(unittest.TestCase):
     def test_ranks_and_peers(self):
         cs = [self.city("A", 1000, 100.0, 0.01, 5), self.city("B", 500, 100.0, None, 9),
               self.city("C", 450, None, 0.05, 1), self.city("D", 100, 1.0, 0.02, 1)]
-        cities.add_ranks(cs)
+        cities.add_ranks(cs, cs[:3])
         r = {c["id"]: c["ranks"] for c in cs}
         self.assertEqual([r[i]["population"] for i in "ABCD"], [1, 2, 3, 4])
         self.assertEqual([r[i]["gdp_per_capita"] for i in "ABCD"], [2, 1, None, 3])
@@ -39,20 +38,21 @@ class RanksTest(unittest.TestCase):
         self.assertEqual([r[i]["food"] for i in "ABCD"], [2, 1, 3, 4])  # tie C/D keeps population order
         self.assertIsNone(r["A"]["science"])
         self.assertEqual(set(r["A"]), set(cities.RANK_KEYS))
-        self.assertEqual(cs[1]["peers"][:2], ["C", "A"])  # by ratio: 450/500 is closer than 1000/500
-        self.assertTrue(all(c["id"] not in c["peers"] and len(c["peers"]) == 3 for c in cs))
+        self.assertEqual(cs[1]["peers"], ["C", "A"])  # by ratio: 450/500 is closer than 1000/500
+        self.assertEqual(cs[3]["peers"], [])  # not in the peer pool (no City View)
 
 
-class PopSeriesTest(unittest.TestCase):
-    pep = {"years": [2020, 2021, 2022], "cbsa": {"A": {"pop": [10.0, None, 12.4], "counties": ["01001", "01003"]}}}
-
-    def test_series(self):
-        self.assertEqual(cities.pop_series(self.pep, "A", ["01003", "01001"]), {"2020": 10, "2021": None, "2022": 12})
-
-    def test_missing_or_different_counties(self):
-        self.assertIsNone(cities.pop_series(self.pep, "B", None))
-        self.assertIsNone(cities.pop_series(self.pep, "A", ["01001"]))
-        self.assertIsNone(cities.pop_series(None, "A", None))
+class MetroGroupsTest(unittest.TestCase):
+    def test_published_merges(self):
+        fua = {"fuas": {"PL006F": {"name": "Gdańsk", "gminas": ["226101", "226401"]},
+                        "PL053F": {"name": "Gdynia", "gminas": ["226201"]},
+                        "PL003F": {"name": "Kraków", "gminas": ["126101"]}}}
+        by6 = {"226101": "2261011", "226401": "2264011", "226201": "2262011", "126101": "1261011"}
+        groups = {g["id"]: g for g in cities.metro_groups(fua, by6)}
+        self.assertEqual(set(groups), {"PL006F", "PL003F"})
+        self.assertEqual(groups["PL006F"]["name"], "Trójmiasto")
+        self.assertEqual(groups["PL006F"]["gminas"], ["2261011", "2262011", "2264011"])
+        self.assertEqual(groups["PL006F"]["fuas"], ["PL006F", "PL053F"])
 
 
 class ResourceSummaryTest(unittest.TestCase):
@@ -83,15 +83,16 @@ class StateLandTest(unittest.TestCase):
 
 
 class CountyFieldsTest(unittest.TestCase):
-    def test_fields_cover_requested_metrics(self):
-        keys = [f["key"] for f in counties.fields()]
-        for k in ("geoid", "name", "state", "population", "land_km2", "density", "bachelors", "median_age", "poverty",
-                  "broadband", "commute", "foreign_born", "homeownership", "uninsured", "income", "home_value",
-                  "forest", "crop", "pasture", "developed", "cbsa"):
-            self.assertIn(k, keys)
+    def test_fields_unique_and_described(self):
+        fields = counties.gmina_fields()
+        keys = [f["key"] for f in fields]
         self.assertEqual(len(keys), len(set(keys)))
-        # Only the land shares and the map-hex column are about hexes; lens descriptions are reworded for a county.
-        self.assertTrue(all("hex" not in f["description"].lower() or f["key"] in counties.LAND or f["key"] == "cell" for f in counties.fields()))
+        for k in ("geoid", "name", "powiat", "state", "population", "density", "pit", "wage", "unemployment",
+                  "president_2025", "forest", "cbsa", "cell"):
+            self.assertIn(k, keys)
+        for f in fields:
+            if f["level"] in ("powiat", "voivodeship") and f["key"] in counties.METRIC:
+                self.assertIn("Published per", f["description"])
 
 
 if __name__ == "__main__":

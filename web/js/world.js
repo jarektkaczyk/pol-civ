@@ -110,7 +110,7 @@ export function prepareWorld(world, cities, extras = {}) {
   return prepared;
 }
 
-export const isCapital = (city) => (city.capital != null ? !!city.capital : city.id === "47900");
+export const isCapital = (city) => (city.capital != null ? !!city.capital : city.id === "1465011");
 
 // --- tile colours ---------------------------------------------------------------------------------------------
 

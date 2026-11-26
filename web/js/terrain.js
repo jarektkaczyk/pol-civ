@@ -12,9 +12,9 @@ export const V1_TERRAIN = [
 export const DEFAULT_TABLES = {
   water: [
     { id: 0, name: "Land" },
-    { id: 1, name: "Ocean", color: "#1b4266", rule: "Water deeper than ~200 m, away from land." },
-    { id: 2, name: "Coast", color: "#2d6d97", rule: "Water next to land or shallower than 200 m." },
-    { id: 3, name: "Lake", color: "#3a80b0", rule: "Hex centre inside a Natural Earth lake." },
+    { id: 1, name: "Open sea", color: "#1d3f63", rule: "Baltic deeper than 40 m, away from land." },
+    { id: 2, name: "Coastal water", color: "#2b6790", rule: "Sea or lagoon next to land or shallower than 40 m." },
+    { id: 3, name: "Lake", color: "#3a80b0", rule: "Mostly lake water, above sea level." },
   ],
   relief: [
     { id: 0, name: "Flat", rule: "Gentle terrain." },
@@ -27,13 +27,13 @@ export const DEFAULT_TABLES = {
     { id: 1, key: "forest_deciduous", name: "Deciduous forest", color: "#4f7a35" },
     { id: 2, key: "forest_evergreen", name: "Evergreen forest", color: "#2f5f3a" },
     { id: 3, key: "forest_mixed", name: "Mixed forest", color: "#436d36" },
-    { id: 4, key: "scrub", name: "Scrub & desert", color: "#b8a26a" },
-    { id: 5, key: "grassland", name: "Grassland", color: "#9fb35a" },
-    { id: 6, key: "pasture", name: "Pasture & hay", color: "#a8b862" },
-    { id: 7, key: "cropland", name: "Cropland", color: "#c2b65c" },
+    { id: 4, key: "scrub", name: "Scrub", color: "#9fa069" },
+    { id: 5, key: "grassland", name: "Mountain meadows", color: "#9fb35a" },
+    { id: 6, key: "pasture", name: "Meadows and pastures", color: "#8fb04e" },
+    { id: 7, key: "cropland", name: "Farmland", color: "#bdb45c" },
     { id: 8, key: "wetland", name: "Wetland", color: "#4f7f68" },
-    { id: 9, key: "urban", name: "Urban", color: "#8c8780" },
-    { id: 10, key: "barren", name: "Barren", color: "#b9ab94" },
+    { id: 9, key: "urban", name: "Built-up", color: "#8c8780" },
+    { id: 10, key: "barren", name: "Bare rock and sand", color: "#b9ab94" },
     { id: 11, key: "ice", name: "Ice & snow", color: "#e8eef2" },
   ],
 };
@@ -55,10 +55,10 @@ export function resolveTables(tables) {
   return out;
 }
 
-// Elevation colour ramp for land without land-cover data (Canada, Mexico, v1 files).
+// Elevation colour ramp for land without land-cover data: Poland's lowlands to the Tatra summits.
 const ELEV_STOPS = [
-  [-100, "#5d8a39"], [250, "#7c9744"], [700, "#a39c58"], [1400, "#b09366"], [2200, "#9a8068"], [3000, "#8c8078"],
-  [3800, "#d8dde0"],
+  [-10, "#5d8a39"], [150, "#7c9744"], [400, "#93995a"], [800, "#a39064"], [1300, "#9a8068"], [1800, "#8c8078"],
+  [2400, "#d8dde0"],
 ].map(([e, c]) => [e, parseHex(c)]);
 
 export function elevColor(elev) {

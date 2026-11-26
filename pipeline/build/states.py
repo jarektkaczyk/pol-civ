@@ -1,32 +1,33 @@
-"""States: the same economic profile as a city (ACS 1-year + BEA GDP), ranks, and a label anchor.
+"""Voivodeships (the `states` slot of the contracts): code, name, capital(s), a label anchor, land-cover shares
+and the economic profile.
 
-Also land-cover shares over the state's hexes and the MW of the power plants mapped in resources.json
-(only the sites above each type's threshold, so not the state's total capacity).
+The economic profile (population, yields, GDP, ranks) has the shape of a city's (see yields.py): the sum of the
+voivodeship's powiaty, with the published voivodeship GDP (Eurostat NUTS 2, 2024) as Gold. A statistics interim
+that is missing leaves its fields null.
 
-Ranks are among the lower 48 + DC (1 = largest). The label anchor is the state's
+The label anchor is the voivodeship's
 "pole of inaccessibility" on the hex map (the hex farthest from the border, by hex
 steps, or one nearly as deep that fits a bigger name), turned along the state's long axis
 when that helps, and sized to fit the run of the state's own hexes through the anchor.
-`size` assumes ~0.6 em per character; for very small states (RI, DE) the 14 km minimum
-can exceed the state, so the frontend should still clamp or hide those labels.
+`size` assumes ~0.6 em per character.
 """
 
 from __future__ import annotations
 
-import json
 import math
 from collections import deque
 
 from ..core.hexgrid import HexGrid
-from ..core.paths import WEB_DATA
 from ..core.store import load_interim, write_web
-from .growth import Growth
-from .yields import YIELDS, economy, gdp_profile
+from .plstats import Stats, Units, num
+from .yields import Economy
 
-REQUIRES = ["_world", "census_boundaries", "acs_1yr", "bea_gdp", "pep_population", "resources.json"]
+REQUIRES = ["_world", "pl_geo_teryt", "pl_geo_fua", "pl_stats_population", "pl_stats_labour", "pl_stats_prosperity",
+            "pl_gdp"]
 PRODUCES = ["states.json"]
 
-MIN_LABEL_KM, MAX_LABEL_KM = 14.0, 110.0  # suggested font height range, map km
+MIN_LABEL_KM, MAX_LABEL_KM = 8.0, 40.0  # suggested font height range, map km
+YIELD_KEYS = ["food", "production", "gold", "science", "culture"]
 
 
 def label_anchor(grid: HexGrid, owner: list[int], s: int, name: str) -> dict | None:
@@ -56,11 +57,11 @@ def label_anchor(grid: HexGrid, owner: list[int], s: int, name: str) -> dict | N
     my = sum(p[1] for p in pts.values()) / len(cells)
 
     # Principal axis of the hex centres. Labels stay horizontal unless tilting them
-    # along a clearly elongated state (at most 45°) allows a much bigger name.
+    # along a clearly elongated state (at most 45 degrees) allows a much bigger name.
     sxx = sum((p[0] - mx) ** 2 for p in pts.values())
     syy = sum((p[1] - my) ** 2 for p in pts.values())
     sxy = sum((p[0] - mx) * (p[1] - my) for p in pts.values())
-    theta = 0.5 * math.atan2(2 * sxy, sxx - syy)  # (-90°, 90°], clockwise on screen
+    theta = 0.5 * math.atan2(2 * sxy, sxx - syy)  # (-90, 90] degrees, clockwise on screen
     angles = [0.0] + ([theta] if 1 <= abs(math.degrees(theta)) <= 45 else [])
     step = grid.radius / 4
 
@@ -113,13 +114,34 @@ def label_anchor(grid: HexGrid, owner: list[int], s: int, name: str) -> dict | N
 
 
 PCT_KEYS = ["forest", "crop", "pasture", "grass", "shrub", "wetland", "developed"]
-ENERGY_NOTE = ("Only the power plants and wind/solar/battery clusters mapped as resources, each above its type's "
-               "size threshold (e.g. gas plants of 1,500 MW or more), are counted: this is not the state's total "
-               "generating capacity.")
+
+# Seats of the voivodeship authorities (gmina TERYT codes). Two voivodeships split them: the voivode sits in
+# Bydgoszcz and Gorzow Wielkopolski, the regional assembly (sejmik) and marshal in Torun and Zielona Gora.
+# Source: Ustawa z dnia 24 lipca 1998 r. o wprowadzeniu zasadniczego trojstopniowego podzialu terytorialnego
+# panstwa, art. 1 (Dz.U. 1998 nr 96 poz. 603).
+CAPITALS_REF = "https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=WDU19980960603"
+CAPITALS = {
+    "02": [("0264011", "Wrocław", "both")],
+    "04": [("0461011", "Bydgoszcz", "voivode"), ("0463011", "Toruń", "sejmik")],
+    "06": [("0663011", "Lublin", "both")],
+    "08": [("0861011", "Gorzów Wielkopolski", "voivode"), ("0862011", "Zielona Góra", "sejmik")],
+    "10": [("1061011", "Łódź", "both")],
+    "12": [("1261011", "Kraków", "both")],
+    "14": [("1465011", "Warszawa", "both")],
+    "16": [("1661011", "Opole", "both")],
+    "18": [("1863011", "Rzeszów", "both")],
+    "20": [("2061011", "Białystok", "both")],
+    "22": [("2261011", "Gdańsk", "both")],
+    "24": [("2469011", "Katowice", "both")],
+    "26": [("2661011", "Kielce", "both")],
+    "28": [("2862011", "Olsztyn", "both")],
+    "30": [("3064011", "Poznań", "both")],
+    "32": [("3262011", "Szczecin", "both")],
+}
 
 
 def land_shares(world: dict, s: int) -> dict | None:
-    """Mean world `pct` (0..100) over the state's cells with land-cover samples, as 0..1 fractions."""
+    """Mean world `pct` (0..100) over the voivodeship's cells with land-cover samples, as 0..1 fractions."""
     pct, cover, owner = world.get("pct"), world.get("cover"), world["owner"]
     if not pct or not cover:
         return None
@@ -129,68 +151,69 @@ def land_shares(world: dict, s: int) -> dict | None:
     return {k: round(sum(pct[k][i] for i in cells) / len(cells) / 100, 3) for k in PCT_KEYS}
 
 
-def energy_by_state() -> dict[str, dict] | None:
-    """abbr → {unit, total, by_type, sites, note} summed from resources.json items of every MW type
-    (states without a mapped site get zeros under "", the default row); None if resources.json is not built."""
-    path = WEB_DATA / "resources.json"
-    if not path.exists():
-        return None
-    res = json.loads(path.read_text())
-    mw_types = [t["id"] for t in res["types"] if t["unit"] == "MW"]
-    mw: dict[str, dict] = {}
-    sites: dict[str, dict] = {}
-    for it in res["items"]:
-        if it["type"] in mw_types and it.get("state"):
-            mw.setdefault(it["state"], dict.fromkeys(mw_types, 0))[it["type"]] += it["value"] or 0
-            sites.setdefault(it["state"], dict.fromkeys(mw_types, 0))[it["type"]] += 1
-    out = {}
-    for abbr in ["", *mw]:
-        by_type = {k: round(v) for k, v in mw.get(abbr, dict.fromkeys(mw_types, 0)).items()}
-        out[abbr] = {"unit": "MW", "total": sum(by_type.values()), "by_type": by_type,
-                     "sites": sites.get(abbr, dict.fromkeys(mw_types, 0)), "note": ENERGY_NOTE}
+def economy(econ: Economy, units: Units, gdp_rows: dict, gdp_year, code: str) -> dict:
+    """The voivodeship's economic profile: its whole powiaty, with the published NUTS 2 GDP as Gold."""
+    powiaty = [p for p in units.powiaty if p[:2] == code]
+    gminas = [g for g in units.gminas if g[:2] == code]
+    prof = econ.profile(gminas, powiaty=powiaty)
+    gdp = num((gdp_rows.get(code) or {}).get("gdp_pln"))
+    if gdp is not None:
+        prof["gdp"] = prof["yields"]["gold"] = round(gdp)
+        prof["gdp_year"] = gdp_year
+        prof["gdp_estimated"] = False
+    return prof
+
+
+def add_ranks(states: list[dict]) -> None:
+    """ranks: {yield key: 1..16}, 1 = largest; null where the value is null."""
+    for key in YIELD_KEYS:
+        have = sorted((s for s in states if s["yields"].get(key) is not None), key=lambda s: -s["yields"][key])
+        for r, s in enumerate(have, 1):
+            s["ranks"][key] = r
+
+
+def capitals(code: str, gminy: dict[str, str]) -> list[dict]:
+    out = []
+    for teryt, name, role in CAPITALS[code]:
+        if gminy.get(teryt) != name:
+            raise ValueError(f"capital {teryt} {name}: the TERYT register has {gminy.get(teryt)!r}")
+        out.append({"gmina": teryt, "name": name, "role": role})
     return out
 
 
 def build() -> None:
     world = load_interim("_world")
-    acs_all = load_interim("acs_1yr")
-    acs = acs_all["geos"]
-    growth = Growth(load_interim("pep_population"), acs_all["year"])  # Census estimates, see growth.py
-    bea = load_interim("bea_gdp")
+    teryt = load_interim("pl_geo_teryt")
+    units = Units(world, teryt)
+    stats = Stats()
+    econ = Economy(units, stats)
+    gdp_rows = stats.rows("pl_gdp", "gdp_voivodeship")
     grid = HexGrid(**world["grid"])
     owner = world["owner"]
-    names = {s["fips"]: s for s in load_interim("census_boundaries")["states"]}
+    names = {v["code"]: v["name"] for v in teryt["voivodeships"]}
+    gminy = {g["code"]: g["name"] for g in teryt["gminy"]}
+    abbr = dict(zip(world["states"], [None] * len(world["states"])))
+    from .world import ABBR
 
-    energy = energy_by_state()
-    if energy is None:
-        print("    resources.json not built yet: energy left null")
+    abbr.update(ABBR)
     states = []
-    for i, fips in enumerate(world["states"]):
-        meta = names.get(fips, {"abbr": None, "name": fips})
-        rec = acs.get("0400000US" + fips, {})
-        econ = economy(rec, gdp_profile(bea["states"].get(fips), bea["year"]))
+    for i, code in enumerate(world["states"]):
+        name = names[code]
         states.append(
             {
-                "fips": fips,
-                "abbr": meta["abbr"],
-                "name": meta["name"],
-                **econ,
-                "growth": growth.state(fips),
-                "growth_years": growth.years,
-                "ranks": {},
-                "label": label_anchor(grid, owner, i, meta["name"]),
+                "fips": code,
+                "abbr": abbr[code],
+                "name": name,
+                "capitals": capitals(code, gminy),
+                "capitals_ref": CAPITALS_REF,
+                **economy(econ, units, gdp_rows, econ.years["gdp_voiv"], code),
+                "ranks": dict.fromkeys(YIELD_KEYS),
+                "label": label_anchor(grid, owner, i, name),
                 "land": land_shares(world, i),
-                "energy": dict(energy.get(meta["abbr"]) or energy[""]) if energy is not None else None,
+                "energy": None,
+                "cells": sum(1 for o in owner if o == i),
             }
         )
-    for y in YIELDS:
-        key = y["key"]
-        ranked = sorted((s for s in states if s["yields"][key] is not None), key=lambda s: -s["yields"][key])
-        for r, s in enumerate(ranked, 1):
-            s["ranks"][key] = r
-        for s in states:
-            s["ranks"].setdefault(key, None)
+    add_ranks(states)
     write_web("states.json", states)
-    no_label = [s["abbr"] for s in states if not s["label"]]
-    print(f"    {len(states)} states" + (f"; no hexes (no label anchor): {', '.join(no_label)}" if no_label else ""))
-
+    print(f"    {len(states)} voivodeships: " + ", ".join(f"{s['abbr']} {s['cells']}" for s in states))

@@ -3,10 +3,10 @@
 // All original art drawn in code; painted once per (kind, size bucket) into sprites (render/art/sprites.js) and
 // stamped into the CACHED static map by ext/layers/ (never per frame).
 //
-//   FORT_KINDS, fortKind(component) → "army" | "navy" | "air" | "marines" | "guard" | "air_guard" | "reserve" | "other"
+//   FORT_KINDS, fortKind(component) -> the existing glyph used for each Polish branch
 //   drawFort(ctx, kind, x, y, size, {tier, joint, muted, coastal})   size = glyph width in ctx user units
 //   drawRestricted(ctx, hatch, vp, o)                            hatched hexes + dashed boundary (see prepareCellSet)
-//   prepareCellSet(w, cells) → {path: Path2D, edges: Path2D, bbox}   hex area and its outer boundary, world km
+//   prepareCellSet(w, cells) -> {path: Path2D, edges: Path2D, bbox}   hex area and its outer boundary, world km
 //   drawProtected(ctx, set, vp, o)                               protected land: soft green wash + dotted boundary
 //   WONDER_KINDS, WONDER_MOTIFS, MOTIF_LABELS, drawWonder(ctx, kind, x, y, size, {rank, motif, variant})
 //   drawPlaque(ctx, text, x, y, {kind, sub, scale})              screen-space name plate (css px)
@@ -62,26 +62,26 @@ function flag(g, upx, x, y, h, col) {
 
 /** Component palettes: walls, roof / accent, flag. */
 export const FORT_KINDS = {
-  army: { name: "Army", wall: "#a8966a", accent: "#5f6b3a", flag: "#e0b44a", pad: "rgba(96,108,58,.72)" },
+  army: { name: "Land Forces", wall: "#a8966a", accent: "#5f6b3a", flag: "#e0b44a", pad: "rgba(96,108,58,.72)" },
   navy: { name: "Navy", wall: "#98a4b2", accent: "#22406a", flag: "#e8e2d0", pad: "rgba(34,64,106,.62)" },
-  air: { name: "Air Force & Space Force", wall: "#b2bac4", accent: "#3a6aa8", flag: "#9cc4ec", pad: "rgba(58,106,168,.55)" },
-  marines: { name: "Marine Corps", wall: "#b0946e", accent: "#8a2a2a", flag: "#e2b84a", pad: "rgba(138,42,42,.6)" },
-  guard: { name: "Army National Guard", wall: "#a8a28c", accent: "#6a6a52", flag: "#cfc3a0", pad: "rgba(110,110,84,.55)" },
-  air_guard: { name: "Air National Guard", wall: "#aeb0b2", accent: "#5a6a7a", flag: "#b9c8d8", pad: "rgba(90,106,122,.55)" },
-  reserve: { name: "Reserve", wall: "#a49e92", accent: "#6a6258", flag: "#d8cfba", pad: "rgba(106,98,88,.5)" },
-  other: { name: "Defense agency", wall: "#a2a2a2", accent: "#4a4a5a", flag: "#d0d0d0", pad: "rgba(74,74,90,.5)" },
+  air: { name: "Air Force", wall: "#b2bac4", accent: "#3a6aa8", flag: "#9cc4ec", pad: "rgba(58,106,168,.55)" },
+  marines: { name: "Special Forces", wall: "#b0946e", accent: "#8a2a2a", flag: "#e2b84a", pad: "rgba(138,42,42,.6)" },
+  guard: { name: "Territorial Defence", wall: "#a8a28c", accent: "#6a6a52", flag: "#cfc3a0", pad: "rgba(110,110,84,.55)" },
+  air_guard: { name: "Air base", wall: "#aeb0b2", accent: "#5a6a7a", flag: "#b9c8d8", pad: "rgba(90,106,122,.55)" },
+  reserve: { name: "Allied site", wall: "#a49e92", accent: "#6a6258", flag: "#d8cfba", pad: "rgba(106,98,88,.5)" },
+  other: { name: "Military site", wall: "#a2a2a2", accent: "#4a4a5a", flag: "#d0d0d0", pad: "rgba(74,74,90,.5)" },
 };
 
-/** military.json component id → a fort kind above. */
+/** military.json component id -> a fort kind above. */
 export function fortKind(component) {
   switch (component) {
-    case "army": return "army";
+    case "land": case "army": return "army";
     case "navy": return "navy";
-    case "air_force": return "air";
-    case "marines": return "marines";
-    case "army_guard": return "guard";
-    case "air_guard": return "air_guard";
-    case "army_reserve": case "navy_reserve": case "air_force_reserve": case "marine_reserve": return "reserve";
+    case "air": case "air_force": return "air";
+    case "special": case "marines": return "marines";
+    case "territorial": case "army_guard": return "guard";
+    case "air_base": case "air_guard": return "air_guard";
+    case "allied": case "nato": case "us_nato": return "reserve";
     default: return "other";
   }
 }
@@ -92,17 +92,16 @@ export function fortKind(component) {
  * muted blockhouse. tier "major" adds a keep and a flag, "site" is a small outpost. joint = a gold ring at the base.
  */
 export function drawFort(ctx, kind, x, y, size, { tier = "base", joint = false, muted = false, coastal = true, airfield = false } = {}) {
-  // a Navy or Marine Corps air station is an airfield with the service's roundel, not a quay or a palisade
+  // an airfield that uses a naval or special-forces palette still uses the airfield glyph
   const air = airfield && (kind === "navy" || kind === "marines") ? 1 : 0;
   const sea = kind === "navy" && coastal && !air ? 1 : 0;
   const key = `site:fort:${kind}:${tier}:${joint ? 1 : 0}:${muted ? 1 : 0}:${sea}:${air}`;
   stamp(ctx, key, x, y, size, { x0: -1.25, y0: -1.35, x1: 1.25, y1: 1.15 }, (g, upx) => paintFort(g, upx, kind, tier, joint, muted, !!sea, !!air));
 }
 
-/** True when a military.json installation name is an air station or airfield (NAS, MCAS, outlying field …). */
+/** True when a military.json installation name is an air station or airfield (NAS, MCAS, outlying field ...). */
 export function isAirfieldName(name) {
-  if (/\bAnnex\b/i.test(name || "")) return false; // e.g. Oceana's Dam Neck Annex is a training site, not a field
-  return /\bAir Station\b|\bNAS\b|\bMCAS\b|\bAir Facility\b|\bALF\b|\bN?OLF\b|Outlying (Landing )?Field|Air Field\b|Airfield\b/i.test(name || "");
+  return /\bBaza Lotnicza\b|\bBaza Lotnictwa\b|\bAir Base\b|\bAirfield\b|\bAviation Detachment\b/i.test(name || "");
 }
 
 function paintFort(g, upx, kind, tier, joint, muted, sea, air = false) {
@@ -285,7 +284,7 @@ function paintAirBase(g, upx, pal, tier, emblem = "star") {
   g.fill();
   ink(g, upx, 0.9);
   if (emblem === "anchor") {
-    // a small anchor in the roundel (Navy / Marine Corps aviation)
+    // a small anchor in the naval roundel
     g.strokeStyle = pal.accent;
     g.lineWidth = Math.max(1.2 / upx, 0.045);
     g.lineCap = "round";
@@ -467,8 +466,10 @@ export function drawProtected(ctx, sets, vp, o) {
 // --- wonders --------------------------------------------------------------------------------------------------------
 
 export const WONDER_KINDS = {
-  natural: { name: "Natural wonder", ring: "#8fd07a", base: "#3f6a34", icon: "w-park" },
-  university: { name: "Great university", ring: "#8fb8ec", base: "#2c4a78", icon: "w-university" },
+  unesco: { name: "World Heritage", ring: "#ecc46a", base: "#6a4a1c", icon: "w-landmark" },
+  memorial: { name: "Memorial site", ring: "#8a8d92", base: "#45484d", icon: "w-landmark" },
+  natural: { name: "National park", ring: "#8fd07a", base: "#3f6a34", icon: "w-park" },
+  university: { name: "Research university", ring: "#8fb8ec", base: "#2c4a78", icon: "w-university" },
   landmark: { name: "Landmark", ring: "#ecc46a", base: "#6a4a1c", icon: "w-landmark" },
 };
 
@@ -477,9 +478,10 @@ export const WONDER_KINDS = {
  * maps wonder ids to motifs); `variant` only picks a fallback for an id it does not know.
  */
 export const WONDER_MOTIFS = {
-  natural: ["peak", "canyon", "forest", "desert", "geyser", "coast", "bridge", "dam", "arch", "obelisk"],
-  university: ["hall", "redhall", "spire"],
-  landmark: ["statue", "mission", "gantry", "mound", "adobe", "ballpark", "brickhall", "rotunda", "carved", "quarter", "flight", "spike", "dam", "obelisk", "arch", "memorial"],
+  natural: ["peak", "forest", "bison", "lakes", "dunes", "coast", "canyon", "desert", "geyser", "bridge", "dam", "arch", "obelisk"],
+  university: ["collegium", "hall", "redhall", "spire"],
+  landmark: ["castle", "saltmine", "woodchurch", "headframe", "cranes", "quarter", "rotunda", "brickhall", "bridge", "dam", "remembrance",
+    "statue", "mission", "gantry", "mound", "adobe", "ballpark", "carved", "flight", "spike", "obelisk", "arch", "memorial"],
 };
 export const MOTIF_LABELS = {
   peak: "Snow peak", canyon: "Canyon", forest: "Forest", desert: "Desert", geyser: "Hot springs & geysers", coast: "Coast & lighthouse",
@@ -487,8 +489,10 @@ export const MOTIF_LABELS = {
   spire: "Bell tower", statue: "Statue", mission: "Mission", gantry: "Launch tower", mound: "Earth mound", adobe: "Pueblo",
   ballpark: "Ballpark", brickhall: "Brick hall", rotunda: "Rotunda", carved: "Carved mountain", quarter: "Old quarter",
   flight: "First flight", spike: "Golden spike", memorial: "Memorial arch",
+  castle: "Brick castle", saltmine: "Salt mine", bison: "Primeval forest", woodchurch: "Wooden church", headframe: "Mine headframe",
+  cranes: "Shipyard", collegium: "Gothic college", dunes: "Moving dunes", lakes: "Lake district", remembrance: "Memorial site",
 };
-const FALLBACK = { natural: ["peak", "forest", "canyon"], university: ["hall", "redhall", "spire"], landmark: ["obelisk", "memorial", "rotunda"] };
+const FALLBACK = { natural: ["peak", "forest", "lakes"], university: ["collegium", "hall", "redhall"], landmark: ["castle", "quarter", "rotunda"] };
 
 /**
  * A wonder tile: a raised round plinth with a gold rim (the wonder "seal"), and the wonder itself on top, drawn from
@@ -524,6 +528,8 @@ function plinth(g, upx, pal, top) {
 
 function paintWonder(g, upx, kind, motif, top) {
   const pal = WONDER_KINDS[kind] || WONDER_KINDS.landmark;
+  // A memorial site is never drawn as a wonder: no plinth, no gold rim, no rank star.
+  if (motif === "remembrance") return paintRemembrance(g, upx);
   plinth(g, upx, pal, top);
   (MOTIF_PAINT[motif] || MOTIF_PAINT.obelisk)(g, upx);
   if (top) {
@@ -674,7 +680,7 @@ function paintLandmark(g, upx, v) {
   }
 }
 
-// --- wonder motifs (all in plinth units: ground at y ≈ 0.36, the top of the box at y = -1.45) -----------------------
+// --- wonder motifs (all in plinth units: ground at y ~ 0.36, the top of the box at y = -1.45) -----------------------
 
 function poly(g, pts) {
   g.beginPath();
@@ -1251,6 +1257,228 @@ function paintSpike(g, upx) {
   g.fillRect(0.32, -0.96, 0.03, 0.9);
 }
 
+// --- Polish motifs ---------------------------------------------------------------------------------------------------
+const BRICK_C = "#a84a32", BRICK_L = "#c0603e", ROOF_C = "#7a2e22", SLATE_C = "#4a5262", COPPER_C = "#5c9a80";
+
+function paintCastle(g, upx) {
+  // a brick castle of the Teutonic Order (Malbork): curtain wall with towers, a tall keep with a steep roof
+  poly(g, [-0.9, 0.36, -0.9, -0.2, 0.9, -0.2, 0.9, 0.36]);
+  fillInk(g, upx, BRICK_C, 1);
+  g.fillStyle = "rgba(40,16,10,.55)";
+  for (let k = 0; k < 9; k++) g.fillRect(-0.86 + k * 0.2, -0.26, 0.1, 0.08);
+  for (const x of [-0.82, 0.82]) {
+    poly(g, [x - 0.14, 0.36, x - 0.14, -0.5, x + 0.14, -0.5, x + 0.14, 0.36]);
+    fillInk(g, upx, BRICK_L, 1);
+    poly(g, [x - 0.18, -0.5, x, -0.86, x + 0.18, -0.5]);
+    fillInk(g, upx, ROOF_C, 1);
+  }
+  poly(g, [-0.36, 0.36, -0.36, -0.62, 0.3, -0.62, 0.3, 0.36]);
+  fillInk(g, upx, BRICK_L, 1.1);
+  poly(g, [-0.42, -0.62, -0.03, -1.12, 0.36, -0.62]);
+  fillInk(g, upx, ROOF_C, 1.1);
+  poly(g, [0.3, 0.36, 0.3, -0.98, 0.5, -0.98, 0.5, 0.36]);
+  fillInk(g, upx, BRICK_C, 1);
+  poly(g, [0.27, -0.98, 0.4, -1.36, 0.53, -0.98]);
+  fillInk(g, upx, SLATE_C, 1);
+  g.fillStyle = "#2a1610";
+  g.beginPath(); g.moveTo(-0.14, 0.36); g.lineTo(-0.14, 0.08); g.quadraticCurveTo(-0.03, -0.04, 0.08, 0.08); g.lineTo(0.08, 0.36); g.fill();
+  g.fillStyle = "rgba(255,240,210,.5)";
+  for (const [x, y] of [[-0.24, -0.4], [0.1, -0.4], [0.38, -0.7]]) g.fillRect(x, y, 0.05, 0.14);
+}
+
+function paintSaltMine(g, upx) {
+  // a wooden shaft house with a steep shingle roof over a salt mine, white rock salt at its foot
+  poly(g, [-0.5, 0.36, -0.5, -0.3, 0.5, -0.3, 0.5, 0.36]);
+  fillInk(g, upx, "#8a5e3a", 1);
+  g.strokeStyle = "rgba(40,24,12,.6)";
+  g.lineWidth = 0.8 / upx;
+  g.beginPath();
+  for (let k = 1; k < 5; k++) { g.moveTo(-0.5 + k * 0.2, -0.3); g.lineTo(-0.5 + k * 0.2, 0.36); }
+  g.stroke();
+  poly(g, [-0.62, -0.3, 0, -1.05, 0.62, -0.3]);
+  fillInk(g, upx, "#5e4636", 1.1);
+  poly(g, [-0.1, -0.78, -0.1, -1.18, 0.1, -1.18, 0.1, -0.78]);
+  fillInk(g, upx, "#8a5e3a", 0.9);
+  poly(g, [-0.16, -1.18, 0, -1.4, 0.16, -1.18]);
+  fillInk(g, upx, "#5e4636", 0.9);
+  g.fillStyle = "#2a1a10";
+  g.fillRect(-0.12, 0.04, 0.24, 0.32);
+  for (const [x, s] of [[-0.75, 0.2], [0.72, 0.24], [0.55, 0.14]]) {
+    poly(g, [x - s, 0.36, x - s * 0.4, 0.36 - s * 1.4, x + s * 0.3, 0.36 - s * 1.1, x + s, 0.36]);
+    fillInk(g, upx, "#f2eee6", 0.9);
+  }
+}
+
+function paintBison(g, upx) {
+  // the primeval forest (Bialowieza): dark spruce and oak behind a European bison
+  for (const [x, h] of [[-0.75, 0.95], [-0.45, 1.25], [0.55, 1.15], [0.8, 0.9]]) pine(g, upx, x, 0.0, h, "#2a4e2e");
+  roundTree(g, upx, 0.12, -0.1, 0.42, "#3f6a34");
+  g.fillStyle = "#4a3222";
+  g.beginPath();
+  g.moveTo(-0.62, 0.3);
+  g.lineTo(-0.6, 0.0);
+  g.bezierCurveTo(-0.62, -0.28, -0.4, -0.5, -0.12, -0.48); // the shoulder hump
+  g.bezierCurveTo(0.12, -0.46, 0.32, -0.34, 0.5, -0.26);
+  g.lineTo(0.62, -0.12);
+  g.lineTo(0.6, 0.06);
+  g.lineTo(0.52, 0.3);
+  g.lineTo(0.42, 0.3);
+  g.lineTo(0.4, 0.06);
+  g.lineTo(-0.36, 0.06);
+  g.lineTo(-0.42, 0.3);
+  g.closePath();
+  fillInk(g, upx, "#4a3222", 1);
+  // the head, low and bearded, toward the left
+  g.beginPath();
+  g.ellipse(-0.66, -0.08, 0.17, 0.2, 0.3, 0, TAU);
+  fillInk(g, upx, "#3a2618", 1);
+  g.strokeStyle = "#e8dcc0";
+  g.lineWidth = 1.2 / upx;
+  g.beginPath(); g.moveTo(-0.7, -0.24); g.quadraticCurveTo(-0.78, -0.34, -0.7, -0.38); g.moveTo(-0.58, -0.24); g.quadraticCurveTo(-0.52, -0.34, -0.58, -0.38); g.stroke();
+  g.fillStyle = "rgba(255,240,200,.18)";
+  g.beginPath(); g.ellipse(-0.2, -0.32, 0.26, 0.1, -0.2, 0, TAU); g.fill();
+}
+
+function paintWoodChurch(g, upx) {
+  // a wooden church of southern Poland: log walls, layered shingle roofs, a tower with a bulb helmet
+  poly(g, [-0.75, 0.36, -0.75, -0.18, 0.2, -0.18, 0.2, 0.36]);
+  fillInk(g, upx, "#7a5234", 1);
+  poly(g, [-0.88, -0.1, -0.62, -0.6, 0.12, -0.6, 0.32, -0.1]);
+  fillInk(g, upx, "#5a4434", 1);
+  g.strokeStyle = "rgba(30,20,12,.45)";
+  g.lineWidth = 0.8 / upx;
+  g.beginPath();
+  for (let y = -0.08; y < 0.36; y += 0.09) { g.moveTo(-0.75, y); g.lineTo(0.2, y); }
+  g.stroke();
+  poly(g, [0.2, 0.36, 0.2, -0.72, 0.62, -0.72, 0.62, 0.36]);
+  fillInk(g, upx, "#6a4a30", 1);
+  poly(g, [0.12, -0.6, 0.41, -0.86, 0.7, -0.6]);
+  fillInk(g, upx, "#5a4434", 1);
+  g.beginPath();
+  g.moveTo(0.29, -0.86); g.bezierCurveTo(0.18, -1.02, 0.36, -1.12, 0.41, -1.24); g.bezierCurveTo(0.46, -1.12, 0.64, -1.02, 0.53, -0.86); g.closePath();
+  fillInk(g, upx, "#5a4434", 1);
+  g.strokeStyle = "#d8b860"; g.lineWidth = 1 / upx;
+  g.beginPath(); g.moveTo(0.41, -1.24); g.lineTo(0.41, -1.4); g.moveTo(0.35, -1.34); g.lineTo(0.47, -1.34); g.stroke();
+  g.fillStyle = "#2a1a10";
+  g.fillRect(0.34, 0.06, 0.14, 0.3);
+}
+
+function paintHeadframe(g, upx) {
+  // a steel mine headframe (Upper Silesia) with two wheels over a brick engine house
+  poly(g, [-0.85, 0.36, -0.85, -0.2, -0.05, -0.2, -0.05, 0.36]);
+  fillInk(g, upx, BRICK_C, 1);
+  poly(g, [-0.9, -0.2, -0.45, -0.46, 0.0, -0.2]);
+  fillInk(g, upx, ROOF_C, 1);
+  g.fillStyle = "rgba(255,240,210,.45)";
+  for (const x of [-0.72, -0.5, -0.28]) g.fillRect(x, -0.1, 0.1, 0.2);
+  g.strokeStyle = "#2a2a30";
+  g.lineWidth = 2.2 / upx;
+  g.beginPath();
+  g.moveTo(0.15, 0.36); g.lineTo(0.38, -1.0); g.lineTo(0.62, 0.36);
+  g.moveTo(0.38, -1.0); g.lineTo(0.88, 0.36);
+  for (const y of [-0.5, -0.05]) { const k = (y + 1.0) / 1.36; g.moveTo(0.38 - 0.23 * k, y); g.lineTo(0.38 + 0.24 * k, y); }
+  g.stroke();
+  for (const [x, y] of [[0.3, -1.06], [0.48, -1.06]]) {
+    g.beginPath(); g.arc(x, y, 0.13, 0, TAU);
+    g.fillStyle = "#3a3e48"; g.fill(); ink(g, upx, 1);
+    g.beginPath(); g.arc(x, y, 0.04, 0, TAU); g.fillStyle = "#c9a45c"; g.fill();
+  }
+}
+
+function paintCranes(g, upx) {
+  // shipyard cranes over a quay and a hull on the slip (Gdansk)
+  water(g, upx, 0.18);
+  poly(g, [-0.75, 0.2, -0.62, 0.0, 0.3, 0.0, 0.4, 0.2]);
+  fillInk(g, upx, "#7a3a2e", 1);
+  for (const [x, h, col] of [[-0.45, 1.25, "#2f6a8a"], [0.55, 1.05, "#b8483a"]]) {
+    g.strokeStyle = col;
+    g.lineWidth = 2.6 / upx;
+    g.beginPath();
+    g.moveTo(x - 0.1, 0.2); g.lineTo(x, -h); g.lineTo(x + 0.1, 0.2);
+    g.moveTo(x - 0.45, -h + 0.05); g.lineTo(x + 0.3, -h + 0.05);
+    g.stroke();
+    g.strokeStyle = "rgba(28,20,10,.9)";
+    g.lineWidth = 0.8 / upx;
+    g.beginPath(); g.moveTo(x - 0.4, -h + 0.05); g.lineTo(x - 0.4, -h + 0.5); g.stroke();
+    g.fillStyle = col;
+    g.fillRect(x - 0.08, -h + 0.08, 0.2, 0.14);
+  }
+}
+
+function paintCollegium(g, upx) {
+  // a brick Gothic college (Collegium Maius): a hall with a stepped gable, an oriel and a slim tower
+  poly(g, [-0.85, 0.36, -0.85, -0.3, 0.3, -0.3, 0.3, 0.36]);
+  fillInk(g, upx, BRICK_L, 1);
+  poly(g, [-0.88, -0.3, -0.28, -0.72, 0.33, -0.3]);
+  fillInk(g, upx, ROOF_C, 1);
+  // stepped gable end on the right
+  poly(g, [0.3, 0.36, 0.3, -0.3, 0.38, -0.3, 0.38, -0.46, 0.48, -0.46, 0.48, -0.62, 0.6, -0.62, 0.6, -0.78, 0.72, -0.78, 0.72, -0.46, 0.82, -0.46, 0.82, -0.3, 0.9, -0.3, 0.9, 0.36]);
+  fillInk(g, upx, BRICK_C, 1);
+  g.strokeStyle = "rgba(40,16,10,.7)";
+  g.lineWidth = 1.4 / upx;
+  g.beginPath();
+  for (const x of [-0.7, -0.5, -0.3, -0.1, 0.1]) { g.moveTo(x, -0.18); g.lineTo(x, 0.05); g.moveTo(x, 0.14); g.lineTo(x, 0.3); }
+  for (const x of [0.48, 0.6, 0.72]) { g.moveTo(x, -0.2); g.lineTo(x, 0.1); }
+  g.stroke();
+  poly(g, [-0.38, -0.72, -0.38, -1.12, -0.2, -1.12, -0.2, -0.72]);
+  fillInk(g, upx, BRICK_C, 1);
+  poly(g, [-0.42, -1.12, -0.29, -1.4, -0.16, -1.12]);
+  fillInk(g, upx, SLATE_C, 1);
+  g.fillStyle = "#f2d27a";
+  g.beginPath(); g.arc(-0.29, -1.42, 0.035, 0, TAU); g.fill();
+}
+
+function paintDunes(g, upx) {
+  // moving dunes on the Baltic shore (Slowinski) with a lighthouse beyond
+  water(g, upx, 0.24);
+  g.beginPath();
+  g.moveTo(-0.96, 0.26);
+  g.bezierCurveTo(-0.7, -0.3, -0.35, -0.55, -0.05, -0.36);
+  g.bezierCurveTo(0.2, -0.22, 0.4, -0.6, 0.66, -0.42);
+  g.bezierCurveTo(0.84, -0.3, 0.92, 0.0, 0.96, 0.26);
+  g.closePath();
+  fillInk(g, upx, "#ecd6a0", 1);
+  g.fillStyle = "rgba(160,120,60,.35)";
+  g.beginPath(); g.moveTo(-0.05, -0.36); g.bezierCurveTo(0.05, -0.1, -0.1, 0.1, 0.0, 0.26); g.lineTo(0.5, 0.26); g.bezierCurveTo(0.3, 0.0, 0.25, -0.2, -0.05, -0.36); g.fill();
+  poly(g, [-0.62, -0.38, -0.58, -1.08, -0.46, -1.08, -0.42, -0.38]);
+  fillInk(g, upx, "#f2ece0", 0.9);
+  g.fillStyle = "#b8483a";
+  g.fillRect(-0.6, -0.82, 0.16, 0.12);
+  poly(g, [-0.6, -1.08, -0.52, -1.24, -0.44, -1.08]);
+  fillInk(g, upx, "#3a3a3a", 0.9);
+}
+
+function paintLakes(g, upx) {
+  // a lake district (Masuria): open water, a sail, pines on the far shore
+  water(g, upx, -0.1);
+  for (const [x, h] of [[-0.8, 0.7], [-0.6, 0.95], [-0.38, 0.8], [0.62, 0.85], [0.84, 0.65]]) pine(g, upx, x, -0.05, h, "#2f5a32");
+  poly(g, [-0.15, 0.2, 0.35, 0.2, 0.28, 0.3, -0.08, 0.3]);
+  fillInk(g, upx, "#f2ece0", 0.9);
+  g.strokeStyle = "#3a2c1c"; g.lineWidth = 1 / upx;
+  g.beginPath(); g.moveTo(0.1, 0.2); g.lineTo(0.1, -0.62); g.stroke();
+  poly(g, [0.12, -0.6, 0.12, 0.14, 0.42, 0.14]);
+  fillInk(g, upx, "#fbf6ea", 0.9);
+  poly(g, [0.08, -0.5, 0.08, 0.12, -0.14, 0.12]);
+  fillInk(g, upx, "#f0e6d0", 0.9);
+}
+
+/** A memorial site: no plinth, no gold. A low dark stone and a lit candle (a znicz) on quiet grey ground. */
+function paintRemembrance(g, upx) {
+  g.fillStyle = "rgba(18,12,4,.3)";
+  g.beginPath(); g.ellipse(0, 0.5, 0.8, 0.22, 0, 0, TAU); g.fill();
+  g.beginPath(); g.ellipse(0, 0.38, 0.78, 0.26, 0, 0, TAU);
+  fillInk(g, upx, "#8a8a84", 0.8);
+  poly(g, [-0.42, 0.34, -0.38, -0.5, 0.38, -0.5, 0.42, 0.34]);
+  fillInk(g, upx, "#4a4a4c", 1);
+  g.fillStyle = "rgba(255,255,255,.12)";
+  g.fillRect(-0.36, -0.46, 0.08, 0.76);
+  poly(g, [0.5, 0.4, 0.5, 0.18, 0.66, 0.18, 0.66, 0.4]);
+  fillInk(g, upx, "#a8323a", 0.8);
+  g.beginPath();
+  g.moveTo(0.58, 0.16); g.quadraticCurveTo(0.52, 0.06, 0.58, -0.04); g.quadraticCurveTo(0.64, 0.06, 0.58, 0.16);
+  g.fillStyle = "#ffd27a"; g.fill();
+}
+
 const MOTIF_PAINT = {
   peak: paintPeak,
   canyon: paintCanyon, forest: paintForest, desert: paintDesert, geyser: paintGeyser, coast: paintCoast, bridge: paintBridge,
@@ -1264,6 +1492,8 @@ const MOTIF_PAINT = {
   statue: paintStatue, mission: paintMission, gantry: paintGantry, mound: paintMound, adobe: paintAdobe,
   ballpark: paintBallpark, brickhall: paintBrickHall, carved: paintCarved, quarter: paintQuarter, flight: paintFlight,
   spike: paintSpike,
+  castle: paintCastle, saltmine: paintSaltMine, bison: paintBison, woodchurch: paintWoodChurch, headframe: paintHeadframe,
+  cranes: paintCranes, collegium: paintCollegium, dunes: paintDunes, lakes: paintLakes, remembrance: paintRemembrance,
 };
 
 // --- plaques --------------------------------------------------------------------------------------------------------

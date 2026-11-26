@@ -1,14 +1,15 @@
-// Share popover: copy a link to the current view, or download a 1600×900 PNG of it with a caption strip.
+// Share popover: copy a link to the current view, or download a 1600x900 PNG of it with a caption strip.
 import { drawIcon, hasIcon } from "../icons.js";
 import { icon } from "../ui/icon.js";
 
-// The address printed on shared images. Set it to the published site (e.g. "example.com/us-atlas"); when left
-// empty, the page's own host and path are used, except on a local dev server, where SITE_FALLBACK is printed.
-export const SITE_URL = "karpathy.ai/usaciv";
-const SITE_FALLBACK = "usaciv";
+// The published site: the one place it is set. index.html's canonical and social-card tags repeat it as literals
+// (crawlers read no JS); keep them equal. Shared images print it without the scheme. When left empty, the page's own
+// host and path are used, except on a local dev server, where SITE_FALLBACK is printed.
+export const SITE_URL = "https://softonsofa.com/pol-civ/";
+const SITE_FALLBACK = "pol-civ";
 
 export function siteLabel() {
-  if (SITE_URL) return SITE_URL;
+  if (SITE_URL) return SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
   try {
     const { hostname, host, pathname } = location;
     const local = !hostname || /^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0)$/.test(hostname) || /\.(localhost|test|local)$/.test(hostname);
@@ -25,7 +26,7 @@ export const IMG_H = 900;
 export const CAPTION_H = 118;
 const SERIF = '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif';
 const SANS = '-apple-system, "Segoe UI", system-ui, sans-serif';
-const CREDIT = "Data: Census ACS, BEA, NOAA, USGS/MRLC, EIA, Natural Earth";
+const CREDIT = "Built from public data: GUS, Eurostat, GUGiK and more";
 
 async function copyText(text) {
   try {
@@ -55,7 +56,7 @@ function spaced(ctx, px) {
 
 /**
  * Compose the share image.
- * info: {renderMap(canvas, w, h) → bool, lens (lens object or null), formatValue(lens, t) → string,
+ * info: {renderMap(canvas, w, h) -> bool, lens (lens object or null), formatValue(lens, t) -> string,
  *        selection: {kind, name, sub} | null}
  */
 export function composeImage(info, { height = IMG_H } = {}) {
@@ -67,7 +68,7 @@ export function composeImage(info, { height = IMG_H } = {}) {
   const mapH = imgH - CAPTION_H;
 
   // --- map ---
-  ctx.fillStyle = "#0d2a47";
+  ctx.fillStyle = "#0f2233";
   ctx.fillRect(0, 0, IMG_W, mapH);
   const map = document.createElement("canvas");
   map.width = IMG_W;
@@ -83,8 +84,8 @@ export function composeImage(info, { height = IMG_H } = {}) {
   // --- caption strip ---
   const y0 = mapH;
   const g = ctx.createLinearGradient(0, y0, 0, imgH);
-  g.addColorStop(0, "#24364a");
-  g.addColorStop(1, "#111a25");
+  g.addColorStop(0, "#1f3447");
+  g.addColorStop(1, "#0d1924");
   ctx.fillStyle = g;
   ctx.fillRect(0, y0, IMG_W, CAPTION_H);
   ctx.fillStyle = "#c9a45c";
@@ -96,30 +97,16 @@ export function composeImage(info, { height = IMG_H } = {}) {
   const cy = y0 + CAPTION_H / 2 + 3;
 
   // Emblem + title
-  const ex = 64;
-  ctx.beginPath();
-  ctx.arc(ex, cy, 30, 0, Math.PI * 2);
-  ctx.fillStyle = "#120d06";
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(ex, cy, 28, 0, Math.PI * 2);
-  ctx.fillStyle = "#c9a45c";
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(ex, cy, 24.5, 0, Math.PI * 2);
-  ctx.fillStyle = "#2a4d8f";
-  ctx.fill();
-  star(ctx, ex, cy + 1, 14, 6, "#f8f0d8");
-
+  drawEmblem(ctx, 64, cy, 62);
   ctx.textBaseline = "alphabetic";
   ctx.fillStyle = "#ecd08e";
-  ctx.font = `bold 36px ${SERIF}`;
-  spaced(ctx, 5);
-  ctx.fillText("UNITED STATES", 112, cy + 2);
+  ctx.font = `bold 40px ${SERIF}`;
+  spaced(ctx, 9);
+  ctx.fillText("POLSKA", 108, cy + 2);
   spaced(ctx, 0);
   ctx.fillStyle = "#b9ab88";
   ctx.font = `italic 17px ${SERIF}`;
-  ctx.fillText("A strategy-map atlas of the real economy", 114, cy + 28);
+  ctx.fillText("as a strategy game, built from real public data", 110, cy + 28);
 
   // Lens + legend ramp
   const mx = 640;
@@ -130,7 +117,7 @@ export function composeImage(info, { height = IMG_H } = {}) {
   ctx.fillStyle = "#ecd08e";
   ctx.font = `24px ${SERIF}`;
   spaced(ctx, 1.5);
-  ctx.fillText((lens ? lens.name : "Terrain").toUpperCase() + (lens ? " LENS" : ""), mx + 50, cy - 8);
+  ctx.fillText(lens ? `${lens.name} lens` : "Terrain", mx + 50, cy - 8);
   spaced(ctx, 0);
   if (lens?.ramp?.length) {
     const rx = mx + 50, ry = cy + 4, rw = 330, rh = 12;
@@ -143,9 +130,9 @@ export function composeImage(info, { height = IMG_H } = {}) {
     ctx.font = `14px ${SANS}`;
     ctx.fillStyle = "#d8cba8";
     ctx.textAlign = "left";
-    ctx.fillText("≤ " + info.formatValue(lens, 0), rx, ry + rh + 18);
+    ctx.fillText(info.formatValue(lens, 0) + " or less", rx, ry + rh + 18);
     ctx.textAlign = "right";
-    ctx.fillText("≥ " + info.formatValue(lens, 1), rx + rw, ry + rh + 18);
+    ctx.fillText(info.formatValue(lens, 1) + " or more", rx + rw, ry + rh + 18);
     ctx.textAlign = "left";
   } else {
     ctx.font = `15px ${SANS}`;
@@ -158,11 +145,9 @@ export function composeImage(info, { height = IMG_H } = {}) {
   ctx.textAlign = "right";
   const sel = info.selection;
   if (sel?.name) {
-    ctx.font = `13px ${SANS}`;
+    ctx.font = `italic 15px ${SERIF}`;
     ctx.fillStyle = "#b9ab88";
-    spaced(ctx, 2);
-    ctx.fillText(sel.kind === "state" ? "STATE" : "CITY", rx, cy - 30);
-    spaced(ctx, 0);
+    ctx.fillText(sel.kind === "state" ? "Voivodeship" : "Town", rx, cy - 30);
     ctx.font = `bold 24px ${SERIF}`;
     ctx.fillStyle = "#f3e6c4";
     ctx.fillText(fit(ctx, sel.name, 460), rx, cy - 6);
@@ -187,24 +172,66 @@ export function composeImage(info, { height = IMG_H } = {}) {
 function fit(ctx, text, maxW) {
   if (ctx.measureText(text).width <= maxW) return text;
   let t = text;
-  while (t.length > 3 && ctx.measureText(t + "…").width > maxW) t = t.slice(0, -1);
-  return t + "…";
-}
-
-function star(ctx, x, y, R, r, color) {
-  ctx.beginPath();
-  for (let i = 0; i < 10; i++) {
-    const a = -Math.PI / 2 + (i * Math.PI) / 5;
-    const rr = i % 2 ? r : R;
-    ctx[i ? "lineTo" : "moveTo"](x + Math.cos(a) * rr, y + Math.sin(a) * rr);
-  }
-  ctx.closePath();
-  ctx.fillStyle = color;
-  ctx.fill();
+  while (t.length > 3 && ctx.measureText(t + "...").width > maxW) t = t.slice(0, -1);
+  return t + "...";
 }
 
 /**
- * opts: {button, getInfo() → composeImage info, fileName() → string, onToast(msg)}
+ * The studio emblem: a heater shield with a gold border, parchment-white over crimson, split by a gold wave (a river).
+ * Original art; no state symbol. (x, y) is the centre, h the height in px. Same shape as the favicon in index.html.
+ */
+export function drawEmblem(ctx, x, y, h) {
+  const k = h / 56; // the SVG emblem spans y 4..60 of a 64 box
+  ctx.save();
+  ctx.translate(x - 32 * k, y - 32 * k);
+  ctx.scale(k, k);
+  const shield = (inset) => {
+    const p = new Path2D();
+    const l = 8 + inset, r = 56 - inset, t = 6 + inset, b = 60 - inset * 1.15;
+    p.moveTo(l, t);
+    p.lineTo(r, t);
+    p.lineTo(r, 30);
+    p.bezierCurveTo(r, 30 + 15 * ((r - l) / 48), 32 + 10, b - 4, 32, b);
+    p.bezierCurveTo(32 - 10, b - 4, l, 30 + 15 * ((r - l) / 48), l, 30);
+    p.closePath();
+    return p;
+  };
+  ctx.shadowColor = "rgba(0,0,0,.55)";
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetY = 1.5;
+  ctx.fillStyle = "#120d06";
+  ctx.fill(shield(0));
+  ctx.shadowColor = "transparent";
+  const gold = ctx.createLinearGradient(0, 6, 0, 60);
+  gold.addColorStop(0, "#f6dc8a");
+  gold.addColorStop(0.5, "#c9a45c");
+  gold.addColorStop(1, "#8a6a2c");
+  ctx.fillStyle = gold;
+  ctx.fill(shield(3));
+  const inner = shield(6.5);
+  ctx.fillStyle = "#b3262e";
+  ctx.fill(inner);
+  ctx.save();
+  ctx.clip(inner);
+  const wave = new Path2D();
+  wave.moveTo(8, 28);
+  wave.bezierCurveTo(14, 31, 20, 31, 32, 28);
+  wave.bezierCurveTo(44, 25, 50, 25, 56, 28);
+  const white = new Path2D(wave);
+  white.lineTo(56, 0);
+  white.lineTo(8, 0);
+  white.closePath();
+  ctx.fillStyle = "#f4ecd8";
+  ctx.fill(white);
+  ctx.strokeStyle = "#e2bf6e";
+  ctx.lineWidth = 2.6;
+  ctx.stroke(wave);
+  ctx.restore();
+  ctx.restore();
+}
+
+/**
+ * opts: {button, getInfo() -> composeImage info, fileName() -> string, onToast(msg)}
  */
 export function initShare(opts) {
   const btn = opts.button;
@@ -215,7 +242,7 @@ export function initShare(opts) {
   pop.innerHTML = `
     <div class="sp-title">Share this view</div>
     <button class="sp-item" data-act="copy">${icon("share", "🔗", { size: 16 })}<span>Copy link</span></button>
-    <button class="sp-item" data-act="image">${icon("terrain", "🖼️", { size: 16 })}<span>Download image <span class="muted">1600×900 PNG</span></span></button>
+    <button class="sp-item" data-act="image">${icon("terrain", "🖼️", { size: 16 })}<span>Download image</span></button>
     <div class="sp-status" role="status" aria-live="polite"></div>
     <input class="sp-url" type="text" readonly hidden aria-label="Link to this view">`;
   const status = pop.querySelector(".sp-status");
@@ -265,7 +292,7 @@ export function initShare(opts) {
         urlBox.select();
       }
     } else if (b.dataset.act === "image") {
-      status.textContent = "Drawing the map…";
+      status.textContent = "Drawing the map...";
       await new Promise((r) => setTimeout(r, 30)); // let the status paint
       try {
         const cv = composeImage(opts.getInfo());

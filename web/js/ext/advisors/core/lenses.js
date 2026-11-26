@@ -1,9 +1,9 @@
-// Map colourings the advisors add beside the built-in lenses (lenses.json has no growth or science-jobs lens).
+// Map colourings the advisors add beside the built-in lenses (growth by metro or voivodeship, science jobs by metro).
 // Each is an ordinary lens object ({id, name, ramp, domain, scale, format, values: per cell}) that app.setLens()
 // accepts; they are built once per data model and cached, so the lens dock's histogram cache stays valid.
 import { fin, quantile } from "./util.js";
 
-// Diverging: shrinking (brick) ← no change (parchment) → growing (teal). Dark ends so the extremes read on the map.
+// Diverging: shrinking (brick), no change (parchment), growing (teal). Dark ends so the extremes read on the map.
 const GROWTH_RAMP = ["#7a1f2b", "#c2463d", "#e8a07a", "#efe6d2", "#8fcbb8", "#2e9c8a", "#0f5e57"];
 const SCIENCE_RAMP = ["#0a1a33", "#173a6b", "#2f63a8", "#4f93d6", "#8cc2ee", "#e4f3ff"];
 
@@ -27,13 +27,13 @@ const robust = (vals, q = 0.02) => {
   return s.length ? [quantile(s, q), quantile(s, 1 - q)] : [0, 1];
 };
 
-/** Population growth per hex: by metro / micro area (other hexes grey) or by state. */
+/** Population growth per hex: by metro area (other hexes grey) or by voivodeship. */
 export function growthLens(data, by = "metros") {
   return memo(data, `growth-${by}`, () => {
     const { app, cellMetro } = data;
     const n = app.w.grid.size, owner = app.w.raw.owner;
     const values = new Array(n).fill(null);
-    const yrs = (data.nat.growth_years || []).join("–");
+    const yrs = (data.nat.growth_years || []).join("-");
     let vals;
     if (by === "states") {
       const rows = data.levels.states.rows;
@@ -44,18 +44,18 @@ export function growthLens(data, by = "metros") {
       vals = data.levels.metros.rows.map((r) => r.v.growth);
     }
     return {
-      id: `adv-growth-${by}`, group: "people", name: by === "states" ? "Growth by state" : "Growth by metro",
-      icon: "l-people", emoji: "📈", unit: "population change", format: "pct", scale: "linear",
-      domain: symDomain(vals), ramp: GROWTH_RAMP, higher_is: "neutral", source: "pep_population",
+      id: `adv-growth-${by}`, group: "people", name: by === "states" ? "Growth by voivodeship" : "Growth by metro",
+      icon: "l-people", emoji: "\u{1f4c8}", unit: "population change", format: "pct", scale: "linear",
+      domain: symDomain(vals), ramp: GROWTH_RAMP, higher_is: "neutral", source: "pl_stats_population",
       description: by === "states"
-        ? `Population change ${yrs} by state (Census population estimates).`
-        : `Population change ${yrs} by metro and micro area (Census population estimates). Grey hexes lie outside them.`,
+        ? `Population change ${yrs} by voivodeship (GUS, on today's borders).`
+        : `Population change ${yrs} by metro area (GUS, on today's borders). Grey hexes lie outside the metro areas.`,
       values,
     };
   });
 }
 
-/** Science-yield workers as a share of employed residents, per metro / micro area (other hexes grey). */
+/** Science-yield workers as a share of all workers, per metro area (other hexes grey). */
 export function scienceLens(data) {
   return memo(data, "science", () => {
     const { app, cellMetro } = data;
@@ -66,17 +66,17 @@ export function scienceLens(data) {
     const sci = app.data.nation?.yields?.find((y) => y.key === "science");
     return {
       id: "adv-science-share", group: "knowledge", name: "Science jobs",
-      icon: "l-degrees", emoji: "🔬", unit: "of employed residents", format: "pct", scale: "linear",
-      domain: robust(data.levels.metros.rows.map((r) => share(r.ref))), ramp: SCIENCE_RAMP, higher_is: "neutral", source: "acs_1yr",
-      description: `${sci?.label || "Science"} workers as a share of employed residents, by metro and micro area (counted where they live). Grey hexes lie outside them.`,
+      icon: "l-degrees", emoji: "\u{1F52C}", unit: "of workers", format: "pct", scale: "linear",
+      domain: robust(data.levels.metros.rows.map((r) => share(r.ref))), ramp: SCIENCE_RAMP, higher_is: "neutral", source: "pl_stats_labour",
+      description: `${sci?.label || "Science"} workers as a share of all workers, by metro area (counted where the employer is). Grey hexes lie outside the metro areas.`,
       values,
     };
   });
 }
 
 /**
- * A county column as a map lens (each hex takes the value of the county at its centre). For counties.json columns
- * that have no lens in lenses.json (e.g. armed-forces share). opts: {name, ramp, format, unit, description, source,
+ * A gmina column as a map lens (each hex takes the value of the gmina at its centre). For counties.json columns
+ * that have no lens in lenses.json. opts: {name, ramp, format, unit, description, source,
  * emoji, icon, group, domain?}
  */
 export function countyLens(data, key, opts = {}) {
@@ -88,7 +88,7 @@ export function countyLens(data, key, opts = {}) {
     const f = lv?.field(key);
     return {
       id: `adv-county-${key}`, group: opts.group || "people", name: opts.name || f?.label || key,
-      icon: opts.icon || "layers", emoji: opts.emoji || "🗺️", unit: opts.unit || f?.unit || "", format: opts.format || f?.format || "float",
+      icon: opts.icon || "layers", emoji: opts.emoji || "\u{1f5fa}\ufe0f", unit: opts.unit || f?.unit || "", format: opts.format || f?.format || "float",
       scale: "linear", domain: opts.domain || robust(lv ? lv.rows.map((r) => r.v[key]) : []), ramp: opts.ramp || SCIENCE_RAMP,
       higher_is: f?.higher_is || "neutral", source: opts.source || f?.source || "", description: opts.description || f?.description || "",
       ...(opts.note ? { note: opts.note } : {}),
@@ -97,7 +97,7 @@ export function countyLens(data, key, opts = {}) {
   });
 }
 
-/** A per-state value as a map lens. valueOf(abbr) → number | null. opts as countyLens plus id. */
+/** A per-voivodeship value as a map lens. valueOf(abbr) -> number | null. opts as countyLens plus id. */
 export function stateLens(data, id, valueOf, opts = {}) {
   return memo(data, `state-${id}`, () => {
     const app = data.app;
@@ -107,7 +107,7 @@ export function stateLens(data, id, valueOf, opts = {}) {
     const values = new Array(n).fill(null);
     for (let i = 0; i < n; i++) if (owner[i] >= 0 && fin(byIdx[owner[i]])) values[i] = byIdx[owner[i]];
     return {
-      id: `adv-state-${id}`, group: opts.group || "people", name: opts.name || id, icon: opts.icon || "layers", emoji: opts.emoji || "🗺️",
+      id: `adv-state-${id}`, group: opts.group || "people", name: opts.name || id, icon: opts.icon || "layers", emoji: opts.emoji || "\u{1f5fa}\ufe0f",
       unit: opts.unit || "", format: opts.format || "float", scale: "linear", domain: opts.domain || robust(byIdx, 0),
       ramp: opts.ramp || SCIENCE_RAMP, higher_is: opts.higher_is || "neutral", source: opts.source || "", description: opts.description || "",
       ...(opts.note ? { note: opts.note } : {}),

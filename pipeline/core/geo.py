@@ -1,8 +1,10 @@
 """Small, dependency-free geometry helpers.
 
-Everything on the map lives in "map km": an Albers equal-area projection of the
-contiguous US, shifted so the top-left of the map is (0, 0) and y points *down*
-(like screen coordinates). Both the hex grid and the browser use this space.
+Everything on the map lives in "map km": an Albers equal-area projection of
+Poland (standard parallels 50 and 54 N, centre 52 N 19.3 E), shifted so the
+top-left of the map is (0, 0) and y points *down* (like screen coordinates).
+Both the hex grid and the browser use this space (web/js/render/art/terrain.js
+keeps a copy of the projection constants).
 """
 
 from __future__ import annotations
@@ -16,11 +18,16 @@ from typing import IO, Iterable, Iterator
 
 R_EARTH_KM = 6371.0088
 
+# Map window (lon/lat): Poland plus a margin of its neighbours and the Baltic (docs/BLUEPRINT.md section 4).
+PL_LON = (13.6, 24.6)
+PL_LAT = (48.75, 55.15)
+PL_ALBERS = {"lat1": 50.0, "lat2": 54.0, "lat0": 52.0, "lon0": 19.3}
+
 
 class Albers:
-    """Albers equal-area conic, standard USGS parameters for the lower 48."""
+    """Albers equal-area conic (spherical). Defaults are the pol-civ parameters for Poland."""
 
-    def __init__(self, lat1=29.5, lat2=45.5, lat0=37.5, lon0=-96.0):
+    def __init__(self, lat1=50.0, lat2=54.0, lat0=52.0, lon0=19.3):
         p1, p2, p0 = map(math.radians, (lat1, lat2, lat0))
         self.lon0 = math.radians(lon0)
         self.n = (math.sin(p1) + math.sin(p2)) / 2
@@ -33,7 +40,7 @@ class Albers:
         return rho * math.sin(theta), self.rho0 - rho * math.cos(theta)
 
     def inverse(self, x: float, y: float) -> tuple[float, float]:
-        """Albers km → (lon, lat)."""
+        """Albers km -> (lon, lat)."""
         dy = self.rho0 - y
         rho = math.hypot(x, dy)
         theta = math.atan2(x, dy)
@@ -77,7 +84,7 @@ class AlbersEllipsoid:
 
 @dataclass
 class MapProjection:
-    """lon/lat → map km (origin top-left, y down)."""
+    """lon/lat -> map km (origin top-left, y down)."""
 
     min_x: float
     max_y: float
@@ -91,7 +98,7 @@ class MapProjection:
         return x - self.min_x + self.margin, self.max_y - y + self.margin
 
     def inverse(self, x: float, y: float) -> tuple[float, float]:
-        """map km → (lon, lat)."""
+        """map km -> (lon, lat)."""
         return self._albers.inverse(x + self.min_x - self.margin, self.max_y + self.margin - y)
 
     def to_dict(self) -> dict:
@@ -192,3 +199,109 @@ def load_geojson(path) -> list[dict]:
 def bbox_intersects(points: Iterable[tuple[float, float]], bbox: tuple[float, float, float, float]) -> bool:
     x0, y0, x1, y1 = bbox
     return any(x0 <= x <= x1 and y0 <= y <= y1 for x, y in points)
+
+
+def topojson_arcs(topo: dict) -> list[list[tuple[float, float]]]:
+    """Decoded arcs of a TopoJSON topology (quantised delta-encoded or plain), in its coordinate units."""
+    tr = topo.get("transform")
+    out = []
+    for arc in topo["arcs"]:
+        if tr:
+            (sx, sy), (tx, ty) = tr["scale"], tr["translate"]
+            x = y = 0
+            pts = []
+            for p in arc:
+                x += p[0]
+                y += p[1]
+                pts.append((x * sx + tx, y * sy + ty))
+        else:
+            pts = [(p[0], p[1]) for p in arc]
+        out.append(pts)
+    return out
+
+
+def topojson_ring(arcs: list[list[tuple[float, float]]], refs: list[int]) -> list[tuple[float, float]]:
+    """One ring from arc indices (a negative index ~k is arc k reversed); shared end points appear once."""
+    ring: list[tuple[float, float]] = []
+    for k in refs:
+        pts = arcs[k] if k >= 0 else arcs[~k][::-1]
+        ring.extend(pts if not ring else pts[1:])
+    return ring
+
+
+def topojson_rings(arcs, geom: dict) -> list[list[tuple[float, float]]]:
+    """All rings (outer and holes) of a TopoJSON Polygon / MultiPolygon geometry."""
+    t, a = geom.get("type"), geom.get("arcs") or []
+    polys = [a] if t == "Polygon" else a if t == "MultiPolygon" else []
+    return [topojson_ring(arcs, ring) for poly in polys for ring in poly]
+
+
+def read_dbf(data: bytes) -> list[dict]:
+    """Records of a dBASE III table (shapefile .dbf). Text is decoded as UTF-8 (latin-1 fallback); numbers
+    become int/float, empty numbers None."""
+    import struct
+
+    n, hlen, rlen = struct.unpack("<IHH", data[4:12])
+    fields = []
+    pos = 32
+    while data[pos] != 0x0D:
+        name = data[pos:pos + 11].split(b"\0", 1)[0].decode("ascii")
+        ftype = chr(data[pos + 11])
+        flen, fdec = data[pos + 16], data[pos + 17]
+        fields.append((name, ftype, flen, fdec))
+        pos += 32
+    out = []
+    for r in range(n):
+        start = hlen + r * rlen
+        rec = data[start:start + rlen]
+        if rec[:1] == b"*":
+            continue  # deleted
+        row, off = {}, 1
+        for name, ftype, flen, fdec in fields:
+            raw = rec[off:off + flen]
+            off += flen
+            if ftype in "NF":
+                txt = raw.strip().decode("ascii", "replace")
+                if not txt or set(txt) <= {"*"}:
+                    row[name] = None
+                else:
+                    try:
+                        row[name] = float(txt) if (fdec or "." in txt or "e" in txt.lower()) else int(txt)
+                    except ValueError:
+                        row[name] = None
+            else:
+                try:
+                    row[name] = raw.decode("utf-8").strip()
+                except UnicodeDecodeError:
+                    row[name] = raw.decode("latin-1").strip()
+        out.append(row)
+    return out
+
+
+def read_shp(data: bytes) -> Iterator[tuple[int, list[list[tuple[float, float]]]]]:
+    """(shape type, parts) for each record of an ESRI shapefile (.shp): polylines and polygons give their parts
+    as point lists, points a single one-point part, null shapes no parts."""
+    import struct
+
+    pos = 100
+    n = len(data)
+    while pos + 8 <= n:
+        _, clen = struct.unpack(">ii", data[pos:pos + 8])
+        body = data[pos + 8:pos + 8 + 2 * clen]
+        pos += 8 + 2 * clen
+        st = struct.unpack("<i", body[:4])[0]
+        if st == 0:
+            yield 0, []
+        elif st in (1, 11, 21):
+            x, y = struct.unpack("<dd", body[4:20])
+            yield st, [[(x, y)]]
+        elif st in (3, 5, 13, 15, 23, 25):
+            nparts, npts = struct.unpack("<ii", body[36:44])
+            starts = list(struct.unpack(f"<{nparts}i", body[44:44 + 4 * nparts]))
+            p0 = 44 + 4 * nparts
+            coords = struct.unpack(f"<{2 * npts}d", body[p0:p0 + 16 * npts])
+            starts.append(npts)
+            parts = [[(coords[2 * k], coords[2 * k + 1]) for k in range(starts[j], starts[j + 1])] for j in range(nparts)]
+            yield st, parts
+        else:
+            yield st, []

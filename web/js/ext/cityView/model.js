@@ -1,33 +1,33 @@
 // City View data model: everything the city screen and its map layer show, derived from cities.json,
 // nation.json, lenses.json, world.json and resources.json. Pure functions over app.data / app.w (no DOM).
 
-// Industry → short label, district colour (the medallion behind its icon) and icon id (icons.js i-<key>).
+// PKD section key (nation.json industries) -> short label and district colour (the medallion behind its icon).
 export const INDUSTRY = {
   agriculture: { short: "Agriculture", color: "#4f7a2a" },
   mining: { short: "Mining", color: "#6a5038" },
-  construction: { short: "Construction", color: "#8a5426" },
   manufacturing: { short: "Manufacturing", color: "#9a5a22" },
-  wholesale: { short: "Wholesale", color: "#7a6420" },
-  retail: { short: "Retail", color: "#8a6a1e" },
-  transportation: { short: "Logistics", color: "#3d5f73" },
-  utilities: { short: "Utilities", color: "#2a5f86" },
-  information: { short: "Information", color: "#25557e" },
+  energy: { short: "Power & heat", color: "#2a5f86" },
+  water: { short: "Water & waste", color: "#2f6f7a" },
+  construction: { short: "Construction", color: "#8a5426" },
+  trade: { short: "Trade", color: "#8a6a1e" },
+  transport: { short: "Transport", color: "#3d5f73" },
+  accommodation: { short: "Hospitality", color: "#6e3a5e" },
+  information: { short: "IT & telecoms", color: "#25557e" },
   finance: { short: "Finance", color: "#7a6420" },
   real_estate: { short: "Real estate", color: "#6b4a2f" },
   professional: { short: "Professional", color: "#2b4f8a" },
-  management: { short: "Management", color: "#4a4a7a" },
-  admin: { short: "Admin services", color: "#4b5a68" },
+  admin: { short: "Business services", color: "#4b5a68" },
+  public_admin: { short: "Public admin", color: "#3a5a4a" },
   education: { short: "Education", color: "#2a3f7a" },
   health: { short: "Health care", color: "#7a2f2f" },
   arts: { short: "Arts", color: "#5b3a7e" },
-  accommodation: { short: "Hospitality", color: "#6e3a5e" },
   other: { short: "Other services", color: "#4b4b4b" },
-  public_admin: { short: "Government", color: "#3a5a4a" },
-  government: { short: "Government", color: "#3a5a4a" },
 };
-export const industryIcon = (k) => `i-${k === "government" ? "public_admin" : k}`;
+// Icon id (icons.js i-<key>); sections without their own icon borrow the nearest one.
+const ICON_ALIAS = { energy: "utilities", water: "utilities", trade: "retail", transport: "transportation", government: "public_admin" };
+export const industryIcon = (k) => `i-${ICON_ALIAS[k] || k}`;
 
-// Land-use groups shown as a hex's "tile yield" (world.json pct keys → group). Cover ids give the map colour.
+// Land-use groups shown as a hex's "tile yield" (world.json pct keys -> group). Cover ids give the map colour.
 export const LAND = [
   { key: "built", label: "Built-up", icon: "l-developed", cover: 9, keys: ["developed"] },
   { key: "farm", label: "Farmland", icon: "l-farmland", cover: 7, keys: ["crop", "pasture"] },
@@ -36,13 +36,13 @@ export const LAND = [
 ];
 
 const sum = (o) => Object.values(o || {}).reduce((a, v) => a + (Number.isFinite(v) ? v : 0), 0);
-const HEX_AREA = (R) => (3 * Math.sqrt(3) / 2) * R * R; // km² of one hex
+const HEX_AREA = (R) => (3 * Math.sqrt(3) / 2) * R * R; // km2 of one hex
 
-/** Industries by jobs (ACS C24030, where residents work) with location quotients vs the nation. */
+/** Jobs by PKD section (city.jobs, workers by employer seat) with location quotients against Poland. */
 export function jobIndustries(city, nation) {
   const n = nation.nation;
-  const total = city.employed || sum(city.jobs) || 1;
-  const nTotal = n.employed || sum(n.jobs) || 1;
+  const total = sum(city.jobs) || city.employed || 1;
+  const nTotal = sum(n.jobs) || n.employed || 1;
   return Object.entries(city.jobs || {})
     .filter(([, v]) => Number.isFinite(v) && v > 0)
     .map(([key, jobs]) => {
@@ -57,38 +57,39 @@ export function jobIndustries(city, nation) {
     .sort((a, b) => b.jobs - a.jobs);
 }
 
-/** GDP by industry (BEA CAGDP2) with shares and location quotients vs U.S. GDP shares. */
-export function gdpIndustries(city, nation) {
-  const g = city.gdp_by_industry;
-  const ng = nation.nation.gdp_by_industry || {};
-  if (!g) return [];
-  // Shares of the metro's whole GDP (not of the disclosed industries only), so a withheld sector cannot inflate
-  // the others.
-  const total = Number.isFinite(city.gdp) && city.gdp > 0 ? city.gdp : sum(g) || 1;
-  const nTotal = Number.isFinite(nation.nation.gdp) && nation.nation.gdp > 0 ? nation.nation.gdp : sum(ng) || 1;
-  const est = new Set(city.gdp_estimated || []);
-  const rows = Object.entries(g)
-    .filter(([, v]) => Number.isFinite(v) && v > 0)
-    .map(([key, value]) => {
-      const share = value / total, natShare = (ng[key] || 0) / nTotal;
-      return {
-        key, value, share, natShare, lq: natShare > 0 ? share / natShare : null, estimated: est.has(key),
-        label: key === "government" ? "Government" : nation.industries?.[key] || key,
-        short: INDUSTRY[key]?.short || key, color: INDUSTRY[key]?.color || "#3a4a5e", icon: industryIcon(key),
-      };
-    })
-    .sort((a, b) => b.value - a.value);
-  // What BEA still withholds after recovery, as its own grey row.
-  const und = Number.isFinite(city.gdp_undisclosed) ? city.gdp_undisclosed
-    : Object.values(g).some((v) => v == null) && Number.isFinite(city.gdp) ? Math.max(0, city.gdp - sum(g)) : 0;
-  if (und > 0) {
-    const missing = Object.entries(g).filter(([, v]) => v == null).map(([k]) => k);
+/**
+ * Towns below the powiat (city.jobs is {}): workers by yield (Food, Production, Science, Culture, all workers),
+ * plus the rest of the town's workers as one row. Shares and quotients against Poland's yields.
+ */
+export function yieldIndustries(city, nation) {
+  const n = nation.nation;
+  const total = city.employed;
+  const nTotal = n.employed;
+  if (!(total > 0) || !(nTotal > 0)) return [];
+  const rows = [];
+  let used = 0, nUsed = 0;
+  for (const y of nation.yields || []) {
+    if (y.unit !== "workers") continue;
+    const v = city.yields?.[y.key];
+    if (!Number.isFinite(v)) continue;
+    const nv = n.yields?.[y.key] || 0;
+    used += v;
+    nUsed += nv;
+    const share = v / total, natShare = nv / nTotal;
     rows.push({
-      key: "undisclosed", value: und, share: und / total, natShare: 0, lq: null, undisclosed: true, missing,
-      label: "Undisclosed by BEA", short: "Undisclosed", color: "#4a5260", icon: "lock",
+      key: y.key, jobs: v, share, natShare, lq: natShare > 0 && v > 0 ? share / natShare : null,
+      label: y.label, short: y.label, color: y.color, icon: y.icon, yieldDef: y,
     });
   }
-  return rows;
+  if (!rows.length) return [];
+  const rest = total - used;
+  if (rest > 0) {
+    rows.push({
+      key: "rest", jobs: rest, share: rest / total, natShare: Math.max(0, nTotal - nUsed) / nTotal, lq: null,
+      label: "Trade, services and public sector", short: "Services", color: "#4b5a68", icon: "i-other",
+    });
+  }
+  return rows.sort((a, b) => b.jobs - a.jobs);
 }
 
 function landOf(w, cell) {
@@ -105,7 +106,7 @@ function landOf(w, cell) {
 
 /**
  * Everything the City View shows for one city.
- * Per footprint hex: estimated residents (lens "density" value × hex area: an estimate, not a count) and the
+ * Per footprint hex: estimated residents (lens "density" value x hex area: an estimate, not a count) and the
  * dominant land-use group with its share of the hex's land.
  */
 export function buildModel(app, city) {
@@ -121,12 +122,12 @@ export function buildModel(app, city) {
     .filter((c) => c != null && c >= 0);
   const mask = new Set(footprint);
 
-  // Resource sites of the metro (resources.json items tagged with this cbsa), biggest first per type.
+  // Resource sites of the town (resources.json items tagged with its id in `cbsa` or `city`), biggest first per type.
   const items = resources?.items || [];
   const typeById = new Map((resources?.types || []).map((t) => [t.id, t]));
   const sites = [];
   items.forEach((it, index) => {
-    if (it.cbsa === city.id) sites.push({ item: it, index, type: typeById.get(it.type) || null });
+    if (it.cbsa === city.id || it.city === city.id) sites.push({ item: it, index, type: typeById.get(it.type) || null });
   });
   const catRank = { energy: 0, mineral: 1, agri: 2 };
   sites.sort((a, b) => (catRank[a.type?.category] ?? 3) - (catRank[b.type?.category] ?? 3)
@@ -151,12 +152,12 @@ export function buildModel(app, city) {
     };
   });
 
-  // Industries (ACS) and GDP by industry (BEA). The map's districts are the real ones from districts.json (BLS
-  // QCEW), placed by placeDistricts() once that file arrives; until then there are none.
-  const inds = jobIndustries(city, nation);
-  const gdpInds = gdpIndustries(city, nation);
+  // Jobs by PKD section (cities with powiat rights) or by yield (other towns). The map's districts are the real ones
+  // from districts.json, placed by placeDistricts() once that file arrives; until then there are none.
+  const jobsBySection = jobIndustries(city, nation);
+  const inds = jobsBySection.length ? jobsBySection : yieldIndustries(city, nation);
   // District plaques go on footprint hexes near the centre that have no resource site and no other city; the rest
-  // (small metros) sit in a row inside the city's own hex.
+  // (small towns) sit in a row inside the city's own hex.
   const cx = grid.cx(city.cell), cy = grid.cy(city.cell);
   // The city's banner stands over the hexes just north of it, so those come after the other near hexes.
   const R = grid.R;
@@ -185,15 +186,15 @@ export function buildModel(app, city) {
 
   return {
     city, N, nation, stateIdx, hexArea: area, stateRGB, states, footprint, mask, tiles, residentsSum,
-    sites, siteCells, inds, gdpInds, free, districts: [], placed: [], inCity: [],
+    sites, siteCells, inds, indsBySection: jobsBySection.length > 0, free, districts: [], placed: [], inCity: [],
     bbox: Number.isFinite(x0) ? { x0, y0, x1, y1 } : null,
     peers,
   };
 }
 
 /**
- * Put the metro's districts on the map (schematic positions): the first ones on the free footprint hexes nearest
- * the city, the rest in a row inside the city's own hex. list = [{id, short, mapLq, color, icon, …}] (districts.js
+ * Put the town's districts on the map (schematic positions): the first ones on the free footprint hexes nearest
+ * the city, the rest in a row inside the city's own hex. list = [{id, short, mapLq, color, icon, ...}] (districts.js
  * cityDistricts). Sets m.districts, m.placed and m.inCity; the map layer reads them on its next frame.
  */
 export function placeDistricts(m, list) {
@@ -232,6 +233,6 @@ export function resourceValue(item, type, compact) {
   if (u === "MW") return v >= 1000 ? `${(v / 1000).toFixed(v >= 10000 ? 0 : 1)} GW` : `${Math.round(v)} MW`;
   if (u === "employees") return `${compact(v)} workers`;
   if (/tons/.test(u)) return `${compact(v)} t/yr`;
-  if (/km²/.test(u)) return `${compact(v)} km² play`;
+  if (/km\u00b2/.test(u)) return `${compact(v)} km\u00b2 play`;
   return `${compact(v)} ${u}`.trim();
 }

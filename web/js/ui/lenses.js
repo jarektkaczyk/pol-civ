@@ -16,14 +16,13 @@ export function formatLensValue(lens, v) {
   if (v == null || !Number.isFinite(v)) return "no data";
   switch (lens.format) {
     case "category": return lens.categories?.[Math.round(v)]?.name ?? "no data";
-    case "usd": return "$" + compact(v);
+    case "pln": case "usd": return compact(v) + " zł";
     case "pct": return (v * 100).toFixed(v < 0.1 ? 1 : 0) + "%";
     case "int": return intish(v) + (lens.unit?.startsWith("people") ? " /km²" : lens.unit ? " " + lens.unit : "");
     case "minutes": return v.toFixed(0) + " min";
     case "years": return v.toFixed(1) + " yrs";
     case "float": return (v < 10 ? v.toFixed(1) : compact(v)) + (lens.unit ? " " + lens.unit : "");
   }
-  if (lens.unit?.includes("$")) return "$" + compact(v);
   return (v < 10 ? v.toFixed(1) : compact(v)) + (lens.unit?.startsWith("people") ? " /km²" : "");
 }
 
@@ -51,8 +50,8 @@ export function lensValueAt(lens, t) {
 }
 
 const TERRAIN = { id: null, icon: "terrain", emoji: "🗺️", name: "Terrain" };
-const RECENT_KEY = "civusa.recentLenses";
-const DEFAULT_RECENT = ["density", "income", "bachelors"];
+const RECENT_KEY = "polciv.recentLenses";
+const DEFAULT_RECENT = ["density", "income", "vote"];
 const BINS = 40;
 const HOVER_HALF = 0.08; // half-width of the hover band, in ramp units
 const QUANT = 80; // band edges snap to 1/80 of the ramp so tiny mouse moves don't re-render the map

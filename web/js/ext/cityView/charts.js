@@ -5,10 +5,10 @@ let uid = 0;
 
 /**
  * Population sparkline: area + line + a dot per year, first/last values labelled.
- * series = [{year, value}], fmt(value) → text. Width scales with the container (viewBox).
+ * series = [{year, value}], fmt(value) -> text. Width scales with the container (viewBox).
  */
 export function sparkline(series, { fmt, color = "#ecd08e", height = 92, title = "" } = {}) {
-  if (series.length < 2) return `<p class="muted cv-note">No yearly estimates for this metro.</p>`;
+  if (series.length < 2) return `<p class="muted cv-note">No yearly figures.</p>`;
   const W = 400, H = height, padL = 6, padR = 6, padT = 22, padB = 20;
   const vals = series.map((p) => p.value);
   let lo = Math.min(...vals), hi = Math.max(...vals);
@@ -47,8 +47,8 @@ export function sparkline(series, { fmt, color = "#ecd08e", height = 92, title =
 }
 
 /**
- * A comparison meter: the city's value as a bar on a 0..max scale, with a tick at the U.S. value.
- * better: "high" | "low" | null decides the bar colour against the U.S. value.
+ * A comparison meter: the town's value as a bar on a 0..max scale, with a tick at Poland's value.
+ * better: "high" | "low" | null decides the bar colour against Poland's value.
  */
 export function meter(v, us, max, better = null) {
   if (v == null || !(max > 0)) return `<div class="cv-meter"><i style="width:0"></i></div>`;
@@ -57,12 +57,12 @@ export function meter(v, us, max, better = null) {
   let cls = "";
   if (better && us != null && Math.abs(v / us - 1) >= 0.03) cls = (better === "high" ? v > us : v < us) ? "good" : "bad";
   return `<div class="cv-meter ${cls}"><i style="width:${(f * 100).toFixed(1)}%"></i>${
-    u != null ? `<b class="us" style="left:${(u * 100).toFixed(1)}%" title="U.S."></b>` : ""}</div>`;
+    u != null ? `<b class="us" style="left:${(u * 100).toFixed(1)}%" title="Poland"></b>` : ""}</div>`;
 }
 
-/** A thin horizontal bar (0..1) in a colour; optional tick (0..1) for a reference such as the U.S. share. */
+/** A thin horizontal bar (0..1) in a colour; optional tick (0..1) for a reference such as Poland's share. */
 export function bar(frac, color, tick = null) {
   const f = Math.max(0, Math.min(1, frac || 0));
   return `<div class="cv-bar"><i style="width:${(f * 100).toFixed(1)}%;background:${color}"></i>${
-    tick != null ? `<b style="left:${(Math.max(0, Math.min(1, tick)) * 100).toFixed(1)}%" title="U.S. share"></b>` : ""}</div>`;
+    tick != null ? `<b style="left:${(Math.max(0, Math.min(1, tick)) * 100).toFixed(1)}%" title="Poland's share"></b>` : ""}</div>`;
 }
