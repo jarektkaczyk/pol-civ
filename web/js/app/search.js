@@ -1,6 +1,7 @@
 // Top-bar search over towns and voivodeships (the "states" slot): prefix matches first, then word-prefix, then substring; ties by population.
 import { esc, popShort } from "../format.js";
 import { icon } from "../ui/icon.js";
+import { track } from "./analytics.js";
 
 const norm = (s) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 const MAX = 8;
@@ -91,6 +92,7 @@ export function initSearch(opts) {
     input.value = "";
     input.blur();
     opts.onPick(e.kind === "city" ? { kind: "city", city: e.city } : { kind: "state", index: e.index });
+    track("search_used", { result: e.kind === "city" ? "town" : "voivodeship" });
   }
 
   function close() {

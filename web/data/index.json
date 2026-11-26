@@ -1,0 +1,636 @@
+{
+ "version": 1,
+ "name": "Polska data catalogue",
+ "site": "https://softonsofa.com/pol-civ/",
+ "generated": "2026-11-26",
+ "description": "Public data behind the Polska map of Poland. Each file is JSON; shapes are documented in docs/DATA_CONTRACTS.md of the source repository.",
+ "contracts": "https://github.com/jarektkaczyk/pol-civ/blob/main/docs/DATA_CONTRACTS.md",
+ "license": {
+  "code": "MIT (see LICENSE in the source repository)",
+  "data": "Each figure belongs to its publisher and is reused under the publisher's terms (see sources.json): Polish public statistics with attribution (GUS: CC BY 4.0), Eurostat and Copernicus reuse policies, ESA WorldCover and HydroSHEDS CC BY 4.0, OpenStreetMap data ODbL (road, rail and position data stay ODbL)."
+ },
+ "creator": {
+  "@type": "Person",
+  "name": "Jarek Tkaczyk",
+  "url": "https://softonsofa.com/"
+ },
+ "text_pages": "https://softonsofa.com/pol-civ/atlas/",
+ "llms": "https://softonsofa.com/pol-civ/llms.txt",
+ "files": [
+  {
+   "path": "data/world.json",
+   "url": "https://softonsofa.com/pol-civ/data/world.json",
+   "bytes": 897652,
+   "description": "The hex grid of Poland: owner voivodeship and gmina per hex, elevation, water, relief, land cover, rivers, lakes.",
+   "fields": [
+    "grid",
+    "owner",
+    "county",
+    "elev",
+    "water",
+    "relief",
+    "cover",
+    "pct",
+    "states",
+    "counties",
+    "rivers",
+    "lakes"
+   ],
+   "rows": 7708,
+   "vintage": {
+    "pl_geo_lau": "LAU 2024 (1 January 2024), 1:1 million",
+    "pl_geo_teryt": "BDL unit register, units in force in 2026",
+    "pl_geo_ne": "Natural Earth v5.1.2 (1:10m)",
+    "pl_geo_etopo": "ETOPO 2022 v1, 15 arc-second (ice surface)",
+    "pl_geo_worldcover": "ESA WorldCover 2021 v200, 1:32 overview (1/375 degree)",
+    "pl_geo_forest_type": "CGLS-LC100 collection 3, epoch 2019 (v3.0.1)",
+    "pl_geo_hydrorivers": "HydroRIVERS v1.0 (2019 release of the 2013 network)"
+   },
+   "sources": [
+    "pl_geo_lau",
+    "pl_geo_teryt",
+    "pl_geo_ne",
+    "pl_geo_etopo",
+    "pl_geo_worldcover",
+    "pl_geo_forest_type",
+    "pl_geo_hydrorivers"
+   ],
+   "publishers": [
+    "Eurostat GISCO",
+    "Statistics Poland (GUS), Local Data Bank (BDL) API",
+    "Natural Earth",
+    "NOAA National Centers for Environmental Information (served by the NOAA PIFSC ERDDAP)",
+    "European Space Agency (ESA WorldCover consortium)",
+    "Copernicus Global Land Service (VITO), distributed on Zenodo",
+    "WWF HydroSHEDS (Lehner and Grill 2013)"
+   ]
+  },
+  {
+   "path": "data/cities.json",
+   "url": "https://softonsofa.com/pol-civ/data/cities.json",
+   "bytes": 899415,
+   "description": "Every town with town rights (1 January 2026), with population, growth, wage, unemployment, GDP share, yields and ranks.",
+   "fields": [
+    "id (TERYT7)",
+    "name",
+    "population",
+    "growth",
+    "wage",
+    "unemployment",
+    "pit_per_person",
+    "gdp",
+    "city_view",
+    "fua"
+   ],
+   "rows": 1026,
+   "vintage": {
+    "pl_geo_places": "GUS towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched",
+    "pl_stats_population": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026",
+    "pl_stats_labour": "GUS, October 2026, May 2026, and December 2025",
+    "pl_stats_prosperity": "Ministry of Finance 2026; GUS annual 2025",
+    "pl_gdp": "Eurostat national 2025; voivodeship GDP 2024; NUTS3 GDP 2023; GVA 2023",
+    "pl_geo_fua": "LAU 2025 (NUTS 2024) correspondence"
+   },
+   "sources": [
+    "pl_geo_places",
+    "pl_stats_population",
+    "pl_stats_labour",
+    "pl_stats_prosperity",
+    "pl_gdp",
+    "pl_geo_fua"
+   ],
+   "publishers": [
+    "Główny Urząd Statystyczny (GUS); OpenStreetMap contributors",
+    "Statistics Poland (GUS)",
+    "Ministry of Finance and Statistics Poland (GUS)",
+    "Eurostat and European Central Bank",
+    "Eurostat"
+   ]
+  },
+  {
+   "path": "data/metros.json",
+   "url": "https://softonsofa.com/pol-civ/data/metros.json",
+   "bytes": 59131,
+   "description": "Metro areas: Eurostat functional urban areas of Poland, with their member gminas and economic figures.",
+   "fields": [
+    "id (FUA code)",
+    "name",
+    "population",
+    "gminas",
+    "cities",
+    "wage",
+    "unemployment"
+   ],
+   "rows": 51,
+   "vintage": "LAU 2025 (NUTS 2024) correspondence",
+   "sources": [
+    "pl_geo_fua",
+    "pl_stats_population",
+    "pl_stats_labour",
+    "pl_gdp"
+   ],
+   "publishers": [
+    "Eurostat",
+    "Statistics Poland (GUS)",
+    "Eurostat and European Central Bank"
+   ]
+  },
+  {
+   "path": "data/states.json",
+   "url": "https://softonsofa.com/pol-civ/data/states.json",
+   "bytes": 19326,
+   "description": "The 16 voivodeships: population, growth, GDP, wage, unemployment, jobs by PKD section, capitals, land cover.",
+   "fields": [
+    "fips (TERYT2)",
+    "abbr",
+    "name",
+    "population",
+    "gdp",
+    "wage",
+    "unemployment",
+    "capitals",
+    "land"
+   ],
+   "rows": 16,
+   "vintage": {
+    "pl_stats_population": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026",
+    "pl_stats_labour": "GUS, October 2026, May 2026, and December 2025",
+    "pl_stats_prosperity": "Ministry of Finance 2026; GUS annual 2025",
+    "pl_gdp": "Eurostat national 2025; voivodeship GDP 2024; NUTS3 GDP 2023; GVA 2023",
+    "pl_geo_worldcover": "ESA WorldCover 2021 v200, 1:32 overview (1/375 degree)"
+   },
+   "sources": [
+    "pl_stats_population",
+    "pl_stats_labour",
+    "pl_stats_prosperity",
+    "pl_gdp",
+    "pl_geo_worldcover"
+   ],
+   "publishers": [
+    "Statistics Poland (GUS)",
+    "Ministry of Finance and Statistics Poland (GUS)",
+    "Eurostat and European Central Bank",
+    "European Space Agency (ESA WorldCover consortium)"
+   ]
+  },
+  {
+   "path": "data/nation.json",
+   "url": "https://softonsofa.com/pol-civ/data/nation.json",
+   "bytes": 4197,
+   "description": "National figures of Poland and the yield definitions.",
+   "fields": [
+    "nation.population",
+    "nation.gdp",
+    "nation.wage",
+    "nation.unemployment",
+    "years",
+    "yields"
+   ],
+   "rows": 1,
+   "vintage": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026",
+   "sources": [
+    "pl_stats_population",
+    "pl_stats_labour",
+    "pl_stats_prosperity",
+    "pl_gdp"
+   ],
+   "publishers": [
+    "Statistics Poland (GUS)",
+    "Ministry of Finance and Statistics Poland (GUS)",
+    "Eurostat and European Central Bank"
+   ]
+  },
+  {
+   "path": "data/counties.json",
+   "url": "https://softonsofa.com/pol-civ/data/counties.json",
+   "bytes": 728936,
+   "description": "Every gmina (TERYT7) with about 30 metrics: density, age, migration, PIT, wage, unemployment, education, faith, vote, air, flood, land cover.",
+   "fields": [
+    "geoid (TERYT)",
+    "name (Gmina)",
+    "type (Type)",
+    "powiat (Powiat)",
+    "state (Voivodeship)",
+    "population (Population)",
+    "area_km2 (Area)",
+    "density (Density)",
+    "median_age (Median age)",
+    "growth (Change 2015-2025)",
+    "net_migration (Net migration)",
+    "elderly (Aged 65+)",
+    "births (Births)",
+    "ukrainians (Ukrainians (PESEL UKR))",
+    "pit (PIT revenue per person)",
+    "wage (Average wage)",
+    "unemployment (Unemployment)",
+    "dwellings (New dwellings)",
+    "higher_ed (Higher education)",
+    "students (University students)",
+    "tourism (Tourist nights)",
+    "doctors (Doctors)",
+    "life_f (Life expectancy, women)",
+    "life_m (Life expectancy, men)",
+    "catholic (Roman Catholic)",
+    "no_religion (No religion)",
+    "mass (Mass attendance)",
+    "president_2025 (President 2025)",
+    "turnout_2025 (Turnout 2025)",
+    "sejm_2023 (Sejm 2023)",
+    "pm25 (PM2.5)",
+    "flood_2024 (2024 flood)",
+    "forest (Forest)",
+    "farmland (Farmland)",
+    "developed (Built-up)",
+    "workers (Workers)",
+    "gdp (GDP (share))",
+    "air_station (Air station)",
+    "cbsa (Metro)",
+    "cell (Cell)"
+   ],
+   "rows": 2479,
+   "vintage": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026; GUS, October 2026, May 2026, and December 2025",
+   "sources": [
+    "pl_census_2021",
+    "pl_foreigners",
+    "pl_gdp",
+    "pl_geo_fua",
+    "pl_geo_teryt",
+    "pl_geo_worldcover",
+    "pl_soc_air",
+    "pl_soc_disasters",
+    "pl_soc_elections",
+    "pl_soc_faith",
+    "pl_soc_health",
+    "pl_stats_labour",
+    "pl_stats_population",
+    "pl_stats_prosperity"
+   ],
+   "publishers": [
+    "Statistics Poland (GUS), regional statistical offices",
+    "Statistics Poland (GUS) and dane.gov.pl",
+    "Eurostat and European Central Bank",
+    "Eurostat",
+    "Statistics Poland (GUS), Local Data Bank (BDL) API",
+    "European Space Agency (ESA WorldCover consortium)",
+    "Główny Inspektorat Ochrony Środowiska (GIOŚ)",
+    "Rada Ministrów (Dziennik Ustaw, via the Sejm ELI API); PKW and GUS for unit codes",
+    "Państwowa Komisja Wyborcza (PKW)",
+    "Główny Urząd Statystyczny (GUS); Instytut Statystyki Kościoła Katolickiego (ISKK); OpenStreetMap; Wikidata",
+    "Główny Urząd Statystyczny (GUS), Bank Danych Lokalnych",
+    "Statistics Poland (GUS)",
+    "Ministry of Finance and Statistics Poland (GUS)"
+   ]
+  },
+  {
+   "path": "data/powiaty.json",
+   "url": "https://softonsofa.com/pol-civ/data/powiaty.json",
+   "bytes": 87151,
+   "description": "Every powiat (TERYT4) with the same metrics, summed or weighted from its gminas.",
+   "fields": [
+    "code (TERYT)",
+    "name (Powiat)",
+    "state (Voivodeship)",
+    "population (Population)",
+    "area_km2 (Area)",
+    "density (Density)",
+    "growth (Change 2015-2025)",
+    "net_migration (Net migration)",
+    "elderly (Aged 65+)",
+    "births (Births)",
+    "ukrainians (Ukrainians (PESEL UKR))",
+    "pit (PIT revenue per person)",
+    "wage (Average wage)",
+    "unemployment (Unemployment)",
+    "higher_ed (Higher education)",
+    "doctors (Doctors)",
+    "catholic (Roman Catholic)",
+    "no_religion (No religion)",
+    "president_2025 (President 2025)",
+    "turnout_2025 (Turnout 2025)",
+    "forest (Forest)",
+    "farmland (Farmland)",
+    "developed (Built-up)",
+    "workers (Workers)",
+    "y_food (Food)",
+    "y_production (Production)",
+    "y_gold (Gold)",
+    "y_science (Science)",
+    "y_culture (Culture)",
+    "cell (Cell)"
+   ],
+   "rows": 380,
+   "vintage": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026; GUS, October 2026, May 2026, and December 2025",
+   "sources": [
+    "pl_census_2021",
+    "pl_foreigners",
+    "pl_gdp",
+    "pl_geo_teryt",
+    "pl_geo_worldcover",
+    "pl_soc_elections",
+    "pl_soc_faith",
+    "pl_soc_health",
+    "pl_stats_labour",
+    "pl_stats_population",
+    "pl_stats_prosperity"
+   ],
+   "publishers": [
+    "Statistics Poland (GUS), regional statistical offices",
+    "Statistics Poland (GUS) and dane.gov.pl",
+    "Eurostat and European Central Bank",
+    "Statistics Poland (GUS), Local Data Bank (BDL) API",
+    "European Space Agency (ESA WorldCover consortium)",
+    "Państwowa Komisja Wyborcza (PKW)",
+    "Główny Urząd Statystyczny (GUS); Instytut Statystyki Kościoła Katolickiego (ISKK); OpenStreetMap; Wikidata",
+    "Główny Urząd Statystyczny (GUS), Bank Danych Lokalnych",
+    "Statistics Poland (GUS)",
+    "Ministry of Finance and Statistics Poland (GUS)"
+   ]
+  },
+  {
+   "path": "data/lenses.json",
+   "url": "https://softonsofa.com/pol-civ/data/lenses.json",
+   "bytes": 1168713,
+   "description": "The map lenses: one value per hex for each metric, with legend domains and notes.",
+   "fields": [
+    "density (Density)",
+    "age (Median age)",
+    "growth (Change 2015-2025)",
+    "migration (Net migration)",
+    "elderly (Aged 65+)",
+    "births (Births)",
+    "ukrainians (Ukrainians (PESEL UKR))",
+    "income (PIT revenue per person)",
+    "wage (Average wage)",
+    "unemployment (Unemployment)",
+    "dwellings (New dwellings)",
+    "higher_ed (Higher education)",
+    "students (University students)",
+    "tourism (Tourist nights)",
+    "doctors (Doctors)",
+    "life_f (Life expectancy, women)",
+    "life_m (Life expectancy, men)",
+    "catholic (Roman Catholic)",
+    "no_religion (No religion)",
+    "mass (Mass attendance)",
+    "vote (President 2025)",
+    "turnout (Turnout 2025)",
+    "sejm (Sejm 2023)",
+    "pm25 (PM2.5)",
+    "flood (2024 flood)",
+    "forest (Forest)",
+    "farmland (Farmland)",
+    "developed (Built-up)"
+   ],
+   "rows": 28,
+   "vintage": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026; PKW: presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 Oct 2023)",
+   "sources": [
+    "pl_census_2021",
+    "pl_foreigners",
+    "pl_geo_worldcover",
+    "pl_soc_air",
+    "pl_soc_disasters",
+    "pl_soc_elections",
+    "pl_soc_faith",
+    "pl_soc_health",
+    "pl_stats_labour",
+    "pl_stats_population",
+    "pl_stats_prosperity"
+   ],
+   "publishers": [
+    "Statistics Poland (GUS), regional statistical offices",
+    "Statistics Poland (GUS) and dane.gov.pl",
+    "European Space Agency (ESA WorldCover consortium)",
+    "Główny Inspektorat Ochrony Środowiska (GIOŚ)",
+    "Rada Ministrów (Dziennik Ustaw, via the Sejm ELI API); PKW and GUS for unit codes",
+    "Państwowa Komisja Wyborcza (PKW)",
+    "Główny Urząd Statystyczny (GUS); Instytut Statystyki Kościoła Katolickiego (ISKK); OpenStreetMap; Wikidata",
+    "Główny Urząd Statystyczny (GUS), Bank Danych Lokalnych",
+    "Statistics Poland (GUS)",
+    "Ministry of Finance and Statistics Poland (GUS)"
+   ]
+  },
+  {
+   "path": "data/resources.json",
+   "url": "https://softonsofa.com/pol-civ/data/resources.json",
+   "bytes": 91717,
+   "description": "Power plants, mines, oil and gas sites, offshore wind and renewables by powiat.",
+   "fields": [
+    "types",
+    "items (name, type, value, status, operator)",
+    "summary",
+    "renewables"
+   ],
+   "rows": 142,
+   "vintage": {
+    "plants": "OpenStreetMap extract 2026-11-26, curated figures as of 2026-11",
+    "renewables": "URE Mapa OZE 2026-09-30",
+    "oil_gas": "Curated as of 2026-11 (ORLEN, Gaz-System)",
+    "mines": "Mining output 2025 (WUG reports, EC hard coal report, KGHM); sulphur 2024"
+   },
+   "sources": [
+    "pl_energy_plants",
+    "pl_energy_res",
+    "pl_energy_oilgas",
+    "pl_mines"
+   ],
+   "publishers": [
+    "OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE",
+    "Urząd Regulacji Energetyki (Energy Regulatory Office); powiat codes from GUS BDL",
+    "ORLEN, Gaz-System (via the cited pages); positions from Wikidata and OpenStreetMap",
+    "Ministry of Industry (report on hard coal mining 2025), State Mining Authority (WUG), KGHM, Sejm; positions from Wikidata and OpenStreetMap"
+   ]
+  },
+  {
+   "path": "data/infrastructure.json",
+   "url": "https://softonsofa.com/pol-civ/data/infrastructure.json",
+   "bytes": 48444,
+   "description": "Motorways, expressways and main railway lines on hex links, plus seaports and airports.",
+   "fields": [
+    "roads",
+    "rail",
+    "ports",
+    "airports",
+    "totals"
+   ],
+   "rows": null,
+   "vintage": {
+    "roads": "OpenStreetMap extract 2026-11-26",
+    "rail": "OpenStreetMap extract 2026-11-26",
+    "network": "Eurostat tran_r_net motorway_km 2024, navigable_canal_km 2024, navigable_river_km 2024, rail_double_track_km 2024, rail_electrified_km 2024, rail_line_km 2024",
+    "ports": "GUS maritime economy 2025 (preliminary); Eurostat ports 2025; TEU 2025",
+    "airports": "Eurostat airport traffic 2025"
+   },
+   "sources": [
+    "pl_transport_osm",
+    "pl_transport_network",
+    "pl_transport_ports",
+    "pl_transport_airports"
+   ],
+   "publishers": [
+    "OpenStreetMap contributors (via the Overpass API)",
+    "Eurostat (data from Statistics Poland, GUS)",
+    "Statistics Poland (GUS); Eurostat; port authorities and Gaz-System (curated items)",
+    "Eurostat (air transport statistics reported by Poland); OpenStreetMap contributors"
+   ]
+  },
+  {
+   "path": "data/military.json",
+   "url": "https://softonsofa.com/pol-civ/data/military.json",
+   "bytes": 47170,
+   "description": "Garrisons, bases, allied sites and training areas, with strength and budget.",
+   "fields": [
+    "installations",
+    "ranges",
+    "states",
+    "national"
+   ],
+   "rows": 87,
+   "vintage": "Curated November 2026; MON budget booklet March 2026; NATO defence report July 2026",
+   "sources": [
+    "pl_soc_military"
+   ],
+   "publishers": [
+    "Ministerstwo Obrony Narodowej (MON), NATO, US Army; cited Wikipedia unit pages"
+   ]
+  },
+  {
+   "path": "data/wonders.json",
+   "url": "https://softonsofa.com/pol-civ/data/wonders.json",
+   "bytes": 16648,
+   "description": "Heritage and landmark sites chosen by published rules: UNESCO properties, national parks, research universities, record landmarks.",
+   "fields": [
+    "wonders (name, kind, metrics, ref, x, y)",
+    "rules",
+    "national"
+   ],
+   "rows": 34,
+   "vintage": {
+    "heritage": "UNESCO whc001 (2026-11-22); NID Pomniki Historii 2026-09-30 + Dz.U. 2026 poz. 1334",
+    "parks": "GUS Ochrona srodowiska 2025 (data for 2024); Wikidata centre points",
+    "universities": "GUS academic year 2025/26 (31 Dec 2025); RAD-on evaluations 2017-2021 and 2022-2025; Wikidata positions",
+    "transport": "GUS maritime economy 2025 (preliminary); Eurostat ports 2025; TEU 2025; Eurostat airport traffic 2025",
+    "energy": "OpenStreetMap extract 2026-11-26, curated figures as of 2026-11"
+   },
+   "sources": [
+    "pl_soc_heritage",
+    "pl_soc_parks",
+    "pl_soc_universities",
+    "pl_transport_ports",
+    "pl_transport_airports",
+    "pl_energy_plants"
+   ],
+   "publishers": [
+    "UNESCO World Heritage Centre (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl)",
+    "Główny Urząd Statystyczny (GUS); Wikidata",
+    "Główny Urząd Statystyczny (GUS); Ministry of Science (RAD-on / POL-on); Wikidata",
+    "Statistics Poland (GUS); Eurostat; port authorities and Gaz-System (curated items)",
+    "Eurostat (air transport statistics reported by Poland); OpenStreetMap contributors",
+    "OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE"
+   ]
+  },
+  {
+   "path": "data/trade.json",
+   "url": "https://softonsofa.com/pol-civ/data/trade.json",
+   "bytes": 17946,
+   "description": "Road and rail freight routes between regions.",
+   "fields": [
+    "zones",
+    "routes",
+    "national_kt"
+   ],
+   "rows": 30,
+   "vintage": "Eurostat road freight 2025, rail regional freight 2020",
+   "sources": [
+    "pl_transport_freight"
+   ],
+   "publishers": [
+    "Eurostat (data from Statistics Poland, GUS)"
+   ]
+  },
+  {
+   "path": "data/citizens.json",
+   "url": "https://softonsofa.com/pol-civ/data/citizens.json",
+   "bytes": 302473,
+   "description": "Citizen mix of each town of 20,000+: workers by sector, age, sex, education, origin.",
+   "fields": [
+    "cities",
+    "national",
+    "groups"
+   ],
+   "rows": 5,
+   "vintage": "GUS population 31 December 2025; demographic rates and life expectancy 2025; university students 31 December 2025; territorial division 1 January 2026; GUS, October 2026, May 2026, and December 2025; NSP 2021 final regional results with December 2022 preliminary map fallback; PESEL UKR 2026-11-11; GUS resident stock 2025-12-31",
+   "sources": [
+    "pl_stats_population",
+    "pl_stats_labour",
+    "pl_census_2021",
+    "pl_foreigners"
+   ],
+   "publishers": [
+    "Statistics Poland (GUS)",
+    "Statistics Poland (GUS), regional statistical offices",
+    "Statistics Poland (GUS) and dane.gov.pl"
+   ]
+  },
+  {
+   "path": "data/districts.json",
+   "url": "https://softonsofa.com/pol-civ/data/districts.json",
+   "bytes": 143644,
+   "description": "Districts and city types of each town of 20,000+, from location quotients of jobs by PKD section.",
+   "fields": [
+    "cities",
+    "catalog",
+    "badges",
+    "rule"
+   ],
+   "rows": 204,
+   "vintage": "GUS, October 2026, May 2026, and December 2025",
+   "sources": [
+    "pl_stats_labour",
+    "pl_stats_population",
+    "pl_transport_ports",
+    "pl_mines",
+    "pl_soc_military"
+   ],
+   "publishers": [
+    "Statistics Poland (GUS)",
+    "Statistics Poland (GUS); Eurostat; port authorities and Gaz-System (curated items)",
+    "Ministry of Industry (report on hard coal mining 2025), State Mining Authority (WUG), KGHM, Sejm; positions from Wikidata and OpenStreetMap",
+    "Ministerstwo Obrony Narodowej (MON), NATO, US Army; cited Wikipedia unit pages"
+   ]
+  },
+  {
+   "path": "data/disasters.json",
+   "url": "https://softonsofa.com/pol-civ/data/disasters.json",
+   "bytes": 79170,
+   "description": "The gminas declared a natural disaster area after the September 2024 flood.",
+   "fields": [
+    "flood_2024"
+   ],
+   "rows": 2479,
+   "vintage": "Dz.U. 2024 poz. 1365 as amended (consolidated text poz. 1395, last change poz. 1412)",
+   "sources": [
+    "pl_soc_disasters"
+   ],
+   "publishers": [
+    "Rada Ministrów (Dziennik Ustaw, via the Sejm ELI API); PKW and GUS for unit codes"
+   ]
+  },
+  {
+   "path": "data/sources.json",
+   "url": "https://softonsofa.com/pol-civ/data/sources.json",
+   "bytes": 119559,
+   "description": "The bibliography: every source with publisher, licence, vintage and the exact files used.",
+   "fields": [
+    "id",
+    "publisher",
+    "license",
+    "vintage",
+    "files"
+   ],
+   "rows": 33,
+   "vintage": null,
+   "sources": [],
+   "publishers": []
+  }
+ ]
+}

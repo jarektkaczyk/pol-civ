@@ -7,6 +7,7 @@ import { createTable } from "../core/table.js";
 import { createScatter } from "../core/scatter.js";
 import { section, segmented, selectBox, sourcesHtml, frameBtn } from "../core/view.js";
 import { rowsHighlight, extendData } from "../core/data.js";
+import { track } from "../../../app/analytics.js";
 
 const DEFAULT_COLS = {
   states: ["population", "growth", "gdp_pc", "wage", "unemployment"],
@@ -57,7 +58,10 @@ export async function mount(ctx) {
     onlySel: false,
     sel: null,
   };
-  const persist = () => save({ level: st.level, cols: st.cols, xy: st.xy });
+  const persist = () => {
+    save({ level: st.level, cols: st.cols, xy: st.xy });
+    track("explorer_used", { level: st.level, columns: (st.cols[st.level] || []).length });
+  };
   const L = () => data.levels[st.level];
 
   // --- controls -------------------------------------------------------------------------------------------------
