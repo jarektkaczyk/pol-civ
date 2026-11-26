@@ -179,8 +179,9 @@ export function install(app) {
         <span class="tl-year" aria-live="polite"></span>`;
       row.querySelector(".tl-play").onclick = () => (timer ? stop() : play());
       row.querySelector("input").oninput = (e) => {
+        const k = +e.target.value; // read before stop(): it redraws the row and resets the slider to the shown year
         stop();
-        idx = +e.target.value;
+        idx = k;
         apply();
         app.hash.update();
       };

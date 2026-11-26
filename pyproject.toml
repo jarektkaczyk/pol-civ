@@ -1,7 +1,7 @@
 [project]
-name = "usaciv"
+name = "pol-civ"
 version = "0.1.0"
-description = "A Civilization-style visualizer of the real United States"
+description = "Real Poland drawn as a turn-based strategy map, built from public data"
 requires-python = ">=3.11"
 dependencies = []  # standard library only, on purpose
 
