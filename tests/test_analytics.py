@@ -29,6 +29,11 @@ console.log(JSON.stringify({
   plain: m.sanitizeUrl("https://softonsofa.com/pol-civ/atlas/krakow/"),
   direct: m.sanitizeUrl("$direct"),
   event: m.sanitizeEvent(event),
+  top: m.embedHost({ top: 1, self: 1 }),
+  framed: m.embedHost({ top: 1, self: 2, location: { ancestorOrigins: ["https://earthciv.org"] } }),
+  byReferrer: m.embedHost({ top: 1, self: 2, location: {}, document: { referrer: "https://maps.example.org/x?y=1" } }),
+  hidden: m.embedHost({ top: 1, self: 2, location: {}, document: { referrer: "" } }),
+  notFramedEvent: "embedded_in" in m.sanitizeEvent({ properties: {} }).properties,
 }));
 """
 
@@ -59,6 +64,13 @@ class AnalyticsUrlFilterTest(unittest.TestCase):
         self.assertEqual(props["ms"], 120)
         self.assertEqual(self.out["event"]["$set_once"]["$initial_current_url"], "https://softonsofa.com/pol-civ/")
         self.assertNotIn("email", json.dumps(self.out["event"]))
+
+    def test_embedding_site_host_or_unknown(self):
+        self.assertIsNone(self.out["top"])
+        self.assertEqual(self.out["framed"], "earthciv.org")
+        self.assertEqual(self.out["byReferrer"], "maps.example.org")
+        self.assertEqual(self.out["hidden"], "unknown")
+        self.assertFalse(self.out["notFramedEvent"])
 
 
 if __name__ == "__main__":

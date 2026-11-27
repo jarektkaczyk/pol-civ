@@ -9,8 +9,10 @@
 // or after the load event (atlas pages). PostHog keeps state in memory only (no cookies, no localStorage), never
 // records sessions, never autocaptures clicks and never calls identify. Its automatic $pageview and $pageleave stay
 // on (they count visitors), but before_send rewrites every URL property to origin + path + hash, keeping only utm_*
-// query parameters, so a query such as ?email=... never leaves the page. Add ?analytics=debug to a URL to print each
-// event to the console.
+// query parameters, so a query such as ?email=... never leaves the page. When another site frames the page (for
+// example a gallery of country maps), before_send also adds embedded_in: the framing site's host name, or "unknown"
+// where the browser hides it (Firefox; a parent that strips the referrer). Add ?analytics=debug to a URL to print
+// each event to the console.
 //
 // In the app, most events come from the extension API (window.__app events) and a few delegated DOM listeners, so
 // the modules that own those actions stay untouched. Search and the Explorer call track() directly.
@@ -36,9 +38,23 @@ function sanitizeProps(props) {
   return props;
 }
 
+/** The host name of the site that frames this page, "unknown" when framed by a hidden site, or null when not framed. */
+export function embedHost(win = globalThis) {
+  try {
+    if (!win || win.top === win.self) return null;
+  } catch {
+    /* a cross-origin top that throws on access: still framed */
+  }
+  const host = (url) => { try { return new URL(url).hostname || null; } catch { return null; } };
+  return host(win.location?.ancestorOrigins?.[0]) || host(win.document?.referrer) || "unknown";
+}
+
+const EMBED = embedHost();
+
 /** PostHog before_send: strip query text from $current_url, $referrer and every other URL-valued property. */
 export function sanitizeEvent(event) {
   if (!event || typeof event !== "object") return event;
+  if (EMBED && event.properties && typeof event.properties === "object") event.properties.embedded_in = EMBED;
   sanitizeProps(event.properties);
   sanitizeProps(event.$set);
   sanitizeProps(event.$set_once);
