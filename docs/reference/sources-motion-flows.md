@@ -10,13 +10,6 @@
 - The layers "Power now", "Migration" and "Money for local governments" (`web/js/ext/power`, `migration`, `money`) read these files; the power layer first asks PSE for today (`api.raporty.pse.pl` is in the app's CSP `connect-src`).
 - The wealth correction is not a payment into an equalisation pot. Under art. 32 of the act of 1 October 2024 it cuts the rich unit's own general subsidy, then its PIT share (voivodeships: CIT first). 294 units have one, 4,672,194,662 PLN in total; Warszawa 941,414,099 PLN.
 
-## Next steps
-
-| Date (2026) | Owner | Step |
-|---|---|---|
-| 12-01 | lead | Add `pl_power_pse` (monthly) and `pl_migration_od` (yearly, in June) to `scripts/refresh/plan.py`; keep `pl_local_finance_flows` static until the 2027 final file (see Refresh). |
-| 12-07 | Jarek | Ask PSE for written reuse terms for the API data (no licence text found; `www.pse.pl` did not resolve from the build machine). |
-
 ## Critical learnings
 
 - PSE accepts `$first=N` (not `$top`) and returns the whole day in one page; without it the API pages 100 rows at a time with a `$after` cursor. `$select` and `$orderby` work too.

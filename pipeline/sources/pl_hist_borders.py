@@ -186,7 +186,7 @@ class HistoricBorders(Source):
         title="CShapes 2.0: historical state borders",
         publisher="ETH Zurich, International Conflict Research (Schvitz et al. 2022)",
         homepage=HOMEPAGE,
-        license="CC BY-NC-SA 4.0",
+        license="CC BY-NC-SA 4.0: non-commercial use, which this free, ad-free site is; the derived borders are shared under the same licence",
         description="Borders of independent states 1886-2019 with their dates of validity. Used for the borders "
                     "of the partitions on 1 July 1914 and the border of interwar Poland (1921-1939).",
         used_for=["Borders of 1914 map layer", "Interwar border map layer"],

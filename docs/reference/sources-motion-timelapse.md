@@ -7,13 +7,6 @@
 - The smog week is 2026-01-18 00:00 to 2026-01-25 00:00 (UTC+1): the highest 7-day mean of the hourly national PM2.5 means between 2025-12-01 and 2026-02-28, 58.3 ug/m3 (runner-up windows start 2026-01-17 at 57.7 and 2026-01-19 at 57.5; the worst December week reaches 28.1). 128 automatic stations reported in the season, 117 in the chosen week. The worst day is 2026-01-22 (national mean 78.9).
 - The vote morph and the population years need no new download: they reuse `lenses.json` (vote_2015, vote_2020, vote) and `timeline.json`.
 
-## Next steps
-
-| Date (2026) | Owner | Step |
-|---|---|---|
-| 11-28 | Jarek | Review the new names: "Presidential vote over time" / "Wybory prezydenckie w czasie", "Population over time" / "Ludność w czasie" (Almanac), and the clock texts ("Tue 20 Jan, 23:00", "Poland average 97 µg/m³", "14,508,483 nights"). |
-| 12-28 | refresh job | Refresh `pl_tourism_monthly` monthly (bump `_today()`); `pl_air_hourly` is a static snapshot. |
-
 ## Critical learnings
 
 - GIOŚ `metadata/sensors` is stale: 23 stations with hourly PM2.5 in December 2025 are missing or closed there. The current-data endpoint (`data/getData`, 1,500 requests per minute) names each position (`-1g` or `-24g`) and answers HTTP 400 (API-ERR-100003) for manual samplers, so it classifies a sensor cheaply.

@@ -1,28 +1,20 @@
-# Sources: transport, energy and mines (W3)
+# Sources: transport, energy and mines
 
-## 1. Conclusions
+## Conclusions
 
 - Nine sources write interims for roads, rail, airports, seaports, freight, power plants, renewables by powiat, oil and gas, and mines. Every one reprocesses from cache with `--offline`.
 - Newest vintages: OSM extract 2026-11-26; Eurostat airports, ports, TEU and road freight 2025; GUS seaports 2025 (preliminary); PGE power capacity 2025; URE renewables as of 2026-09-30; mining output 2025.
 - Road freight has no published region-to-region matrix. Rail freight flows between voivodeships exist only for 2020 (Eurostat `tran_r_rago`).
 - `pl_transport_osm` adds a `lines` key to the interim contract: `{id, kind, ref, name, coords: [[lon, lat], ...]}`. W5 must read it; BLUEPRINT section 6 does not list it yet.
 
-## 2. Next steps
-
-| When | Owner | Step |
-|---|---|---|
-| 2026-11-27 | lead | Add `lines` to BLUEPRINT section 6 or tell W5 to read it from `pl_transport_osm`. |
-| 2026-11-27 | lead | Set `SSL_CERT_FILE` to a CA bundle with GlobalSign Root R46 before a fresh Eurostat fetch (uv's Python uses `/etc/ssl/cert.pem`, which lacks it). |
-| 2026-11-27 | W5 | Draw roads and rail from `lines`; place airports, ports, plants, mines and oil and gas from `points`. |
-
-## 3. Critical learnings
+## Critical learnings
 
 - Overpass: some networks drop a request that sends no byte for 60 s. Roads and rail are fetched as 15 bbox tiles per layer; the helper rotates endpoints and backs off on 429/502/504.
 - ULC (airport statistics) sits behind a bot-protection page. Eurostat `avia_paoa` carries the same airport data; Warszawa-Chopin 2025 is 24,079,757 in Eurostat against 24,082,472 in ULC's PDF.
 - Port tonnage differs by counting method: GUS gives Gdańsk 75.3 Mt for 2025, the port authority 80.4 Mt.
 - OSM tags lignite plants as `coal`; the three lignite plants are named in code.
 
-## 4. Sources
+## Sources
 
 | id | Publisher | Dataset | Exact URL | Vintage | Licence | Level | Fields / content | Caveats |
 |---|---|---|---|---|---|---|---|---|
@@ -36,7 +28,7 @@
 | `pl_energy_oilgas` | ORLEN; Gaz-System (via Wikipedia); Wikidata; OSM | curated sites | refs per site, e.g. `https://raportzintegrowany2022.orlen.pl/en/operating-segments/operating-segments-in-2022/refining/` | 2026-11 | public pages; CC0; ODbL | points | capacity_bcm, capacity_mt, status | Field output null (PIG-PIB Bilans only as PDF, host unreachable). Refinery capacity from the 2022 report. |
 | `pl_mines` | Ministry of Industry (EC report 2025); WUG; KGHM; Sejm | curated mines with output | `https://www.gov.pl/attachment/f83b64ed-0cc8-4e47-b952-21e95fc6dbc0` (EC report), WUG reports per mine (`ref`), KGHM production report Dec 2025 | 2025 (sulphur 2024) | public information; CC0; ODbL | points, country table, companies | commodity, status, output, output_unit, output_year, ref | Mine output is raw coal; KGHM has no per-mine output. |
 
-## 5. Datasets looked for and not obtained
+## Datasets looked for and not obtained
 
 - ULC airport statistics (ulc.gov.pl): bot-protection page blocks scripts. Eurostat used instead.
 - Road freight origin-destination matrix by NUTS 3 or voivodeship: not published by Eurostat or GUS (GUS "Transport drogowy w Polsce w latach 2024 i 2025" has voivodeship balances only, PDF).

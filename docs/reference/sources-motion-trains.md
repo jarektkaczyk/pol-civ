@@ -1,4 +1,4 @@
-# Motion layer sources: trains and flights (M2)
+# Motion layer sources: trains and flights
 
 ## Conclusions
 
@@ -6,15 +6,6 @@
 - The timetable is the PKP PLK timetable converted to GTFS by Mikołaj Kuranowski. PKP PLK and Koleje Mazowieckie allow re-use, commercial or not, with attribution. The page must name PKP PLK, Koleje Mazowieckie and Mikołaj Kuranowski, the data date, and that the data was processed. The Almanac page "Moving layers" shows all three: the names, the feed creation and download times (UTC), and a sentence on the processing (`trains.json` `attribution`).
 - `pl_air_routes` gives `web/data/flights.json`: 446 airport pairs from 12 Polish airports to 138 foreign airports, monthly passengers 2024-01 to 2024-12. File size 0.11 MB.
 - The newest Eurostat month is still 2024-12 (data update 2025-10-22). ULC has 2025 figures, but only in PDF tables per foreign city, without the Polish airport. Eurostat stays the source.
-
-## Next steps
-
-| Date | Owner | Step |
-|---|---|---|
-| 2026-12-01 | Jarek | Decide whether to tell PKP PLK about the re-use (their terms say "poinformowania PKP Polskie Linie Kolejowe S.A. o przetworzeniu informacji"; see Licences). |
-| 2026-12-01 | Jarek | Approve the toggle names and clock labels (see the M2 report). |
-| 2026-12-14 | lead | Re-run `fetch --force pl_rail_gtfs` after the 2026-12-13 timetable change and compare trip counts with this run. |
-| 2027-05 | lead | Re-check Eurostat `avia_par_pl` for 2025 months. |
 
 ## Critical learnings
 

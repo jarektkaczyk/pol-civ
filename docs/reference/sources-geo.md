@@ -1,20 +1,12 @@
-# Geography sources (W1 core-geo)
+# Geography sources
 
-## 1. Conclusions
+## Conclusions
 
 - Seven sources build the map of Poland: gmina outlines (GISCO LAU 2024), the 2026 unit register (GUS BDL), elevation (ETOPO 2022), land cover (ESA WorldCover 2021), forest type (Copernicus 2019), rivers (HydroRIVERS) and neighbours, lagoons and names (Natural Earth).
 - Every source downloads without a login or key, through `Source.download()`. The two big rasters are read by HTTP range requests, so the cache holds about 60 MB, not several GB.
 - The map has 7,708 hexes of 5 km (82 x 94); 4,805 are Polish land. Gmina codes are TERYT as of 2026 (2,479 gminy).
 
-## 2. Next steps
-
-| When (2026) | Owner | Step |
-|---|---|---|
-| 11-27 | W5 builders | Read `_world` (`county_samples`, `powiat`, `gminy_without_samples`) for the gmina, powiat and voivodeship lenses. |
-| 11-27 | W5 builders | Fill the economic fields of `states.json` (they are `null` now). |
-| 11-27 | W2 stats | Run BDL downloads with a CA bundle that holds the Certum Trusted Root CA (see caveats). |
-
-## 3. Critical learnings
+## Critical learnings
 
 - The Polish LAU id is not the TERYT code. It is `10` + the GUS BDL unit id without its type digit (`1001121216101` = Kraków, TERYT6 `126101`). The type digit comes from the BDL register.
 - BDL `units/search` filters by year, but stops at 2,000 records (page 20 of 100 answers HTTP 500). Gminy are fetched one kind at a time (urban 302, rural 1,453, urban-rural 724).
@@ -22,7 +14,7 @@
 - Python's CA store on the build machine lacks the Certum Trusted Root CA that `bdl.stat.gov.pl` chains to. Fetch with `SSL_CERT_FILE` pointing at a bundle that adds it (the macOS system roots have it).
 - WorldCover counts every patch with tree canopy as tree cover: 42% of Poland's land, against 29.6% official forest area (GUS). The `forest` shares follow WorldCover and the cover note says so.
 
-## 4. Sources
+## Sources
 
 | id | Publisher | Dataset | Exact URL | Vintage | Licence | Level | Fields used | Caveats |
 |---|---|---|---|---|---|---|---|---|
@@ -34,7 +26,7 @@
 | `pl_geo_hydrorivers` | WWF HydroSHEDS | HydroRIVERS v1.0, Europe, shapefile | https://data.hydrosheds.org/file/HydroRIVERS/HydroRIVERS_v10_eu_shp.zip | v1.0 (2019 release of the 2013 network) | HydroSHEDS licence: free for scientific, educational and commercial use, with attribution (Lehner and Grill 2013) | river reach | `HYRIV_ID`, `NEXT_DOWN`, `UPLAND_SKM`, `DIS_AV_CMS`, `ORD_CLAS`, line | 5,816 reaches with 400 km2 or more upstream area in the window; chains drawn from 1,500 km2. No names: names come from Natural Earth. |
 | `pl_geo_ne` | Natural Earth | 1:10m admin 0 countries, lakes, lakes Europe, rivers and lake centerlines, rivers Europe, release v5.1.2 | https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson (and the 4 other files) | v5.1.2 (pinned tag) | Public domain | country, lake, river | outlines, `name`, `name_pl`, `featurecla` | The 1:10m river file has English names only. Polish names come from the Europe file's `name_pl` (Oder to Odra) and one entry in code (Vistula to Wisła). Śniardwy and Mamry have no name in Natural Earth. |
 
-## 5. Detail
+## Detail
 
 ### Codes and gaps
 
@@ -46,7 +38,7 @@
 - Land and water: 7 sample points per hex against the LAU and Natural Earth outlines; lagoons (Vistula, Curonian, Szczecin) are coastal water; a hex is a lake when WorldCover water is half its land points and ETOPO puts it above sea level.
 - Relief, cover, rivers, lakes and spits: rules are in `world.json` `tables` and `docs/DATA_CONTRACTS.md` "world.json".
 
-## 6. Datasets looked for and not used
+## Datasets looked for and not used
 
 | Dataset | Reason |
 |---|---|

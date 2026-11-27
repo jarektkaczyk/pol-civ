@@ -1,19 +1,12 @@
 # Sources: additional statistical lenses
 
-## 1. Conclusions
+## Conclusions
 
 - Six source ids add education, housing, tourism, exams, local finance, vehicles, farms, and election history.
 - The finest published level ranges from gmina to powiat. Each lens states its level and year.
 - Fixed broadband remains unavailable as a public machine-readable gmina dataset.
 
-## 2. Next steps
-
-| Date | Owner | Step |
-|---|---|---|
-| 2027-01-15 | lead | Recheck SIDUSIS for a public, token-free gmina export. |
-| 2027-09-30 | lead | Replace the 2026 exam workbooks when CKE publishes the final 2027 national files. |
-
-## 3. Critical learnings
+## Critical learnings
 
 - BDL publishes 2025 tourist use at powiat level. DBW adds exact figures for 58 cities, including 11 below powiat level.
 - BDL price series cover dwellings in multi-unit buildings. They exclude detached houses.
@@ -21,7 +14,7 @@
 - Historical PKW codes can map type changes exactly. The 2015 Ostrowice row cannot be split between its successors.
 - Ministry finance files use dBASE. The source reads the official Rb-27S, Rb-28S, and Rb-Z records directly.
 
-## 4. Sources
+## Sources
 
 | id | Publisher | Dataset | Exact URL | Vintage | Licence | Level | Fields | Caveats |
 |---|---|---|---|---|---|---|---|---|
@@ -40,7 +33,7 @@
 - Warmińsko-Mazurskie: `https://olsztyn.stat.gov.pl/download/gfx/olsztyn/pl/defaultaktualnosci/753/32/1/1/2024_01_31_stan_i_struktura_demograficzno_spoleczna_ludnosci.xlsx`
 - Zachodniopomorskie: `https://szczecin.stat.gov.pl/download/gfx/szczecin/pl/defaultaktualnosci/753/19/1/1/aneks_wojewodzki.xlsx`
 
-## 5. Datasets checked but not obtained
+## Datasets checked but not obtained
 
 - UKE 2025 market report: `https://uke.gov.pl/akt/raport-o-stanie-rynku-komunikacji-elektronicznej-w-2025-roku,670.html`. It offers PDFs only.
 - Retired SIIS: `https://api.dane.gov.pl/1.4/datasets/588`. The metadata says SIIS is shut down and no longer updated.

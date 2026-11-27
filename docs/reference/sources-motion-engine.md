@@ -1,4 +1,4 @@
-# Motion layer sources: commuters, trade routes, new factories and warehouses (M1)
+# Motion layer sources: commuters, trade routes, new factories and warehouses
 
 ## Conclusions
 
@@ -6,14 +6,6 @@
 - `permits_monthly.json`: 36,734 gmina-decisions for new industrial and storage buildings in 2,325 gminas, 130 months from 2016-01 to 2026-10 (file of 2026-11-25), 439 kB.
 - The counts do not show a boom. Decisions per year: 3,110 (2016, the register's first year), 3,849 (2017), 3,825 (2018), 3,602 (2019), 3,232 (2020), 3,719 (2021), 3,491 (2022), 3,193 (2023), 3,076 (2024), 3,047 (2025), 2,590 (2026 to October). The page therefore names the layer "New factories and warehouses", not "Investment boom".
 - The hours of the commuters and the speed of the wagons are for show. Each file says so in its `rules`.
-
-## Next steps
-
-| Date (2026) | Owner | Step |
-|---|---|---|
-| 12-01 | lead | Decide the toggle name ("New factories and warehouses" or "Investment boom") and the clock words (see the report). |
-| 12-01 | lead | Add a "Moving layers" page or block to the Almanac that quotes the `rules` of the three files (`web/js/ui/pedia.js`, not owned by M1). |
-| 12-01 | lead | Add `permits_monthly` to the monthly refresh: it rebuilds from the same zips as `pl_econ_permits`. |
 
 ## Critical learnings
 

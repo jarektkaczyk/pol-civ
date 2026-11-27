@@ -1,4 +1,4 @@
-# Economy site sources: Made in Poland, Tech and games (E2)
+# Economy site sources: Made in Poland, Tech and games
 
 ## Conclusions
 
@@ -6,14 +6,6 @@
 - Every curated fact was re-read at its source on 2026-11-26 and checked again by an independent fact-check the same day (11 facts reworded or dropped). Each has a `ref` URL and the `year` of its figure. All `ref` pages but two are cached through `Source.download()`: lg.com refuses automated reads (read by hand), and forbes.com (Brainly) refuses all automated reads, so that figure was read from the Wikipedia infobox that cites it (`ref2`).
 - Gmina codes come from point in polygon against the LAU 2024 outlines. All 150 points fall inside a gmina outline.
 - Game studios come from Wikidata (CC0). The best-known game of the 30 studios with the most sitelinks was checked by hand: 3 picks changed (CD Projekt Red now shows The Witcher 3), 3 studios dropped (CD Projekt S.A., Nibris, Reality Pump), 2 moved to their real town (Techland to Wrocław by its KRS seat, Tate Multimedia to Warszawa).
-
-## Next steps
-
-| Date (2026) | Owner | Step |
-|---|---|---|
-| 12-01 | lead | Read the fact table below and strike any fact you do not want on the page. |
-| 12-01 | lead | Add `pl_tech_sites` to the quarterly refresh and keep `pl_econ_champions` static (see Refresh). |
-| 2027-05 | lead | Check the TOP500 June 2027 list and the next company reports; update the facts with a new `ref` and `year`. |
 
 ## Critical learnings
 

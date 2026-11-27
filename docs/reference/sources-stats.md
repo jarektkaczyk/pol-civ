@@ -1,21 +1,13 @@
 # Statistics sources
 
-## 1. Conclusions
+## Conclusions
 
 Six cached sources cover population, labour, local income, education, GDP, and foreigners.
 The population table contains 2,479 gminas and totals 37,332,510 people.
 Bulk files replace BDL for the required labour, finance, housing, tourism, and census work.
 The sources run offline after the first successful fetch.
 
-## 2. Next steps
-
-| Date (UTC+7) | Owner | Step |
-|---|---|---|
-| 2026-11-27 | W5 builders | Consume the six processable interims and preserve published null values. |
-| 2026-11-27 | W2 stats | Recheck final NSP regional tables when GUS publishes one consistent powiat workbook. |
-| 2026-11-27 | W2 stats | Recheck GUS for powiat dwelling prices and gmina housing and tourism bulk tables. |
-
-## 3. Critical learnings
+## Critical learnings
 
 - The 2026 division contains 2,479 whole gminas. The blueprint count of 2,477 was provisional.
 - GUS labour bulk tables cover 380 powiats and 2,479 gminas without BDL requests.
@@ -24,7 +16,7 @@ The sources run offline after the first successful fetch.
 - Eurostat has 2024 voivodeship GDP. NUTS3 GDP and GVA end in 2023.
 - The PESEL UKR powiat identifies the registering authority. It may differ from current residence.
 
-## 4. Source register
+## Source register
 
 | Source id | Publisher and dataset | Exact URL | Vintage | Licence | Level | Fields | Caveats |
 |---|---|---|---|---|---|---|---|
@@ -35,7 +27,7 @@ The sources run offline after the first successful fetch.
 | `pl_gdp` | GUS regional accounts 2024 (revision of 30 September 2026); Eurostat regional and national accounts; ECB exchange rate | [GUS regional GDP 2024][gusgdp], [NUTS2 GDP][gdp2], [NUTS3 GDP][gdp3], [NUTS3 GVA][gva3], [national GDP][gdpn], [GDP per person][gdppc], [ECB rate][ecb] | National 2025; voivodeship 2024 (GUS, 30 September 2026); NUTS3 GDP and GVA 2023 | Eurostat reuse policy; ECB attribution terms | voivodeship, NUTS3, country | GDP in PLN (GUS) and EUR (Eurostat), GDP per person in PLN (GUS) and EUR, GVA by NACE A*6, national GDP in PLN, EUR, and USD | Voivodeship gdp_pln is GUS; Eurostat PLN is kept as gdp_pln_eurostat. Mazowieckie combines PL91 and PL92 (GUS: Warszawski stołeczny and Mazowiecki regionalny). USD uses the 2025 ECB annual rate. |
 | `pl_foreigners` | Ministry of Digital Affairs PESEL UKR; GUS temporary protection | [PESEL UKR dataset][ukr-dataset], [November file][ukr-nov], [GUS annual file][ukr-gus] | PESEL UKR 2026-11-11, published 2026-11-16; GUS 2025-12-31 | dane.gov.pl CC0 1.0; GUS CC BY 4.0 | powiat, voivodeship | PESEL UKR total, men, and women | Powiat is the registering authority. Values below two would stay null. ZUS data remains unavailable to automated downloads. |
 
-## 5. Interim coverage
+## Interim coverage
 
 | Source id | Tables and row counts |
 |---|---|
@@ -46,7 +38,7 @@ The sources run offline after the first successful fetch.
 | `pl_gdp` | GDP voivodeship 16; GDP NUTS3 73; GVA NUTS3 73; GVA voivodeship 16; country 1 |
 | `pl_foreigners` | PESEL UKR powiat 380; temporary protection voivodeship 16 |
 
-## 6. Missing datasets
+## Missing datasets
 
 - GUS bulk releases omit powiat dwelling prices in PLN/m2.
 - GUS bulk releases omit gmina housing completions and tourism for 2025.

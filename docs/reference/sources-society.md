@@ -1,18 +1,10 @@
-# Society sources (W4)
+# Society sources
 
 ## Conclusions
 
 - 9 sources feed the society lenses, the wonders, the military layer and the Culture, Knowledge and Military advisors. Each one processes from cache with `--offline`.
 - Gmina codes come from PKW 6-digit codes plus the type digit from the GUS BDL unit list (level 6). Poland has 2,479 gminas since 1 Jan 2025 (Szczawa 1207132 and Grabówka 2002162 are new).
 - Broadband by gmina is not available as a machine-readable file. Life expectancy is left to the stats worker (W2).
-
-## Next steps
-
-| Date (2026) | Owner | Step |
-|---|---|---|
-| 11-27 | W5 builders | Read the interims below. Treat a gmina absent from `flood_2024_gmina` as not declared. |
-| 12-20 | lead | Check iskk.pl for the Annuarium with 2025 data and GUS for "Ochrona środowiska 2026" (2025 park visitors). Rerun `pl_soc_faith` and `pl_soc_parks`. |
-| 2027-01 | lead | Rerun `pl_soc_universities` when RAD-on publishes more 2022-2025 evaluation results. |
 
 ## Critical learnings
 

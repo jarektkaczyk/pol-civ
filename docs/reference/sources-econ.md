@@ -1,21 +1,13 @@
 # Sources: enterprise and innovation lenses
 
-## 1. Conclusions
+## Conclusions
 
 - Three source ids feed six lenses in the new group Enterprise (Przedsiębiorczość): tech firms, new firms, sole traders (gmina), patents (powiat), R&D spending (voivodeship) and new factories and warehouses (gmina).
 - The REGON tables are GUS monthly XML files by gmina, state at the end of October 2026. They use PKD 2007 (the table headers say so).
 - Patents are 2024 and 2025 together. R&D spending is 2024, the newest year in DBW (2025 is empty).
 - The permit lens counts GUNB register decisions of 2024-11-26 to 2026-11-25 (the newest file date).
 
-## 2. Next steps
-
-| Date | Owner | Step |
-|---|---|---|
-| 2026-12-28 | refresh job | Fetch `pl_econ_regon` and `pl_econ_permits` monthly; add the Polish entry for the new vintage line of each. |
-| 2027-01-31 | lead | Check DBW for R&D 2025 and patents 2026; `pl_econ_innovation` picks them up on its quarterly fetch. |
-| 2027-03-31 | lead | Watch for PKD 2025 in the REGON XML headers. `pl_econ_regon` stops with an error when the header no longer names PKD 2007, because section J changes meaning. |
-
-## 3. Critical learnings
+## Critical learnings
 
 - The REGON XML has no national row. City rows with type 1 hold only the entities that no district or delegation holds: Warszawa, Kraków, Łódź, Poznań and Wrocław are the type 1 row plus the type 8 or 9 rows. Types 4 and 5 repeat type 3 and are not added.
 - Sum of whole gminas, October 2026: 5,541,584 entities, of which 336,360 in section J (6.07%). The GUS headline for the month is 5,543.8 thousand: about 2,200 entities have no gmina. The PKD table 1 has 336,639 section J entities in Poland.
@@ -23,7 +15,7 @@
 - A GUNB CSV row is one building object or one amendment. Lesznowola (1418032) has 67 matching rows and 36 unique decisions.
 - The GUNB CSV holds investor and designer names. The source reads six columns only and never extracts the CSV.
 
-## 4. Sources
+## Sources
 
 | id | Publisher | Dataset | Exact URL | Vintage | Licence | Level | Fields | Caveats |
 |---|---|---|---|---|---|---|---|---|
@@ -31,7 +23,7 @@
 | `pl_econ_innovation` | Statistics Poland (GUS), Dziedzinowe Bazy Wiedzy | Variable 463 "Udzielone patenty", section 169, position "Ogółem"; variable 406 "Nakłady wewnętrzne na działalność B+R", section 2 "na 1 mieszkańca" | `https://api-dbw.stat.gov.pl/api/variable/variable-data-section?id-zmienna=463&id-przekroj=169&id-rok=2025&id-okres=282&ile-na-stronie=5000&numer-strony=0&lang=pl` (and `id-rok=2024`); `https://api-dbw.stat.gov.pl/api/variable/variable-data-section?id-zmienna=406&id-przekroj=2&id-rok=2024&id-okres=282&ile-na-stronie=5000&numer-strony=0&lang=pl` | patents 2024 and 2025; R&D 2024 | GUS CC BY 4.0 | powiat, voivodeship, country | patents (2 years), patents per 100,000 residents, R&D spending per resident (PLN) | Powiat patents cover national applications in the national procedure, at the seat of the first applicant (DBW method note). Per 100,000 uses population on 2025-12-31. R&D follows the unit that does the research. |
 | `pl_econ_permits` | Główny Urząd Nadzoru Budowlanego (GUNB) | Rejestr Wniosków, Decyzji i Zgłoszeń w sprawach budowlanych (dane.gov.pl dataset 3467), 16 voivodeship files | `https://wyszukiwarka.gunb.gov.pl/pliki_pobranie/wynik_<voivodeship>.zip` (ASCII names, for example `wynik_opolskie.zip`); `https://dane.gov.pl/pl/dataset/3467` | decisions 2024-11-26 to 2026-11-25 | CC0 1.0 | gmina, country | permit decisions for new category XVIII buildings in 24 months | Category XVIII of the Prawo budowlane annex (Dz.U. 2025 poz. 418): industrial and storage buildings, also sheds and railway buildings. First-instance decisions only; no approval or refusal flag; no closed (military) areas. 187 decisions without a usable TERC code are left out. Recent weeks can be incomplete. |
 
-## 5. Not available
+## Not available
 
 | Dataset | Reason |
 |---|---|

@@ -1,4 +1,4 @@
-# Identity, history, flows and time sources (data-b)
+# Identity, history, flows and time sources
 
 ## Conclusions
 
@@ -8,14 +8,6 @@
 - Commuting is the NSP 2021 gmina-to-gmina matrix (31 March 2021). It is the newest edition: GUS publishes it once per census.
 - EU funds cover the 2021-2027 European Funds project list of 1 November 2026 (242.5 bn zł of EU co-financing, 66.5% of it placed in named gminas). KPO (the Recovery plan) has no open project list with places, so it is left out.
 - Population by gmina exists for every 31 December 2015-2025 and for 30 June 2026 from the GUS bulk tables. No BDL requests are made.
-
-## Next steps
-
-| Date (2026) | Owner | Step |
-|---|---|---|
-| 11-27 | lead | Merge `data-b`; rebuild `seo` so the atlas and `data/index.json` pick up the new lenses; add `history.json`, `commuting.json` and `timeline.json` to the file list in `pipeline/build/seo.py` if they belong in the public catalogue. |
-| 11-27 | lead | Decide whether the CC BY-NC-SA 4.0 licence of CShapes 2.0 suits the public site; if not, drop the two border switches (the code and data are separate: `ext/history`, `history.json`). |
-| 12-02 | lead | Point `pl_eu_funds` at the 1 December 2026 snapshot of dane.gov.pl dataset 13939 (URL and `SNAPSHOT` constants). |
 
 ## Critical learnings
 
