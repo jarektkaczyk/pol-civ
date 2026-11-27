@@ -13,7 +13,7 @@
 // Exports
 //   prepareNetwork(w, infra) -> net                     once per data load
 //   drawRoads(ctx, net, vp, o) / drawRail(ctx, net, vp, o)   world transform (km), o = the static-layer options
-//   ROAD_MIN_RPX, MAJOR_MIN_RPX, RAIL2_MIN_RPX           zoom thresholds (hex radius in css px)
+//   OVERVIEW_MIN_RPX, ROAD_MIN_RPX, MAJOR_MIN_RPX, RAIL2_MIN_RPX   zoom thresholds (hex radius in css px)
 //   portTier(port), drawPort(ctx, x, y, sizeKm, opts), drawAirport(ctx, x, y, sizeKm, opts)   (any transform)
 //   prepareRoutes(w, trade) -> routes; drawTradeRoutes(ctx, routes, vp, o); hitRoute(routes, x, y, Rpx, s)
 //   MODE_STYLE                                          per freight mode: colour, dash, marker kind, label
@@ -26,7 +26,8 @@ const TILE_KM = 300;
 const DIR_COS = [0, 1, 2, 3, 4, 5].map((d) => Math.cos((d * Math.PI) / 3));
 const DIR_SIN = [0, 1, 2, 3, 4, 5].map((d) => Math.sin((d * Math.PI) / 3));
 
-export const ROAD_MIN_RPX = 10; // motorways and main-line rail from the region view in
+export const OVERVIEW_MIN_RPX = 2.5; // the country view: motorways, expressways and main-line rail as plain lines
+export const ROAD_MIN_RPX = 10; // paved motorways and main-line rail with ballast from the region view in
 export const MAJOR_MIN_RPX = 18; // expressways and secondary rail once hexes are big enough to read them
 export const RAIL2_MIN_RPX = 18;
 const DETAIL_RPX = 30; // cobbles, centre dashes, sleepers
@@ -132,9 +133,45 @@ export function roadWidths(Rpx) {
   return { inter: clamp(Rpx * 0.095, 1.7, 9), major: clamp(Rpx * 0.06, 1.1, 5.5) };
 }
 
+/** The country view: the motorway and expressway network as a dark-cased pale line (expressways thinner), so the
+ *  Roads switch shows something before the region view, where the paved style takes over. */
+function drawRoadsOverview(ctx, net, vp, o) {
+  const s = vp.s;
+  const tiles = visibleTiles(net.roads, vp, 4 / s);
+  if (!tiles.length) return;
+  const k = clamp(o.Rpx / 6, 0.75, 1.3);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  for (const [cls, core] of [[1, 1.1], [0, 1.8]]) {
+    ctx.strokeStyle = "rgba(40,30,18,.62)";
+    ctx.lineWidth = (core + 1.5) * k / s;
+    strokeAll(ctx, tiles, cls);
+    ctx.strokeStyle = cls === 0 ? "#f1dfaf" : "#d9c597";
+    ctx.lineWidth = core * k / s;
+    strokeAll(ctx, tiles, cls);
+  }
+}
+
+/** The country view: main-line rail as a dark line on a pale casing (other lines appear from the region view). */
+function drawRailOverview(ctx, net, vp, o) {
+  const s = vp.s;
+  const tiles = visibleTiles(net.rail, vp, 4 / s);
+  if (!tiles.length) return;
+  const k = clamp(o.Rpx / 6, 0.75, 1.3);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = "rgba(236,226,202,.5)";
+  ctx.lineWidth = 2.6 * k / s;
+  strokeAll(ctx, tiles, 0);
+  ctx.strokeStyle = "#2d2622";
+  ctx.lineWidth = 1.05 * k / s;
+  strokeAll(ctx, tiles, 0);
+}
+
 /** Paved motorways and expressways, with stone kerbs and centre details when close. */
 export function drawRoads(ctx, net, vp, o) {
-  if (!net || o.Rpx < ROAD_MIN_RPX) return;
+  if (!net || o.Rpx < OVERVIEW_MIN_RPX) return;
+  if (o.Rpx < ROAD_MIN_RPX) return drawRoadsOverview(ctx, net, vp, o);
   const s = vp.s, Rpx = o.Rpx;
   const tiles = visibleTiles(net.roads, vp, 2 * (o.Rpx / s));
   if (!tiles.length) return;
@@ -187,7 +224,8 @@ export function drawRoads(ctx, net, vp, o) {
 
 /** Railroads: a ballast bed, sleepers (near), a steel line with a bright edge. Secondary lines thinner, nearer. */
 export function drawRail(ctx, net, vp, o) {
-  if (!net || o.Rpx < ROAD_MIN_RPX) return;
+  if (!net || o.Rpx < OVERVIEW_MIN_RPX) return;
+  if (o.Rpx < ROAD_MIN_RPX) return drawRailOverview(ctx, net, vp, o);
   const s = vp.s, Rpx = o.Rpx;
   const tiles = visibleTiles(net.rail, vp, 2 * (Rpx / s));
   if (!tiles.length) return;

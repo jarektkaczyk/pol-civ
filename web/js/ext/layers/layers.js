@@ -7,7 +7,7 @@
 // restricted ground 58 (hatching on hexes), ports & airports 65, forts 66, wonders 67 (above city tiles, under the fog),
 // name plates 68 (forts and wonders laid out together, clear of city banners and City View district plaques), trade
 // routes 85 (above resources, under voivodeship names). Everything is drawn into the cached static map; nothing animates.
-import { drawRoads, drawRail, drawPort, drawAirport, drawTradeRoutes, hitRoute, ROAD_MIN_RPX, OVERVIEW_ROUTES } from "../../render/art/improvements.js";
+import { drawRoads, drawRail, drawPort, drawAirport, drawTradeRoutes, hitRoute, OVERVIEW_MIN_RPX, OVERVIEW_ROUTES } from "../../render/art/improvements.js";
 import { drawFort, drawRestricted, drawProtected, drawWonder, drawPlaque } from "../../render/art/sites.js";
 import { visibleSites, siteSize, hitSites } from "./model.js";
 import { t } from "../../i18n.js";
@@ -36,7 +36,7 @@ export function makeLayers(model, on, { tips = {}, app = null } = {}) {
   const lensAlpha = (o) => (o.lens ? 0.55 : 1);
 
   const roads = {
-    id: "roads", z: 55, minRpx: ROAD_MIN_RPX,
+    id: "roads", z: 55, minRpx: OVERVIEW_MIN_RPX,
     visible: () => !!on.roads && !!m.net,
     sig: ver,
     draw(ctx, vp, w, o) {
@@ -45,7 +45,7 @@ export function makeLayers(model, on, { tips = {}, app = null } = {}) {
     },
   };
   const rail = {
-    id: "rail", z: 56, minRpx: ROAD_MIN_RPX,
+    id: "rail", z: 56, minRpx: OVERVIEW_MIN_RPX,
     visible: () => !!on.rail && !!m.net,
     sig: ver,
     draw(ctx, vp, w, o) {
