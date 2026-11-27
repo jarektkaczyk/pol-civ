@@ -117,7 +117,7 @@ export function install(app) {
   };
   app.registerStaticLayer(layer);
   app.ui.addMapToggle({
-    id: "commuters", label: t("Commuters"), icon: "l-commute", default: false,
+    id: "commuters", label: t("Commuters"), icon: "l-commute", default: false, menu: false,
     title: t("The largest flows of commuters into the 12 largest cities"),
     get: () => on,
     set: (v) => {

@@ -1,8 +1,8 @@
 // The motion engine: animated map layers that share one clock (app.motion). See docs/DATA_CONTRACTS.md "Motion
 // layers" for the contract other extensions build on.
 //
-//   app.motion.register({id, name?, data?, axis, range, step?, speed, start?, loop?, label(t), status?(t), active(), load(),
-//                        draw(ctx, vp, t, o), hit?(mx, my), filter?(sel)}) -> unregister
+//   app.motion.register({id, name?, data?, axis, range, step?, speed, start?, loop?, background?(), label(t), status?(t),
+//                        active(), load(), draw(ctx, vp, t, o), hit?(mx, my), filter?(sel)}) -> unregister
 //   app.motion.clock     {t, axis, playing, speed, play(), pause(), toggle(), seek(t), setSpeed(k), axisOf(id)}
 //   app.motion.particles(path, opts)   the shared moving-dots helper (particles.js)
 //   app.motion.month(iso) / monthIso(index)   the month axis unit: year * 12 + (month - 1)
@@ -17,8 +17,9 @@
 // The clock follows the axis of the most recently enabled layer; layers on another axis hold their last frame. The
 // clock bar (play/pause, speed, scrubber, time label, the layer's counter) sits above the lens dock while any motion
 // layer is on. The URL keeps the clock value as #t= (08:15, 2026-01-20T23:00, 2018-06, 2019) once it was paused or
-// moved by hand.
+// moved by hand. panel.js adds the Animations button and panel to the lens dock.
 import { particles } from "./particles.js";
+import { installPanel } from "./panel.js";
 import { t, ROOT } from "../../i18n.js";
 import { esc } from "../../format.js";
 
@@ -160,7 +161,10 @@ export function createEngine(app, { reducedMotion = null } = {}) {
       changed = true;
       e.on = on;
       if (on) {
-        e.order = ++order;
+        // A layer that is on only by default (trains) takes the clock only when no other layer is on.
+        let bg = false;
+        try { bg = !!e.def.background?.(); } catch (err) { warn(e, "background", err); }
+        e.order = bg ? -(++order) : ++order;
         ensureLoaded(e);
         applyFilter(e);
       }
@@ -238,7 +242,8 @@ export function createEngine(app, { reducedMotion = null } = {}) {
       stats.dots = dots;
       stats.drawMs = performance.now() - t0;
       if (bar && current) updateBarTime();
-      if (playing && current && !document.hidden) app.requestDraw();
+      // While the data loads the clock waits; ensureLoaded() asks for a frame when it arrives.
+      if (playing && current && current.loaded && !document.hidden) app.requestDraw();
     },
   };
 
@@ -476,4 +481,5 @@ export function createEngine(app, { reducedMotion = null } = {}) {
 export function install(app) {
   addCss();
   app.motion = createEngine(app);
+  app.motion.panel = installPanel(app);
 }

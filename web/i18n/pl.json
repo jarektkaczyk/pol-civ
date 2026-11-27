@@ -2708,5 +2708,19 @@
  "Presidential vote over time": "Wybory prezydenckie w czasie",
  "{km} km": "{km} km",
  "{n} nights": {"one": "{n} nocleg", "few": "{n} noclegi", "many": "{n} noclegów", "other": "{n} noclegu"},
- "{v} per resident": "{v} na mieszkańca"
+ "{v} per resident": "{v} na mieszkańca",
+ "Animations": "Animacje",
+ "Over time": "W czasie",
+ "Every train of a weekday": "Wszystkie pociągi jednego dnia",
+ "Passengers on every route, month by month": "Pasażerowie na każdej trasie, miesiąc po miesiącu",
+ "Today's power and flows across the borders": "Dzisiejsza produkcja prądu i przepływy przez granice",
+ "Who moves between voivodeships, 1995-2025": "Przeprowadzki między województwami, 1995-2025",
+ "State money for every gmina, 2026": "Pieniądze od państwa dla każdej gminy, 2026",
+ "Morning rush into the largest cities": "Poranne dojazdy do największych miast",
+ "The largest rail freight routes": "Największe trasy kolejowych przewozów towarów",
+ "Permits month by month since 2016": "Pozwolenia miesiąc po miesiącu od 2016 r.",
+ "Seaside summers, mountain winters": "Lato nad morzem, zima w górach",
+ "PM2.5 hour by hour, January 2026": "PM2,5 godzina po godzinie, styczeń 2026",
+ "2015, 2020 and 2025 runoffs": "Drugie tury z 2015, 2020 i 2025 r.",
+ "2015 to June 2026": "Od 2015 do czerwca 2026 r."
 }

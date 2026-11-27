@@ -190,7 +190,7 @@ export function install(app) {
   });
 
   app.ui.addMapToggle({
-    id: "migration", label: t("Migration"), icon: "l-commute", default: false,
+    id: "migration", label: t("Migration"), icon: "l-commute", default: false, menu: false,
     title: t("Moves between voivodeships, year by year"),
     get: () => on,
     set: (v) => {

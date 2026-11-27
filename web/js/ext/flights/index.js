@@ -326,7 +326,7 @@ export function install(app) {
   }
 
   app.ui.addMapToggle({
-    id: "flights", label: t("Flights"), icon: "t-airport", default: false,
+    id: "flights", label: t("Flights"), icon: "t-airport", default: false, menu: false,
     title: t("Air routes from Polish airports, month by month"),
     get: () => on,
     set: (v) => {

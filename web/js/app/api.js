@@ -373,23 +373,25 @@ export function createUi(app, { toast, onLayout }) {
 // --- map layer toggles -------------------------------------------------------------------------------------------
 
 /**
- * app.ui.addMapToggle({id, label, icon, get() → bool, set(on), title?, default?}) → remove function
+ * app.ui.addMapToggle({id, label, icon, get() → bool, set(on), title?, default?, menu?}) → remove function
  *   A switch for a map layer, listed in the "Map layers" menu next to the Resources toggle in the lens dock (one
  *   button that opens a small menu, so any number of layers fits on a phone). `icon` is an icons.js id or a short
  *   text / emoji. `set(on)` is yours: flip your layer's state (its visible()/sig() then change and the static map
  *   re-renders; main also calls app.requestDraw()). `default` is the state when the URL says nothing (defaults to
- *   get() at the time of adding).
+ *   get() at the time of adding). `menu: false` keeps the toggle and its `layers=` entry but leaves it out of the
+ *   Map menu and its count (the motion layers: the Animations panel in ext/motion lists them).
  *   The URL hash key `layers` lists the toggles that are on (`#layers=roads,rail,military`; `layers=none` = all
  *   off) and is written only while some toggle differs from its default; a toggle added after the page loaded is
  *   set from the current hash right away. Calling it again with the same id replaces the toggle.
  * app.ui.setMapToggle(id, on) → bool       switch one from code, as the menu would (false if no such toggle)
- * app.ui.mapToggles() → [{id, label, on}]   for debugging and tests
+ * app.ui.mapToggles() → [{id, label, icon, menu, on}]   every toggle, listed in the Map menu or not
+ *   main emits "maptoggle" after any toggle changes (menu, code or URL).
  *
  * opts: {dock (the #lens-dock element), after (element to insert the button after), area (#lens-area),
  *        hash: {register, update, value}, onChange()}
  */
 export function createMapToggles({ dock, after, area, hash, onChange }) {
-  const toggles = new Map(); // id → {id, label, icon, title, get, set, def}
+  const toggles = new Map(); // id → {id, label, icon, title, get, set, def, menu}
   let btn = null, pop = null, restoreFocus = null;
   // The ids the URL asked for (a Set), or null when the URL has no layers= key. Ids of toggles that are not
   // registered yet (an extension still loading) stay in the hash until their toggle arrives.
@@ -472,7 +474,7 @@ export function createMapToggles({ dock, after, area, hash, onChange }) {
 
   function render() {
     if (!btn) return;
-    const list = [...toggles.values()];
+    const list = [...toggles.values()].filter((tg) => tg.menu);
     btn.hidden = !list.length;
     const nOn = list.filter(isOn).length;
     btn.classList.toggle("active", nOn > 0);
@@ -503,9 +505,9 @@ export function createMapToggles({ dock, after, area, hash, onChange }) {
     return true;
   }
 
-  function add({ id, label, icon: ic = "", get, set, title = "", default: def } = {}) {
+  function add({ id, label, icon: ic = "", get, set, title = "", default: def, menu = true } = {}) {
     if (!id || typeof get !== "function" || typeof set !== "function") throw new Error("addMapToggle({id, label, icon, get, set})");
-    const t = { id: String(id), label: label || String(id), icon: ic, title, get, set, def: false };
+    const t = { id: String(id), label: label || String(id), icon: ic, title, get, set, def: false, menu: menu !== false };
     t.def = def === undefined ? isOn(t) : !!def;
     toggles.set(t.id, t);
     ensureDom();
@@ -537,7 +539,7 @@ export function createMapToggles({ dock, after, area, hash, onChange }) {
   return {
     add,
     set: setToggle,
-    list: () => [...toggles.values()].map((t) => ({ id: t.id, label: t.label, on: isOn(t) })),
+    list: () => [...toggles.values()].map((t) => ({ id: t.id, label: t.label, icon: t.icon, menu: t.menu, on: isOn(t) })),
     close,
     get isOpen() { return !!pop && !pop.hidden; },
     refresh: render,

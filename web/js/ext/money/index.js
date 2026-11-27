@@ -243,7 +243,7 @@ export function install(app) {
   }
 
   app.ui.addMapToggle({
-    id: "money", label: t("Money for local governments"), icon: "y-gold", default: false,
+    id: "money", label: t("Money for local governments"), icon: "y-gold", default: false, menu: false,
     title: t("State money for every gmina, powiat and voivodeship"),
     get: () => on,
     set: (v) => {

@@ -959,7 +959,7 @@ one overlay (z 92, under the city banners).
 
 ```js
 app.motion.register({
-  id: "trains",                 // also the Map-menu toggle id (the layer registers its own toggle with app.ui.addMapToggle)
+  id: "trains",                 // also the toggle id (the layer registers its own toggle with app.ui.addMapToggle, menu: false)
   name: t("Trains"),            // optional: the name the Almanac shows (the toggle label)
   data: "trains",               // optional: the web/data file whose rules, sources, vintage and attribution the Almanac shows
   axis: "day",                  // "day" | "hour" | "month" | "year" | "live": what the clock counts for this layer
@@ -970,6 +970,8 @@ app.motion.register({
   speed: 1440,                  // axis units per real second at 1x (day: 1440 = 24 h in 60 s)
   start: 23400,                 // optional: the clock value when the layer first takes the clock (default range[0])
   loop: true,                   // optional: wrap at the end (default true on "day"); else play stops on the last value
+  background() { return true; },// optional: while true, the layer takes the clock only when no other motion layer is on
+                                // (trains while on only by default, so a lens link keeps its own clock)
   z: 10,                        // optional: draw order among motion layers
   label(t) { return "08:15"; },             // the clock text, localized
   status(t) { return "8,492 permits"; },    // optional: a running count beside the scrubber, localized
@@ -1009,6 +1011,15 @@ app.motion.layers() -> [{id, name, data, axis, on, loaded, t}];  app.motion.stat
   in screen pixels and the path is culled by its bounding box.
 * **Budget.** At most about 3,000 moving dots and 60 fps on a mid-range phone (390x844, 4x CPU throttling in headless
   Chromium). Use level of detail by zoom (fewer cars per train, fewer routes at the country view) and cull to `vp`.
+* **Animations panel.** An "Animations" button in the lens dock, right after the Map button, with the count of animations
+  that are on (motion layers plus a time-lapse lens shown). Its panel (`ext/motion/panel.js`) lists the eight motion
+  layers under "On the map" (switches through `app.ui.setMapToggle`, so `layers=` keeps them) and the four time-lapse
+  lenses under "Over time" (a pick shows the lens with `app.setLens`; a second pick clears it). Each row has the
+  layer's icon, its name and one hint line. Esc closes it and returns the focus to the button.
+* **Trains by default.** `trains` is the one motion layer on by default (`default: true`). Without `layers=` in the URL
+  it starts on, loads `trains.json` once the map has drawn its first frame and the browser is idle, and opens the day
+  clock at the current time in Poland (Europe/Warsaw); a `#t=` link still wins, and with reduced motion the still
+  frame shows that time. Switched off, it is recorded as a `layers=` list without `trains`.
 * **Hover.** A static layer `motion-hit` (z 86, draws nothing) asks the active motion layers' `hit()`, newest first.
 * **Layers now.** `commuters` (day; `ext/commuting/motion.js`), `trade` (day; `ext/layers/tradeMotion.js`), `permits`
   (month, 2016-01 to the newest month; `ext/permits`), `trains` (day, one Wednesday; `ext/trains`, static layer
@@ -1133,12 +1144,13 @@ city banners: the first non-null `hit()` wins and its `tooltip(item)` is shown (
 first (true consumes it), then the `"mapclick"` handlers, then the default (select city/state). While a mode is active
 (City View, advisors) the `"mapclick"` handlers go first and the layer's `click` only after them.
 
-**Map toggles.** `app.ui.addMapToggle({id, label, icon, get() → bool, set(on), title?, default?}) → remove()`: a switch
+**Map toggles.** `app.ui.addMapToggle({id, label, icon, get() → bool, set(on), title?, default?, menu?}) → remove()`: a switch
 in the "Map" menu next to the Resources toggle in the lens dock (one button + a small menu, so it fits phones). `set` is
 yours (flip the state your layer's `visible()` reads); main redraws. The hash key `layers` lists the switches that are on
 (`#layers=roads,rail,military`, `layers=none`) and is written only while some switch differs from its default; switches
-added after load are set from it, and ids whose extension has not loaded yet stay in the URL. `app.ui.mapToggles()` →
-`[{id, label, on}]`. `app.ui.setMapToggle(id, on) → bool` switches one from code exactly as the menu would (redraw,
+added after load are set from it, and ids whose extension has not loaded yet stay in the URL. `menu: false` keeps the
+switch and its `layers=` entry but leaves it out of the Map menu and its count (the motion layers: the Animations panel
+lists them). Main emits `"maptoggle"` after any switch changes. `app.ui.mapToggles()` → `[{id, label, icon, menu, on}]`. `app.ui.setMapToggle(id, on) → bool` switches one from code exactly as the menu would (redraw,
 hash), e.g. an advisor's "show roads, rail and forts" button; false if no toggle has that id (yet).
 
 **URL.** Core keys: `lens`, `city` (the town's TERYT 7-digit code, cities.json `id`), `state`, `at`, plus extension

@@ -230,7 +230,7 @@ export function install(app) {
   });
 
   app.ui.addMapToggle({
-    id: "permits", label: t("New factories and warehouses"), icon: "d-industrial-zone", default: false,
+    id: "permits", label: t("New factories and warehouses"), icon: "d-industrial-zone", default: false, menu: false,
     title: t("Building permits for new factories and warehouses, month by month"),
     get: () => on,
     set: (v) => {

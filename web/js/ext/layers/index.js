@@ -18,7 +18,7 @@ const TOGGLES = [
   { id: "hubs", label: t("Ports & airports"), icon: "d-harbor", def: true, title: t("Polish seaports and passenger airports"), layers: ["hubs"] },
   { id: "military", label: t("Military"), icon: "m-army", def: true, title: t("Garrisons and main training areas"), layers: ["forts", "restricted", "plates"] },
   { id: "wonders", label: t("Heritage"), icon: "w-landmark", def: true, title: t("World Heritage, memorials, parks, universities and landmarks"), layers: ["wonders", "protected", "plates"] },
-  { id: "trade", label: t("Trade routes"), icon: "t-trade", def: false, title: t("The 30 largest regional freight flows at least 100 km apart"), layers: ["trade"] },
+  { id: "trade", label: t("Trade routes"), icon: "t-trade", def: false, menu: false, title: t("The 30 largest regional freight flows at least 100 km apart"), layers: ["trade"] },
 ];
 
 export function install(app) {
@@ -29,7 +29,7 @@ export function install(app) {
 
   for (const tg of TOGGLES) {
     app.ui.addMapToggle({
-      id: tg.id, label: tg.label, icon: tg.icon, title: tg.title, default: tg.def,
+      id: tg.id, label: tg.label, icon: tg.icon, title: tg.title, default: tg.def, menu: tg.menu,
       get: () => on[tg.id],
       set: (v) => {
         on[tg.id] = !!v;

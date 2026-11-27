@@ -865,7 +865,7 @@ async function main() {
   const mapToggles = createMapToggles({
     dock: document.getElementById("lens-dock"), after: resBtn, area: document.getElementById("lens-area"),
     hash: { register: url.register, update: url.schedule, value: url.value },
-    onChange: () => requestDraw(),
+    onChange: () => { requestDraw(); events.emit("maptoggle"); },
   });
   ui.addMapToggle = mapToggles.add;
   ui.mapToggles = mapToggles.list;

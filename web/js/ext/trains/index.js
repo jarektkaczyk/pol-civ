@@ -3,6 +3,9 @@
 // number, name, route and next stop; hover a station for its next departures; click a station (or select a town) to
 // see only the trains through it. Night trains that left the evening before run in the early morning.
 //
+// On by default: a visit without layers= in the URL starts with the trains on, the clock at the current time in
+// Poland (a #t= link still wins), and trains.json loads only once the map has drawn its first frame.
+//
 // Position: a trip has its stops' times and their distances along the trip's line (trains.json patterns), so a
 // train between two stops sits at the linear share of the distance; it waits at a stop between arrival and departure.
 import { esc } from "../../format.js";
@@ -11,7 +14,7 @@ import { showHtmlTooltip } from "../../ui/tooltip.js";
 
 const DAY = 86400;
 const BUCKET = 900; // s: trips are indexed by the 15-minute buckets they are on the move in
-const START = 7 * 3600; // the clock opens at 07:00, in the morning rush
+const START = 7 * 3600; // the clock opens at 07:00, in the morning rush (when switched on by hand)
 // Operator colours: long distance warm and large, regional operators each their own hue.
 const COLORS = {
   IC: "#e8392f", LEO: "#ffd23f", RJ: "#ffd23f", PR: "#ff8c1a", KM: "#3fcf5a", KS: "#2f9bff", KD: "#a970ff",
@@ -51,6 +54,32 @@ function sprite(color, px, long, dpr) {
   if (sprites.size > 300) sprites.clear();
   sprites.set(key, c);
   return c;
+}
+
+/** Seconds since midnight now in Poland (Europe/Warsaw, DST included). */
+export function warsawSeconds(date = new Date()) {
+  try {
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Warsaw", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
+    }).formatToParts(date);
+    const g = (k) => +(parts.find((p) => p.type === k)?.value || 0);
+    return (g("hour") % 24) * 3600 + g("minute") * 60 + g("second");
+  } catch {
+    return START;
+  }
+}
+
+/** Resolves once the map has drawn a frame and the browser is idle (or after a short timeout in a background tab). */
+function afterFirstFrame() {
+  return new Promise((done) => {
+    let fired = false;
+    const go = () => { if (!fired) { fired = true; done(); } };
+    requestAnimationFrame(() => {
+      if (typeof requestIdleCallback === "function") requestIdleCallback(go, { timeout: 800 });
+      else setTimeout(go, 100);
+    });
+    setTimeout(go, 1500); // rAF never fires in a background tab
+  });
 }
 
 /** Decode a trip's times: [dep0, run1, dwell1, ...] -> arrival and departure per stop (trains.json). */
@@ -144,7 +173,11 @@ function activeAt(m, t) {
 export function install(app) {
   const motion = app.motion;
   if (!motion) return;
-  let on = false;
+  // On by default unless the URL lists the layers (then it is on only when listed). `byDefault` stays true until the
+  // user switches it: the clock then opens at the current time in Poland and gives way to any other motion layer.
+  const listed = app.hash?.value?.("layers");
+  let on = listed == null ? true : String(listed).split(",").map((s) => s.trim()).includes("trains");
+  let byDefault = listed == null;
   let model = null;
   let loading = null;
   let focus = null; // {stations: Set, key} | null: only the trains through these stations
@@ -156,7 +189,7 @@ export function install(app) {
 
   const ensure = () => {
     if (model) return Promise.resolve(model);
-    loading ??= app.loadData("trains").then((d) => {
+    loading ??= (byDefault ? afterFirstFrame() : Promise.resolve()).then(() => app.loadData("trains")).then((d) => {
       if (!d || !Array.isArray(d.trips)) return null;
       model = prepare(d);
       version++;
@@ -207,7 +240,9 @@ export function install(app) {
     range: [0, DAY],
     step: 60,
     speed: 1440,
-    start: START,
+    // On arrival: the current time in Poland, except between midnight and 05:00, when few trains run.
+    get start() { if (!byDefault) return START; const now = warsawSeconds(); return now < 5 * 3600 ? START : now; },
+    background: () => byDefault,
     z: 30,
     label: (tc) => motion.hhmm(tc),
     status: (tc) => {
@@ -253,6 +288,7 @@ export function install(app) {
         if (!p) continue;
         pointAt(tr.pat.shape, p.d, tmp);
         if (tmp[0] < vp.x0 - pad || tmp[0] > vp.x1 + pad || tmp[1] < vp.y0 - pad || tmp[1] > vp.y1 + pad) continue;
+        if (app.w.grid.cellAt(tmp[0], tmp[1]) < 0) continue; // beyond the drawn map (cross-border runs)
         const dim = !passes(tr);
         if (!dim && tr.long) { late.push([tr, p, tmp[0], tmp[1]]); continue; } // long distance on top
         put(tr, p, dim);
@@ -378,11 +414,12 @@ export function install(app) {
   });
 
   app.ui.addMapToggle({
-    id: "trains", label: t("Trains"), icon: "t-rail", default: false,
+    id: "trains", label: t("Trains"), icon: "t-rail", default: true, menu: false,
     title: t("Every passenger train of one weekday, on the move"),
     get: () => on,
     set: (v) => {
       on = !!v;
+      byDefault = false;
       if (on) ensure();
       else { stationFocus = null; refocus(); }
       app.requestDraw();

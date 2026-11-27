@@ -408,7 +408,7 @@ export function install(app) {
   });
 
   app.ui.addMapToggle({
-    id: "power", label: t("Power now"), icon: "r-wind", default: false,
+    id: "power", label: t("Power now"), icon: "r-wind", default: false, menu: false,
     title: t("Electricity generation and cross-border flows, every 15 minutes"),
     get: () => on,
     set: (v) => {

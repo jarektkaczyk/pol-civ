@@ -4,7 +4,8 @@
 // as an error and does not stop the others. Modules are fetched in parallel and installed in list order.
 // layers/: static map layers (roads, rail, ports, forts, wonders, trade routes) and their toggles.
 // economy/: the "Made in Poland" and "Tech and games" site layers and their toggles.
-// motion/: the shared clock for animated layers (app.motion); it installs first so the others can register on it.
+// motion/: the shared clock for animated layers (app.motion) and the Animations panel in the lens dock; it installs
+// first so the others can register on it.
 // timeline/, timelapse/: the population years, tourist nights by month, the smog week and the presidential vote
 // over time (lenses that play on the motion clock).
 // permits/: the time-lapse of permits for new factories and warehouses (a motion layer).
