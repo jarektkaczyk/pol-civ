@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/lublin/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/lublin/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Lublin has 188 university students per 1,000 residents, the 3rd highest share of the 84 towns of 20,000+ with a university.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/belchatow/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/belchatow/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Bełchatów has the 5th most polluted air of the 154 towns of 20,000+ with a measuring station within 25 km: PM2.5 averaged 21.6 µg/m³ in 2025 at the nearest station.
 

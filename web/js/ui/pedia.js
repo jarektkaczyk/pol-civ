@@ -126,7 +126,7 @@ export function initPedia(data) {
           ].filter(Boolean);
           return `
           <div class="lens-entry"><div class="le-ic">${glyph(l, 26)}</div><div>
-          <h4>${esc(t(l.name))}</h4><p>${esc(t(l.description))}<br>
+          <h4>${esc(t(l.name))}</h4><p>${esc(t(l.description))}${l.scale_note ? ` ${esc(t(l.scale_note))}` : ""}<br>
           <i class="le-ramp" style="background:linear-gradient(90deg, ${(l.ramp || []).map(esc).join(",")})"></i>
           <span class="muted">${meta.map(esc).join(" · ")}</span></p></div></div>`;
         }).join("")}`;
@@ -149,9 +149,44 @@ export function initPedia(data) {
           <td>${esc(x.description ? t(x.description) : "")}<br><span class="muted">${esc(t("Source: {source}", { source: srcName(x.source) }))}</span></td>
           <td class="num">${esc(int(count.get(x.id) || 0))}</td></tr>`).join("")}</table>`).join("")}`;
     },
+    // Every registered motion layer (app.motion), with the rules, sources and attribution of its data file.
+    "Moving layers": () => {
+      const app = data.app;
+      const list = app?.motion?.layers?.() || [];
+      if (!list.length) return `${h2("layers", "▤", t("Moving layers"))}<p class="muted">${esc(t("This data build has no moving layers."))}</p>`;
+      const stamp = (iso) => (iso ? `${date(String(iso).slice(0, 10))} ${String(iso).slice(11, 16)} UTC` : "");
+      const waiting = [];
+      const entries = list.map((l) => {
+        const d = l.data ? app.data?.[l.data] : null;
+        if (l.data && d === undefined) waiting.push(l.data);
+        const rules = Array.isArray(d?.rules) ? d.rules : d?.rules && typeof d.rules === "object" ? Object.values(d.rules) : d?.rule ? [d.rule] : [];
+        const srcs = (d?.sources || []).map(srcName).filter(Boolean);
+        const vintage = typeof d?.vintage === "string" ? t(d.vintage) : "";
+        const a = d?.attribution && !Array.isArray(d.attribution) ? d.attribution : null;
+        return `<h4>${esc(l.name || l.id)}</h4>
+          ${rules.length ? `<ul>${rules.map((r) => `<li>${esc(t(r))}</li>`).join("")}</ul>` : d === undefined ? `<p class="muted">${esc(t("Loading..."))}</p>` : ""}
+          ${a ? `<p>${a.created
+            ? `${esc(t("Source: {source}", { source: (a.credit || []).join("; ") }))}<br>
+            ${esc(t("Data created {created}; retrieved {retrieved}.", { created: stamp(a.created), retrieved: stamp(a.retrieved) }))}`
+            : esc(a.retrieved ? t("Source: {source}, retrieved {retrieved}", { source: (a.credit || []).join("; "), retrieved: date(String(a.retrieved).slice(0, 10)) })
+              : t("Source: {source}", { source: (a.credit || []).join("; ") }))}
+            ${a.processed ? `<br>${esc(t(a.processed))}` : ""}${a.disclaimer ? `<br>${esc(t(a.disclaimer))}` : ""}
+            ${a.original?.url ? `<br>${t("Original data: {link} ({size}, SHA-256 {hash})", { link: `<a href="${esc(a.original.url)}" rel="noopener">${esc(a.original.url.replace(/^https?:\/\//, ""))}</a>`, size: `${num((a.original.bytes || 0) / 1e6, 1)} MB`, hash: `<code style="word-break:break-all">${esc(String(a.original.sha256 || ""))}</code>` })}` : ""}</p>` : ""}
+          ${srcs.length || vintage ? `<p class="muted">${esc([srcs.join(", "), vintage].filter(Boolean).join(" · "))}</p>` : ""}`;
+      });
+      // Data files not loaded yet: load them, then redraw this page if it is still open.
+      if (waiting.length) {
+        Promise.all(waiting.map((n) => app.loadData(n))).then(() => {
+          if (!modal.hidden && current === "Moving layers") show("Moving layers");
+        });
+      }
+      return `${h2("layers", "▤", t("Moving layers"))}
+      <p>${esc(t("These layers play on one clock. Press play under the map, drag the slider or change the speed."))}</p>
+      ${entries.join("")}`;
+    },
     Sources: () => `
       ${h2("pedia", "📖", t("Sources"))}
-      ${data.sources.map((s) => `
+      ${data.sources == null ? `<p class="muted">${esc(t("Loading..."))}</p>` : ""}${(data.sources || []).map((s) => `
         <h4>${esc(t(s.title))}</h4>
         <p>${esc(t(s.description))}<br>
         <span class="muted">${esc(t(s.publisher))} · ${esc(t(s.license))}${s.vintage ? " · " + esc(t(s.vintage)) : ""} ·
@@ -161,11 +196,13 @@ export function initPedia(data) {
   // Page ids stay English (other modules open pages by id); the nav shows the translated title.
   const TITLE = {
     "About this map": t("About this map"), Yields: t("Yields"), Voivodeships: t("Voivodeships"), Terrain: t("Terrain"),
-    Lenses: t("Lenses"), Resources: t("Resources"), Sources: t("Sources"),
+    Lenses: t("Lenses"), Resources: t("Resources"), "Moving layers": t("Moving layers"), Sources: t("Sources"),
   };
 
+  let current = null;
   const show = (name) => {
     if (!pages[name]) name = "About this map";
+    current = name;
     body.innerHTML = pages[name]();
     body.scrollTop = 0;
     nav.querySelectorAll("button").forEach((b) => {
@@ -201,6 +238,16 @@ export function initPedia(data) {
   return {
     open(page = "About this map") {
       if (modal.hidden) restoreFocus = document.activeElement;
+      // The source list loads with the Almanac, not with the map.
+      if (data.sources == null && data.app?.loadData) {
+        data.app.loadData("sources").then((d) => {
+          data.sources = Array.isArray(d) ? d : [];
+          if (!modal.hidden && current) show(current);
+        }, () => {
+          data.sources = [];
+          if (!modal.hidden && current) show(current);
+        });
+      }
       show(page);
       modal.hidden = false;
       (nav.querySelector("button.active") || card.querySelector("[data-close]"))?.focus();

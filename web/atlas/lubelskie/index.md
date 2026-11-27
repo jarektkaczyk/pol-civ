@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/lubelskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/lubelskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Lubelskie has the lowest average gross wage of the 16 voivodeships: 7,982 zł a month in May 2026.
 

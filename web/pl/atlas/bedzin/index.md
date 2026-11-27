@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/bedzin/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/bedzin/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Będzin liczy 52 240 mieszkańców (stan na 30 czerwca 2026 r.). W latach 2015-2025 liczba ludności spadła o 9,4%.
 

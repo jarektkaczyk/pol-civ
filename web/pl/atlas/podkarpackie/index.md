@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/podkarpackie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/podkarpackie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Planowane na 2026 r. dochody gmin z PIT w województwie podkarpackim wynoszą 3368 zł na mieszkańca. To najniższy wynik wśród województw.
 

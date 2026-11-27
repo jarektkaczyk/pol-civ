@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/zamosc/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/zamosc/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Zamość liczy 56 521 mieszkańców (stan na 30 czerwca 2026 r.). W latach 2015-2025 liczba ludności spadła o 12,3%.
 

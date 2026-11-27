@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/sopot/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/sopot/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W latach 2015-2025 liczba mieszkańców miasta spadła o 16,2%. Pod względem tempa spadku Sopot zajmuje pierwsze miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

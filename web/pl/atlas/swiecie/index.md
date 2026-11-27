@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/swiecie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/swiecie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Świecie liczy 24 385 mieszkańców (stan na 30 czerwca 2026 r.).
 

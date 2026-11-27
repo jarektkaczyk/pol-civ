@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/zielona-gora/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/zielona-gora/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W 2025 r. średnie roczne stężenie pyłu PM2,5 na najbliższej stacji wyniosło 11,8 µg/m³. To dziewiąte miejsce od końca wśród 154 miast liczących co najmniej 20 tys. mieszkańców ze stacją pomiarową w promieniu 25 km.
 

@@ -75,13 +75,21 @@ const saveRecent = (ids) => {
   try { localStorage.setItem(RECENT_KEY, JSON.stringify(ids)); } catch { /* private mode: fine */ }
 };
 
+// The legend shows what the colours mean; the publisher credit at the end of a description ("... (GUS).") stays
+// in the Almanac, which lists every source.
+const SRC = "GUS|PKW|GIOŚ|GIOS|CKE|Eurostat|GUNB|ISKK|URE|PSE|UPRP|UKE|NFZ|REGON|NSP 2021|CShapes|OSM|Wikidata|Ministry of Finance|Ministerstw[oa] Finansów|Statistics Poland|Główny Urząd Statystyczny";
+// A parenthesis that starts with a publisher ("(GUS)", "(GUS, 30 June 2026)", "(REGON, GUS)") is a credit.
+const CREDIT = new RegExp(`\\s*\\((?:${SRC})\\b[^()]*\\)`, "g");
+const CREDIT_TAIL = new RegExp(`\\s*\\((?:[^()]*\\b(?:${SRC})\\b[^()]*)\\)(\\.?)\\s*$`);
+const legendText = (l) => t(l.description || l.unit || "").replace(CREDIT_TAIL, "$1").replace(CREDIT, "")
+  .replace(/\.\.(?=\s|$)/g, ".").replace(/\s+([.,;])/g, "$1"); // "2026 r. (GUS). Dane" -> "2026 r. Dane"
+
 /**
  * opts: {lenses (lenses.json), sources (sources.json list), w (prepared world), onPick(lens|null), onBand(band|null)}
  */
 export function initLensDock(opts) {
   const { lenses: lensFile, w } = opts;
   const lenses = lensFile?.lenses || [];
-  const sources = opts.sources || [];
   const byId = new Map(lenses.map((l) => [l.id, l]));
   const quick = document.getElementById("lens-quick");
   const moreBtn = document.getElementById("btn-lenses");
@@ -121,7 +129,7 @@ export function initLensDock(opts) {
     const known = new Set(groups.map((g) => g.id));
     if (lenses.some((l) => !known.has(l.group))) groups.push({ id: "__other", name: t("Other") });
     const tile = (l) => `<button class="lp-tile ${isActive(l) ? "active" : ""}" data-id="${esc(l.id ?? "")}" aria-pressed="${isActive(l)}"
-        title="${esc(t(l.description || l.name))}">
+        title="${esc(l.description ? legendText(l) : t(l.name))}">
         <span class="lp-ic">${glyph(l, 20)}</span><span class="lp-nm">${esc(dockName(l))}</span>
         ${l.ramp ? `<i class="lp-ramp" style="background:linear-gradient(90deg, ${rampStops(l)})"></i>` : `<i class="lp-ramp terrain"></i>`}
       </button>`;
@@ -206,12 +214,6 @@ export function initLensDock(opts) {
     return h;
   }
 
-  function sourceLine(lens) {
-    const src = sources.find((s) => s.id === lens.source);
-    const name = src ? t(src.publisher && src.title.length > 44 ? src.publisher : src.title) : lens.source;
-    const vintage = t(src?.vintage || lensFile?.vintage || "");
-    return [name, vintage].filter(Boolean).map(esc).join(" · ");
-  }
 
   // Categorical lenses (format "category"): values are indices into lens.categories, whose colours are the ramp
   // stops (domain [0, n-1], linear), so world.js colours them exactly. The legend is a row of swatches; clicking
@@ -248,10 +250,9 @@ export function initLensDock(opts) {
       <div class="lg-head"><span class="lg-ic">${glyph(l, 18)}</span><span class="title">${esc(t(l.name))}</span>
         <button class="icon-btn lg-more" aria-expanded="${legendExpanded}" aria-label="${esc(t("Show the full legend"))}" title="${esc(t("Details"))}">${legendExpanded ? "−" : "+"}</button>
         <button class="icon-btn lg-close" aria-label="${esc(t("Turn the lens off (back to terrain)"))}" title="${esc(t("Back to terrain"))}">${icon("close", "✕", { size: 11 })}</button></div>
-      <div class="desc">${esc(t(l.description || l.unit || ""))}</div>
+      <div class="desc">${esc(legendText(l))}</div>
       ${noteHtml(l)}
       <div class="lg-cats" role="group" aria-label="${esc(t("{name} categories: click one to show only it", { name: t(l.name) }))}">${sw}</div>
-      <div class="lg-meta"><span class="src">${sourceLine(l)}</span></div>
       <div class="lg-hint" aria-live="polite">${esc(t("Click a category to show only it"))}</div>`;
     legend.querySelector(".lg-close").onclick = () => opts.onPick(null);
     legend.classList.toggle("expanded", legendExpanded);
@@ -303,7 +304,7 @@ export function initLensDock(opts) {
       <div class="lg-head"><span class="lg-ic">${glyph(l, 18)}</span><span class="title">${esc(t(l.name))}</span>
         <button class="icon-btn lg-more" aria-expanded="${legendExpanded}" aria-label="${esc(t("Show the full legend"))}" title="${esc(t("Details"))}">${legendExpanded ? "−" : "+"}</button>
         <button class="icon-btn lg-close" aria-label="${esc(t("Turn the lens off (back to terrain)"))}" title="${esc(t("Back to terrain"))}">${icon("close", "✕", { size: 11 })}</button></div>
-      <div class="desc">${esc(t(l.description || l.unit || ""))}</div>
+      <div class="desc">${esc(legendText(l))}</div>
       ${noteHtml(l)}
       <div class="lg-scale" role="slider" tabindex="0" aria-label="${esc(t("Highlight a range of {name} values. Hover or drag; arrow keys move the highlight, Escape clears it.", { name: t(l.name) }))}"
         aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
@@ -312,7 +313,7 @@ export function initLensDock(opts) {
       </div>
       <div class="ticks">${ticks}</div>
       ${l.unit ? `<div class="lg-unit">${esc(t(l.unit))}</div>` : ""}
-      <div class="lg-meta">${hib}<span class="src">${l.unit ? esc(t(l.unit)) + " · " : ""}${sourceLine(l)}</span></div>
+      <div class="lg-meta">${hib}<span class="src">${l.unit ? esc(t(l.unit)) : ""}</span></div>
       <div class="lg-hint" aria-live="polite">${esc(t("Hover or drag the scale to show only that range"))}</div>`;
     legend.querySelector(".lg-close").onclick = () => opts.onPick(null);
     legend.classList.toggle("expanded", legendExpanded);

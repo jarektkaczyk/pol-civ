@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/czerwionka-leszczyny/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/czerwionka-leszczyny/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Czerwionka-Leszczyny had 25,874 residents on 30 June 2026.
 

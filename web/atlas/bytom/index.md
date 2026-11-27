@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/bytom/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/bytom/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Bytom lost 15.3% of its residents between 2015 and 2025, the 3rd steepest fall of the 203 Polish towns with 20,000 or more people.
 

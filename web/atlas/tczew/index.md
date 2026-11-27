@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/tczew/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/tczew/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Tczew had 55,678 residents on 30 June 2026. Between 2015 and 2025 it lost 6.9% of its residents.
 

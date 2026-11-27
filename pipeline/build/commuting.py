@@ -24,6 +24,9 @@ RULE = (f"The {N_CITIES} most populous cities (30 June 2026). Into each: the flo
         f"gminas of {MIN_FLOW} people or more, the largest {MAX_ARCS}. NSP 2021 census, 31 March 2021 (GUS); "
         "flows of fewer than 3 people are not published.")
 
+MOTION_RULE = ("On the moving map, dots travel into each city in the morning and home in the afternoon, more of them on "
+               "the larger flows. The census counts commuters but not when they travel, so the hours are for show only.")
+
 
 def gmina_centres(world: dict, grid: HexGrid) -> dict[str, tuple[float, float]]:
     acc: dict[int, list] = {}
@@ -73,6 +76,7 @@ def build() -> None:
         "vintage": payload.get("vintage"),
         "sources": ["pl_flows_commuting"],
         "rule": RULE,
+        "rules": [RULE, MOTION_RULE],
         "cities": out,
     })
     print(f"    {len(out)} cities, {sum(len(c['arcs']) for c in out)} arcs")

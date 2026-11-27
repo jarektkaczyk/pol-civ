@@ -1,17 +1,20 @@
-// Time slider for the population lenses (density and change since 2015): a row in the lens legend with a play button
-// and a year slider, 2015 to 2025 (31 December) and June 2026. The URL keeps the year (#year=2019).
+// Population years for the density and change lenses: 2015 to 2025 (31 December) and June 2026, on the shared
+// motion clock (app.motion, year axis). Picking either lens plays the years from the first to June 2026 in the clock
+// bar (play, pause, speed, scrubber); there is no second control row in the legend. The URL keeps the clock value
+// (#t=2019); an old link with #year=2019 still opens that year.
 //
 // Data: timeline.json (pipeline/build/timeline.py), loaded when a population lens is first opened. It holds per-date
-// integer arrays for the Polish land cells; they are decoded once into full per-cell arrays, so moving the slider only
+// integer arrays for the Polish land cells; they are decoded once into full per-cell arrays, so a new year only
 // swaps the lens's `values` for a ready array (no allocation per step) and asks main to recolour the map.
-import { lensScale } from "../../world.js";
-import { rampColor, parseHex } from "../../color.js";
+//
+// Without the motion engine (it failed to load) the legend keeps its own row: a play button and a year slider.
 import { t, date } from "../../i18n.js";
+import { drawLegendHist } from "../timelapse/legend.js";
 
 const LENSES = new Set(["density", "growth"]);
 const FIRST = { density: 0, growth: 1 }; // change since 2015 starts with 2016
 const STEP_MS = 750;
-const BINS = 40; // as the legend histogram in ui/lenses.js
+const SPEED = 1; // years per second on the clock at 1x
 
 const CSS = `
 .tl-row { display: flex; align-items: center; gap: 8px; margin: 6px 0 2px; }
@@ -48,7 +51,8 @@ function decode(doc, size) {
 }
 
 export function install(app) {
-  addCss();
+  const motion = app.motion || null;
+  if (!motion) addCss();
   const legend = document.getElementById("legend");
   const size = app.w.grid.size;
   let doc = null, arrays = null, loading = null;
@@ -56,12 +60,22 @@ export function install(app) {
   const original = new Map(); // lens id -> its own values (the newest year)
   let idx = null; // date index shown, or null = the lens's own date
   let pendingYear = null; // year from the URL before the data arrived
+  let wantYear = null; // clock year to seek to once the population layer has the clock
   let timer = 0;
   let row = null;
 
   const ownIndex = (l) => (doc ? doc.dates.indexOf(doc.lens_dates?.[l.id]) : -1);
   const shownIndex = () => (idx == null && lens ? ownIndex(lens) : idx);
   const yearKey = (k) => doc.dates[k].slice(0, 4);
+  // The clock's year axis: 2015 ... 2025 are those 31 Decembers, 2026 is 30 June 2026 (the last date).
+  const yearOf = (k) => +doc.dates[k].slice(0, 4);
+  const firstYear = () => (doc && lens ? yearOf(FIRST[lens.id] ?? 0) : 2015);
+  const lastYear = () => (doc ? yearOf(doc.dates.length - 1) : 2026);
+  const indexOfYear = (y) => {
+    if (!doc) return -1;
+    const k = doc.dates.findIndex((d) => +d.slice(0, 4) === Math.floor(y));
+    return k < 0 ? -1 : Math.max(FIRST[lens?.id] ?? 0, k);
+  };
 
   function ensure() {
     if (doc || loading) return loading;
@@ -83,7 +97,7 @@ export function install(app) {
     lens.values = idx == null || idx === own ? original.get(lens.id) : arrays[lens.id][idx];
     app.setBand(app.state.band);
     app.invalidate();
-    drawHist();
+    drawLegendHist(app, lens);
     update();
   }
 
@@ -94,56 +108,63 @@ export function install(app) {
   function setYear(y, { fromUrl = false } = {}) {
     if (!doc) { pendingYear = y; return; }
     pendingYear = null;
+    if (motion) {
+      // The clock owns the year: a URL year becomes a seek once the population layer has the clock.
+      if (y != null) wantYear = Math.min(lastYear(), Math.max(firstYear(), +y));
+      app.requestDraw();
+      return;
+    }
     if (y == null) { idx = null; apply(); return; }
     const first = FIRST[lens?.id] ?? 0;
-    let k = doc.dates.findIndex((d) => d.slice(0, 4) === String(y));
+    const k = doc.dates.findIndex((d) => d.slice(0, 4) === String(y));
     if (k < 0) return;
     idx = Math.max(first, k);
     apply();
     if (!fromUrl) app.hash.update();
   }
 
-  // The legend histogram is cached per lens by ui/lenses.js; redraw it for the year shown.
-  function drawHist() {
-    const cv = legend?.querySelector(".lg-hist");
-    if (!cv || !lens?.ramp) return;
-    const dpr = window.devicePixelRatio || 1;
-    const cssW = cv.clientWidth || 256, cssH = cv.clientHeight || 38;
-    if (cv.width !== Math.round(cssW * dpr)) cv.width = Math.round(cssW * dpr);
-    if (cv.height !== Math.round(cssH * dpr)) cv.height = Math.round(cssH * dpr);
-    const ctx = cv.getContext("2d");
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, cssW, cssH);
-    const counts = new Array(BINS).fill(0);
-    const scale = lensScale(lens);
-    const owner = app.w.raw.owner;
-    for (let i = 0; i < lens.values.length; i++) {
-      const v = lens.values[i];
-      if (v == null || owner[i] < 0) continue;
-      const tv = scale(v);
-      if (!Number.isFinite(tv)) continue;
-      counts[Math.max(0, Math.min(BINS - 1, Math.floor(tv * BINS)))]++;
-    }
-    const max = Math.max(1, ...counts);
-    const stops = lens.ramp.map(parseHex);
-    const bw = cssW / BINS;
-    for (let b = 0; b < BINS; b++) {
-      if (!counts[b]) continue;
-      const hh = Math.max(1.5, Math.sqrt(counts[b] / max) * (cssH - 2));
-      const [r, g, bl] = rampColor(stops, (b + 0.5) / BINS);
-      ctx.fillStyle = `rgb(${r | 0},${g | 0},${bl | 0})`;
-      ctx.fillRect(b * bw + 0.5, cssH - hh, Math.max(1, bw - 1), hh);
-    }
-    ctx.fillStyle = "rgba(201,164,92,.45)";
-    ctx.fillRect(0, cssH - 1, cssW, 1);
+  // --- the motion clock ----------------------------------------------------------------------------------------
+  if (motion) {
+    motion.register({
+      id: "population",
+      name: t("Population over time"),
+      data: "timeline",
+      axis: "year",
+      get range() { return [firstYear(), lastYear()]; },
+      get start() { return motion.reducedMotion ? lastYear() : firstYear(); },
+      step: 1,
+      speed: SPEED,
+      loop: false,
+      label: (y) => {
+        const k = indexOfYear(y);
+        return k < 0 ? String(Math.floor(y)) : date(doc.labels[k]); // "2019", or "2026-06" -> June 2026
+      },
+      active: () => !!lens,
+      load: () => ensure(),
+      draw(ctx, vp, y) {
+        if (wantYear != null && motion.clock.layer === "population") {
+          const w = wantYear;
+          wantYear = null;
+          motion.clock.seek(w);
+          return 0;
+        }
+        const k = indexOfYear(y);
+        if (k < 0 || k === shownIndex()) return 0;
+        idx = k;
+        apply();
+        return 0;
+      },
+    });
   }
 
+  // --- the legend row (only without the motion engine) ---------------------------------------------------------
   function stop() {
     clearTimeout(timer);
     timer = 0;
     update();
   }
   function play() {
+    if (motion) { motion.clock.play(); return; }
     if (!doc || !lens) return;
     const first = FIRST[lens.id] ?? 0, last = doc.dates.length - 1;
     if (shownIndex() >= last) { idx = first; apply(); }
@@ -170,7 +191,7 @@ export function install(app) {
 
   function render() {
     if (!legend) return;
-    if (!lens || !doc || legend.hidden) { row?.remove(); return; }
+    if (motion || !lens || !doc || legend.hidden) { row?.remove(); return; }
     if (!row) {
       row = document.createElement("div");
       row.className = "tl-row";
@@ -192,33 +213,44 @@ export function install(app) {
     if (!legend.contains(row)) {
       const anchor = legend.querySelector(".ticks");
       if (anchor) anchor.after(row); else legend.appendChild(row);
-      if (idx != null) drawHist();
+      if (idx != null) drawLegendHist(app, lens);
     }
     update();
   }
 
-  // The lens dock rebuilds the legend's HTML (lens change, details toggle): put the row back each time.
-  if (legend) new MutationObserver(() => { if (lens && doc && row && !legend.contains(row)) render(); })
-    .observe(legend, { childList: true });
+  // The lens dock rebuilds the legend's HTML (lens change, details toggle): put the row back, and redraw the
+  // histogram of the year shown (the dock draws the lens's own year).
+  if (legend) new MutationObserver(() => {
+    if (!lens || !doc) return;
+    if (row && !motion && !legend.contains(row)) render();
+    if (idx != null && idx !== ownIndex(lens)) drawLegendHist(app, lens);
+  }).observe(legend, { childList: true });
 
   app.on("lens", (l) => {
+    const was = lens;
     if (lens && lens !== l) { stop(); restore(lens); }
     const keep = lens && l && LENSES.has(l.id) ? idx : null; // keep the year when switching between the two
     lens = l && LENSES.has(l.id) ? l : null;
     idx = null;
     if (!lens) { row?.remove(); app.hash.update(); return; }
+    // A fresh pick plays from the first year (the year axis is shared with other layers); a switch between the
+    // two population lenses keeps the year on the clock.
+    if (motion && !was) wantYear = motion.reducedMotion ? 2026 : (FIRST[lens.id] ? 2016 : 2015);
     ensure()?.then(() => {
-      if (keep != null && lens) setYear(yearKey(keep));
+      if (keep != null && lens) {
+        if (motion) { idx = Math.max(FIRST[lens.id] ?? 0, keep); apply(); } else setYear(yearKey(keep));
+      }
       render();
     });
     render();
   });
 
   app.hash.register("year", {
-    get: () => (lens && doc && idx != null && idx !== ownIndex(lens) ? yearKey(idx) : null),
+    // With the motion clock the year lives in #t=; #year= is only read, for old links.
+    get: () => (!motion && lens && doc && idx != null && idx !== ownIndex(lens) ? yearKey(idx) : null),
     set: (v) => {
       const y = v == null ? null : parseInt(v, 10);
-      if (y == null || !Number.isFinite(y)) { if (lens) setYear(null); else pendingYear = null; return; }
+      if (y == null || !Number.isFinite(y)) { if (lens && !motion) setYear(null); else pendingYear = null; return; }
       if (!lens) { pendingYear = y; return; }
       setYear(y, { fromUrl: true });
     },

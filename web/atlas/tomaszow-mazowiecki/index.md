@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/tomaszow-mazowiecki/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/tomaszow-mazowiecki/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Tomaszów Mazowiecki had 55,696 residents on 30 June 2026. Between 2015 and 2025 it lost 12.4% of its residents.
 

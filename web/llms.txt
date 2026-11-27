@@ -52,10 +52,20 @@ Poland had 37,242,958 residents on 30 June 2026. Pages are in English; place nam
 - [data/commuting.json](https://softonsofa.com/pol-civ/data/commuting.json): Commuting flows into the 12 most populous cities, from the NSP 2021 gmina matrix.
 - [data/timeline.json](https://softonsofa.com/pol-civ/data/timeline.json): Annual population density and change for Polish land hexes, 2015 to 2026.
 - [data/economy.json](https://softonsofa.com/pol-civ/data/economy.json): Made in Poland and Tech and games: product and tech sites with one fact each, and the game studios of each town.
+- [data/permits_monthly.json](https://softonsofa.com/pol-civ/data/permits_monthly.json): Building permits for new factories and warehouses per gmina and month, from the GUNB permit register.
+- [data/trains.json](https://softonsofa.com/pol-civ/data/trains.json): Every passenger train of one ordinary weekday: operator, number, name, stops with times and the line it runs on.
+- [data/flights.json](https://softonsofa.com/pol-civ/data/flights.json): Air routes from the main Polish airports with passengers per month over the newest 12 months.
+- [data/power.json](https://softonsofa.com/pol-civ/data/power.json): One day of the power system every 15 minutes: generation by fuel, wind, solar, demand and the flows on each border, with the border lines, the largest wind and solar sites and capacity by powiat.
+- [data/migration.json](https://softonsofa.com/pol-civ/data/migration.json): Moves of permanent residence between the 16 voivodeships, origin by destination, every year.
+- [data/money.json](https://softonsofa.com/pol-civ/data/money.json): State money for each gmina, powiat and voivodeship in one year: PIT and CIT shares, general subsidy and the wealth correction.
+- [data/timelapse.json](https://softonsofa.com/pol-civ/data/timelapse.json): Tourist nights per voivodeship for each of the newest 36 months, and the presidential runoffs and population years that play over time.
+- [data/smog.json](https://softonsofa.com/pol-civ/data/smog.json): Hourly PM2.5 at every automatic GIOŚ station in the week with the worst smog of winter 2025/26, and the same hours on hexes within 40 km of a station.
 - [data/sources.json](https://softonsofa.com/pol-civ/data/sources.json): The bibliography: every source with publisher, licence, vintage and the exact files used.
 
 ## Sources
 
+- [Główny Inspektorat Ochrony Środowiska (GIOŚ)](https://powietrze.gios.gov.pl/pjp/content/api): Air quality: hourly PM2.5 at every automatic station, winter 2025/26
+- [Eurostat; OurAirports; Wikidata](https://ec.europa.eu/eurostat/databrowser/view/avia_par_pl/default/table): Air routes from Polish airports: passengers per month
 - [Statistics Poland (GUS)](https://bdl.stat.gov.pl/bdl/dane/podgrup/temat/31/640/4318): NSP 2021 education by powiat and gmina
 - [Eurostat, GUS, the Polish Investment and Trade Agency (PAIH), company reports and press pages](https://www.paih.gov.pl/): Made in Poland: plants, yards and makers behind Polish products
 - [Statistics Poland (GUS), Dziedzinowe Bazy Wiedzy](https://dbw.stat.gov.pl/): Patents granted and R&D spending
@@ -76,10 +86,12 @@ Poland had 37,242,958 residents on 30 June 2026. Pages are in English; place nam
 - [Statistics Poland (GUS), Local Data Bank (BDL) API](https://bdl.stat.gov.pl/bdl/start): Territorial units of Poland in 2026 (TERYT codes)
 - [European Space Agency (ESA WorldCover consortium)](https://esa-worldcover.org/): ESA WorldCover 2021 (v200), 10 m land cover
 - [ETH Zurich, International Conflict Research (Schvitz et al. 2022)](https://icr.ethz.ch/data/cshapes/): CShapes 2.0: historical state borders
+- [Ministry of Finance (MF)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia): Revenue of local governments set by the state: PIT and CIT shares, general subsidy, wealth correction
 - [Ministry of Industry (report on hard coal mining 2025), State Mining Authority (WUG), KGHM, Sejm; positions from Wikidata and OpenStreetMap](https://www.gov.pl/web/wug/kwk): Mines of Poland: coal, lignite, copper and silver, salt, sulphur (curated)
 - [Central Examination Commission (CKE) and Centre for Education Informatics (CIE)](https://mapa.wyniki.edu.pl/MapaEgzaminow/): Eighth-grade exam and matura results
 - [Ministry of Finance (MF); Statistics Poland (GUS); RIO Krakow methodology](https://www.gov.pl/web/finanse/bazy-danych8): Municipal budgets and debt in 2025
-- [Główny Inspektorat Ochrony Środowiska (GIOŚ)](https://powietrze.gios.gov.pl/pjp/archives): Air quality: annual means of PM2.5, PM10 and benzo(a)pyrene by station
+- [Polskie Sieci Elektroenergetyczne S.A. (PSE, transmission system operator); interconnector lines from OpenStreetMap](https://raporty.pse.pl/): Power system of Poland every 15 minutes: generation by fuel and cross-border flows
+- [PKP Polskie Linie Kolejowe; Koleje Mazowieckie; GTFS conversion by Mikołaj Kuranowski](https://mkuran.pl/gtfs/): Passenger train timetables of Poland (GTFS)
 - [Rada Ministrów (Dziennik Ustaw, via the Sejm ELI API); PKW and GUS for unit codes](https://api.sejm.gov.pl/eli/acts/DU/2024/1395): Area of the 2024 flood state of natural disaster
 - [Państwowa Komisja Wyborcza (PKW)](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach): Election results by gmina (presidential 2015, 2020 and 2025, Sejm 2023)
 - [Główny Urząd Statystyczny (GUS); Instytut Statystyki Kościoła Katolickiego (ISKK); OpenStreetMap; Wikidata](https://stat.gov.pl/spisy-powszechne/nsp-2021/nsp-2021-wyniki-ostateczne/): Religious affiliation (NSP 2021), Mass attendance by diocese (ISKK) and dioceses

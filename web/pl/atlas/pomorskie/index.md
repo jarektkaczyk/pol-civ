@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/pomorskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/pomorskie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W latach 2015-2025 liczba ludności województwa pomorskiego wzrosła o 2,2%. To drugie miejsce w rankingu zmiany liczby ludności województw.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/skawina/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/skawina/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Skawina had 23,756 residents on 30 June 2026.
 

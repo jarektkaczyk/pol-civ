@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/raciborz/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/raciborz/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Turnout in Racibórz was 64.1% in the presidential runoff of 1 June 2025, the 6th lowest of the 203 Polish towns with 20,000 or more people.
 

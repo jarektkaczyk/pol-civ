@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/koscian/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/koscian/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Kościan had 22,888 residents on 30 June 2026. Between 2015 and 2025 it lost 3.3% of its residents.
 

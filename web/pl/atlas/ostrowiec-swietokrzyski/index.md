@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/ostrowiec-swietokrzyski/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/ostrowiec-swietokrzyski/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Mediana wieku w mieście wynosi 50,1 roku. To najwyższy wynik wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

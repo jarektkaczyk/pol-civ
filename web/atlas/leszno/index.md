@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/leszno/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/leszno/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Leszno had 58,457 residents on 30 June 2026. Between 2015 and 2025 it lost 9.0% of its residents.
 

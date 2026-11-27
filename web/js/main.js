@@ -64,9 +64,9 @@ const isMobile = () => matchMedia("(max-width: 700px)").matches;
 
 async function main() {
   initLangSwitch(); // before the data loads, so the EN | PL links keep the view from the first click
-  const [world, cities, nation, lenses, sources, resources, statesData, metros, powiaty] = await Promise.all([
+  const [world, cities, nation, lenses, resources, statesData, metros, powiaty] = await Promise.all([
     loadJSON("world"), loadJSON("cities"), loadJSON("nation"),
-    loadJSON("lenses", true), loadJSON("sources", true), loadJSON("resources", true), loadJSON("states", true),
+    loadJSON("lenses", true), loadJSON("resources", true), loadJSON("states", true),
     loadJSON("metros", true), loadJSON("powiaty", true),
   ]);
   const lensFile = lenses && Array.isArray(lenses.lenses) ? lenses : { vintage: "", groups: [], lenses: [] };
@@ -112,7 +112,7 @@ async function main() {
     requestDraw();
     url.schedule();
   });
-  const pedia = initPedia({ world, nation, lenses: lensFile, sources: sources || [], w, resources, states, metros });
+  const pedia = initPedia({ world, nation, lenses: lensFile, sources: null, w, resources, states, metros, app });
   const help = initHelp();
 
   // --- static layer cache ----------------------------------------------------------------------------------------
@@ -507,7 +507,7 @@ async function main() {
 
   // --- lens ------------------------------------------------------------------------------------------------------
   const dock = initLensDock({
-    lenses: lensFile, sources: sources || [], w,
+    lenses: lensFile, w,
     onPick: (lens) => setLens(lens),
     onBand: (band) => setBand(band),
   });
@@ -1186,7 +1186,7 @@ async function main() {
   }
   Object.assign(app, {
     // data. Optional files arrive via loadData(name) (and the "data" event); see docs/DATA_CONTRACTS.md.
-    data: { world, cities, states, nation, lenses: lensFile, resources, sources: sources || [], counties: null, metros, powiaty },
+    data: { world, cities, states, nation, lenses: lensFile, resources, sources: [], counties: null, metros, powiaty }, // sources.json: loadData("sources") (Almanac, advisors)
     loadData,
     loadCounties: () => loadData("counties"),
     w, cam, state, cityById, lensById,

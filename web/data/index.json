@@ -2,7 +2,7 @@
  "version": 1,
  "name": "Polska data catalogue",
  "site": "https://softonsofa.com/pol-civ/",
- "generated": "2026-11-26",
+ "generated": "2026-11-27",
  "description": "Public data behind the Polska map of Poland. Each file is JSON; shapes are documented in docs/DATA_CONTRACTS.md of the source repository.",
  "contracts": "https://github.com/jarektkaczyk/pol-civ/blob/main/docs/DATA_CONTRACTS.md",
  "license": {
@@ -565,7 +565,7 @@
   {
    "path": "data/lenses.json",
    "url": "https://softonsofa.com/pol-civ/data/lenses.json",
-   "bytes": 2352432,
+   "bytes": 2430413,
    "description": "The map lenses: one value per hex for each metric, with legend domains and notes.",
    "fields": [
     "density (Density)",
@@ -620,13 +620,16 @@
     "minority (Largest minority identity)",
     "commuters (Commuters in)",
     "eu_funds (EU co-financing)",
+    "tourism_monthly (Tourist nights by month)",
+    "smog_week (Smog week)",
     "forest (Forest)",
     "farmland (Farmland)",
     "developed (Built-up)"
    ],
-   "rows": 55,
+   "rows": 57,
    "vintage": "GUS population 2026-06-30; population 2025-12-31 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 2025-12-31; territorial division 2026-01-01; PKW: presidential election runoffs of 2015-05-24 and 2020-07-12; presidential election 2025 (rounds of 18 May and 2025-06-01); Sejm 2023 (2023-10-15)",
    "sources": [
+    "pl_air_hourly",
     "pl_census_2021",
     "pl_econ_innovation",
     "pl_econ_permits",
@@ -646,9 +649,11 @@
     "pl_soc_health",
     "pl_stats_labour",
     "pl_stats_population",
-    "pl_stats_prosperity"
+    "pl_stats_prosperity",
+    "pl_tourism_monthly"
    ],
    "publishers": [
+    "Główny Inspektorat Ochrony Środowiska (GIOŚ)",
     "Statistics Poland (GUS)",
     "Statistics Poland (GUS), Dziedzinowe Bazy Wiedzy",
     "Główny Urząd Nadzoru Budowlanego (GUNB)",
@@ -657,7 +662,6 @@
     "European Space Agency (ESA WorldCover consortium)",
     "Central Examination Commission (CKE) and Centre for Education Informatics (CIE)",
     "Ministry of Finance (MF); Statistics Poland (GUS); RIO Krakow methodology",
-    "Główny Inspektorat Ochrony Środowiska (GIOŚ)",
     "Rada Ministrów (Dziennik Ustaw, via the Sejm ELI API); PKW and GUS for unit codes",
     "Państwowa Komisja Wyborcza (PKW)",
     "Główny Urząd Statystyczny (GUS); Instytut Statystyki Kościoła Katolickiego (ISKK); OpenStreetMap; Wikidata",
@@ -665,6 +669,10 @@
     "Ministry of Finance and Statistics Poland (GUS)"
    ],
    "licenses": [
+    {
+     "source": "pl_air_hourly",
+     "terms": "Public sector information; reuse must name GIOŚ as the source (API terms)"
+    },
     {
      "source": "pl_census_2021",
      "terms": "Creative Commons Attribution 4.0"
@@ -744,6 +752,10 @@
     {
      "source": "pl_stats_prosperity",
      "terms": "Public sector information reuse terms and CC BY 4.0"
+    },
+    {
+     "source": "pl_tourism_monthly",
+     "terms": "CC BY 4.0"
     }
    ]
   },
@@ -937,7 +949,7 @@
   {
    "path": "data/trade.json",
    "url": "https://softonsofa.com/pol-civ/data/trade.json",
-   "bytes": 18001,
+   "bytes": 19197,
    "description": "Road and rail freight routes between regions.",
    "fields": [
     "zones",
@@ -1100,7 +1112,7 @@
   {
    "path": "data/commuting.json",
    "url": "https://softonsofa.com/pol-civ/data/commuting.json",
-   "bytes": 30018,
+   "bytes": 30461,
    "description": "Commuting flows into the 12 most populous cities, from the NSP 2021 gmina matrix.",
    "fields": [
     "cities (name, commuters_in, commuters_out, arcs)",
@@ -1124,7 +1136,7 @@
   {
    "path": "data/timeline.json",
    "url": "https://softonsofa.com/pol-civ/data/timeline.json",
-   "bytes": 471441,
+   "bytes": 471785,
    "description": "Annual population density and change for Polish land hexes, 2015 to 2026.",
    "fields": [
     "dates",
@@ -1184,9 +1196,266 @@
    ]
   },
   {
+   "path": "data/permits_monthly.json",
+   "url": "https://softonsofa.com/pol-civ/data/permits_monthly.json",
+   "bytes": 439145,
+   "description": "Building permits for new factories and warehouses per gmina and month, from the GUNB permit register.",
+   "fields": [
+    "months",
+    "gminas (code, name, x, y)",
+    "counts (month, gmina, permits)",
+    "national",
+    "rules"
+   ],
+   "rows": 2325,
+   "vintage": "GUNB permit register, file of 2026-11-25; decisions 2016-01 to 2026-10",
+   "sources": [
+    "pl_econ_permits"
+   ],
+   "publishers": [
+    "Główny Urząd Nadzoru Budowlanego (GUNB)"
+   ],
+   "licenses": [
+    {
+     "source": "pl_econ_permits",
+     "terms": "CC0 1.0"
+    }
+   ]
+  },
+  {
+   "path": "data/trains.json",
+   "url": "https://softonsofa.com/pol-civ/data/trains.json",
+   "bytes": 2949901,
+   "description": "Every passenger train of one ordinary weekday: operator, number, name, stops with times and the line it runs on.",
+   "fields": [
+    "trips (op, cat, no, name, p, t)",
+    "patterns (shape, stops, d)",
+    "shapes",
+    "stations (name, x, y)",
+    "operators",
+    "rules",
+    "attribution"
+   ],
+   "rows": 7366,
+   "vintage": "PKP PLK timetable via GTFS feed 2026-11-27; weekday 2026-12-16",
+   "sources": [
+    "pl_rail_gtfs"
+   ],
+   "publishers": [
+    "PKP Polskie Linie Kolejowe; Koleje Mazowieckie; GTFS conversion by Mikołaj Kuranowski"
+   ],
+   "licenses": [
+    {
+     "source": "pl_rail_gtfs",
+     "terms": "Re-use under the public sector information terms of PKP PLK (bip.plk-sa.pl/ponowne-wykorzystywanie) and Koleje Mazowieckie: state the source, when the data was made and obtained, and that it was processed. GTFS conversion credited to Mikołaj Kuranowski."
+    }
+   ]
+  },
+  {
+   "path": "data/flights.json",
+   "url": "https://softonsofa.com/pol-civ/data/flights.json",
+   "bytes": 124506,
+   "description": "Air routes from the main Polish airports with passengers per month over the newest 12 months.",
+   "fields": [
+    "routes (from, to, value, total, end, bearing, km)",
+    "airports (icao, name, label, city, country, x, y)",
+    "months",
+    "rules"
+   ],
+   "rows": 446,
+   "vintage": "Eurostat avia_par_pl 2024-01 to 2024-12 (data updated 2025-10-22)",
+   "sources": [
+    "pl_air_routes"
+   ],
+   "publishers": [
+    "Eurostat; OurAirports; Wikidata"
+   ],
+   "licenses": [
+    {
+     "source": "pl_air_routes",
+     "terms": "Eurostat: CC BY 4.0 (Commission Decision 2011/833/EU), credit Eurostat and state changes. OurAirports: public domain (Unlicense). Wikidata: CC0."
+    }
+   ]
+  },
+  {
+   "path": "data/power.json",
+   "url": "https://softonsofa.com/pol-civ/data/power.json",
+   "bytes": 62405,
+   "description": "One day of the power system every 15 minutes: generation by fuel, wind, solar, demand and the flows on each border, with the border lines, the largest wind and solar sites and capacity by powiat.",
+   "fields": [
+    "t",
+    "mix (by fuel group)",
+    "wind",
+    "solar",
+    "demand",
+    "neighbours (code, net, lines)",
+    "wind_farms",
+    "solar_farms",
+    "res_powiat",
+    "live",
+    "rules",
+    "attribution"
+   ],
+   "rows": 96,
+   "vintage": "PSE 2026-11-26 (15-minute data); OpenStreetMap 2026-11-27",
+   "sources": [
+    "pl_power_pse",
+    "pl_energy_plants",
+    "pl_energy_res"
+   ],
+   "publishers": [
+    "Polskie Sieci Elektroenergetyczne S.A. (PSE, transmission system operator); interconnector lines from OpenStreetMap",
+    "OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE",
+    "Urząd Regulacji Energetyki (Energy Regulatory Office); powiat codes from GUS BDL"
+   ],
+   "licenses": [
+    {
+     "source": "pl_power_pse",
+     "terms": "PSE: public sector information, no licence text published with the API; cite PSE S.A. OpenStreetMap: ODbL 1.0"
+    },
+    {
+     "source": "pl_energy_plants",
+     "terms": "OSM: ODbL 1.0. Map data (c) OpenStreetMap contributors, available under the Open Database Licence (ODbL 1.0), https://www.openstreetmap.org/copyright Curated figures: public operator and regulator pages (see ref)."
+    },
+    {
+     "source": "pl_energy_res",
+     "terms": "Public information (Polish re-use of public sector information act); cite URE"
+    }
+   ]
+  },
+  {
+   "path": "data/migration.json",
+   "url": "https://softonsofa.com/pol-civ/data/migration.json",
+   "bytes": 102353,
+   "description": "Moves of permanent residence between the 16 voivodeships, origin by destination, every year.",
+   "fields": [
+    "years",
+    "regions (code, name, capital, x, y, in, out, net)",
+    "flows (from, to, values, path)",
+    "rules"
+   ],
+   "rows": 240,
+   "vintage": "GUS BDL P1358, years 1995 to 2025",
+   "sources": [
+    "pl_migration_od"
+   ],
+   "publishers": [
+    "Statistics Poland (GUS), Local Data Bank (BDL) API"
+   ],
+   "licenses": [
+    {
+     "source": "pl_migration_od",
+     "terms": "GUS CC BY 4.0 (reuse with the source named)"
+    }
+   ]
+  },
+  {
+   "path": "data/money.json",
+   "url": "https://softonsofa.com/pol-civ/data/money.json",
+   "bytes": 783584,
+   "description": "State money for each gmina, powiat and voivodeship in one year: PIT and CIT shares, general subsidy and the wealth correction.",
+   "fields": [
+    "units (code, level, kind, name, x, y, pit, cit, subsidy, total, correction, needs)",
+    "fields",
+    "rules"
+   ],
+   "rows": 2807,
+   "vintage": "MF, amounts for 2026 (final, budget act)",
+   "sources": [
+    "pl_local_finance_flows"
+   ],
+   "publishers": [
+    "Ministry of Finance (MF)"
+   ],
+   "licenses": [
+    {
+     "source": "pl_local_finance_flows",
+     "terms": "Public sector information; the gov.pl page text is CC BY-SA 4.0 (no separate licence for the file)"
+    }
+   ]
+  },
+  {
+   "path": "data/timelapse.json",
+   "url": "https://softonsofa.com/pol-civ/data/timelapse.json",
+   "bytes": 9990,
+   "description": "Tourist nights per voivodeship for each of the newest 36 months, and the presidential runoffs and population years that play over time.",
+   "fields": [
+    "states",
+    "tourism (months, nights, per_resident, national, population)",
+    "elections (frames: year, lens, candidate, share, turnout)",
+    "population",
+    "rules"
+   ],
+   "rows": 36,
+   "vintage": {
+    "tourism": "GUS BDL monthly tourism, 2023-10 to 2026-09",
+    "elections": "PKW: presidential election runoffs of 2015-05-24 and 2020-07-12; presidential election 2025 (rounds of 18 May and 2025-06-01); Sejm 2023 (2023-10-15)",
+    "population": "GUS population 2015-12-31 to 2025 and 2026-06-30"
+   },
+   "sources": [
+    "pl_tourism_monthly",
+    "pl_stats_population",
+    "pl_soc_elections",
+    "pl_hist_population"
+   ],
+   "publishers": [
+    "Główny Urząd Statystyczny (GUS), Bank Danych Lokalnych",
+    "Statistics Poland (GUS)",
+    "Państwowa Komisja Wyborcza (PKW)"
+   ],
+   "licenses": [
+    {
+     "source": "pl_tourism_monthly",
+     "terms": "CC BY 4.0"
+    },
+    {
+     "source": "pl_stats_population",
+     "terms": "Creative Commons Attribution 4.0"
+    },
+    {
+     "source": "pl_soc_elections",
+     "terms": "Public information (PKW official results); cite as Państwowa Komisja Wyborcza"
+    },
+    {
+     "source": "pl_hist_population",
+     "terms": "GUS CC BY 4.0"
+    }
+   ]
+  },
+  {
+   "path": "data/smog.json",
+   "url": "https://softonsofa.com/pol-civ/data/smog.json",
+   "bytes": 2004238,
+   "description": "Hourly PM2.5 at every automatic GIOŚ station in the week with the worst smog of winter 2025/26, and the same hours on hexes within 40 km of a station.",
+   "fields": [
+    "start",
+    "hours",
+    "stations (id, name, city, x, y, pm25)",
+    "cells",
+    "values",
+    "national_hourly",
+    "peak",
+    "rules"
+   ],
+   "rows": 117,
+   "vintage": "GIOS hourly PM2.5, smog week 2026-01-18 to 2026-01-24, 117 stations",
+   "sources": [
+    "pl_air_hourly"
+   ],
+   "publishers": [
+    "Główny Inspektorat Ochrony Środowiska (GIOŚ)"
+   ],
+   "licenses": [
+    {
+     "source": "pl_air_hourly",
+     "terms": "Public sector information; reuse must name GIOŚ as the source (API terms)"
+    }
+   ]
+  },
+  {
    "path": "data/sources.json",
    "url": "https://softonsofa.com/pol-civ/data/sources.json",
-   "bytes": 243222,
+   "bytes": 278535,
    "description": "The bibliography: every source with publisher, licence, vintage and the exact files used.",
    "fields": [
     "id",
@@ -1195,7 +1464,7 @@
     "vintage",
     "files"
    ],
-   "rows": 46,
+   "rows": 53,
    "vintage": null,
    "sources": [],
    "publishers": [],

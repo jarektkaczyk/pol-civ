@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/piastow/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/piastow/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W drugiej turze wyborów prezydenckich 1 czerwca 2025 r. frekwencja w mieście wyniosła 81,3%. To czwarte miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

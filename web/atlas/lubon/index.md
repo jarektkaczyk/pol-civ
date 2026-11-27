@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/lubon/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/lubon/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Registered unemployment around Luboń (powiat poznański) was 1.4% in October 2026, the lowest for any of the 203 Polish towns with 20,000 or more people.
 

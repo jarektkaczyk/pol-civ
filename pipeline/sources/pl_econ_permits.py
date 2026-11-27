@@ -126,6 +126,51 @@ def count_decisions(rows: Iterable[dict[str, str]], start: dt.date, end: dt.date
         decisions.setdefault(code, set()).add(key)
 
 
+def month_key(day: dt.date) -> str:
+    return f"{day.year:04d}-{day.month:02d}"
+
+
+def last_full_month(day: dt.date) -> str:
+    """The newest month that the file of `day` covers in full: its own month on the month's last day, else the one
+    before (authorities still enter the rest of the current month)."""
+    if day.day == calendar.monthrange(day.year, day.month)[1]:
+        return month_key(day)
+    return month_key(months_before(day.replace(day=1), 1))
+
+
+def first_decisions(rows: Iterable[dict[str, str]], by6: dict[str, str], first: dict[tuple, dt.date],
+                    stats: dict) -> None:
+    """For each new category XVIII decision, its gmina and the earliest decision date the rows give it.
+
+    `first[(gmina, authority, decision number)]` keeps the earliest date (amendment rows repeat a decision). A decision
+    that covers buildings in two gminas counts in each. `stats` counts the decisions without a usable TERC code."""
+    for row in rows:
+        if row["kategoria"].strip() != CATEGORY or not row["nazwa_zamierzenia_bud"].strip().startswith(NEW_BUILD):
+            continue
+        day = parse_day(row["data_wydania_decyzji"])
+        if day is None:
+            stats["undated"] = stats.get("undated", 0) + 1
+            continue
+        key = (row["nazwa_organu"].strip(), row["numer_decyzji_urzedu"].strip())
+        code = current_code(whole_gmina(row["terc"]), by6)
+        if code is None:
+            stats.setdefault("unmapped", set()).add(key)
+            continue
+        k = (code, *key)
+        if k not in first or day < first[k]:
+            first[k] = day
+
+
+def monthly_counts(first: dict[tuple, dt.date], start: str, end: str) -> dict[tuple[str, str], int]:
+    """(gmina, "YYYY-MM") -> decisions in that month, for months start..end inclusive."""
+    out: dict[tuple[str, str], int] = {}
+    for (code, *_key), day in first.items():
+        m = month_key(day)
+        if start <= m <= end:
+            out[(code, m)] = out.get((code, m), 0) + 1
+    return out
+
+
 class PlEconPermitsSource(Source):
     info = SourceInfo(
         id="pl_econ_permits",

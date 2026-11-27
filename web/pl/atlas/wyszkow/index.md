@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/wyszkow/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/wyszkow/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Wyszków liczy 25 601 mieszkańców (stan na 30 czerwca 2026 r.).
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/wielkopolskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/wielkopolskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Wielkopolskie has the lowest registered unemployment of the 16 voivodeships: 3.8% in October 2026.
 

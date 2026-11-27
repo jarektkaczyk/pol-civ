@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/debica/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/debica/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Dębica had 41,985 residents on 30 June 2026. Between 2015 and 2025 it lost 9.0% of its residents.
 

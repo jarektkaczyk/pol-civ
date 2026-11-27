@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/lodzkie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/lodzkie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W 2025 r. w województwie łódzkim przeciętne dalsze trwanie życia nowo narodzonych dziewczynek wynosiło 81,4 roku. To najniższy wynik wśród województw.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/ostrow-mazowiecka/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/ostrow-mazowiecka/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Ostrów Mazowiecka had 21,164 residents on 30 June 2026. Between 2015 and 2025 it lost 6.7% of its residents.
 

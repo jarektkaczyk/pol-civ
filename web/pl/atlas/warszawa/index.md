@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/warszawa/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/warszawa/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Warszawa to stolica i największe miasto Polski. Liczy 1 866 929 mieszkańców (stan na 30 czerwca 2026 r.).
 

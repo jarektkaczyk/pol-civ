@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/lubuskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/lubuskie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Drzewa pokrywają 60% powierzchni województwa lubuskiego. To najwyższy wynik wśród województw.
 

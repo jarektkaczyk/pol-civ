@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/opolskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/opolskie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 30 czerwca 2026 r. województwo opolskie liczyło 919 766 mieszkańców. To najniższy wynik wśród województw.
 

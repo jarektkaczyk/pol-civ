@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/zdunska-wola/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/zdunska-wola/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 The average gross wage around Zduńska Wola (powiat zduńskowolski) was 7,317 zł a month in May 2026, the 9th lowest for any of the 203 Polish towns with 20,000 or more people.
 

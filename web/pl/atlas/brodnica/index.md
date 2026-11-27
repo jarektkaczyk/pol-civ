@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/brodnica/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/brodnica/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W maju 2026 r. przeciętne miesięczne wynagrodzenie brutto w powiecie brodnickim wyniosło 7274 zł. To szóste miejsce od końca wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/zawiercie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/zawiercie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Zawiercie had 44,546 residents on 30 June 2026. Between 2015 and 2025 it lost 11.3% of its residents.
 

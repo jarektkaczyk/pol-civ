@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/krasnik/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/krasnik/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Kraśnik expects 3,235 zł per resident from its share of personal income tax in 2026, the 2nd lowest of the 203 Polish towns with 20,000 or more people.
 

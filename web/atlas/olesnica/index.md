@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/olesnica/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/olesnica/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Oleśnica had 34,498 residents on 30 June 2026. Between 2015 and 2025 it lost 7.4% of its residents.
 

@@ -8,6 +8,7 @@ import math
 from collections import defaultdict
 from pathlib import Path
 
+from ..core.fetch import read_manifest
 from ..core.hexgrid import HexGrid
 from ..core.paths import WEB_DATA
 from ..core.store import load_interim, load_interim_payload, write_web
@@ -17,6 +18,12 @@ REQUIRES = ["_world", "pl_geo_teryt", "pl_transport_freight", "infrastructure.js
 PRODUCES = ["trade.json"]
 
 TOP_N = 30
+# Eurostat re-use notice (ec.europa.eu/eurostat/help/copyright-notice): credit Eurostat, state the changes and that
+# Eurostat is not responsible for them. The Almanac's "Moving layers" page shows this object.
+PROCESSED = ("We summed rail freight between regions into voivodeships, kept the 30 largest flows between "
+             "voivodeships whose capitals are at least 100 km apart and drew them along mapped roads and railways; "
+             "road freight is shown as regional totals.")
+EUROSTAT_DISCLAIMER = "Eurostat is not responsible for the changes."
 MIN_KM = 100
 PARTNERS = 5
 STEP_COST = {"motorway": 1.0, "expressway": 1.25, "rail": 1.4, "land": 4.0, "water": 10.0}
@@ -26,6 +33,10 @@ RULE = (
     "apart, ranked by tonnes and summed in both directions. Eurostat publishes road freight loaded and unloaded by "
     "NUTS 3 region, but no road origin-destination matrix, so those road figures appear as regional totals and are "
     "not turned into routes."
+)
+MOTION_RULE = (
+    "On the moving map, each wagon stands for the same tonnage on every route, so a route with twice the tonnes "
+    "carries twice the wagons; half run each way. Their speed and the time of day are for show only."
 )
 PATH_NOTE = (
     "The source gives each shipment's origin and destination region, not its route. The drawn path follows mapped "
@@ -182,12 +193,19 @@ def build() -> None:
         "sources": ["pl_transport_freight"],
         "rule": RULE,
         "path_note": PATH_NOTE,
+        "rules": [RULE, PATH_NOTE, MOTION_RULE],
         "units": {"value_kt": "thousand tonnes"},
         "modes": [{"id": "rail", "name": "Rail"}],
         "national_kt": {"interregional_rail": round(sum(pairs.values()), 1)},
         "road_freight": road_freight_table(freight),
         "zones": [zones[code] for code in sorted(zones)],
         "routes": routes,
+        "attribution": {
+            "credit": ["Eurostat (road_go_na_rl3g, road_go_na_ru3g, tran_r_rago)"], "created": None,
+            "retrieved": max((f"{m['retrieved'][:16]}Z" for m in read_manifest("pl_transport_freight").values()
+                              if m.get("retrieved")), default=None),
+            "processed": PROCESSED, "disclaimer": EUROSTAT_DISCLAIMER,
+        },
     })
     print(f"    {len(zones)} voivodeships, {len(candidates)} pairs at least {MIN_KM} km apart, {len(routes)} routes")
 

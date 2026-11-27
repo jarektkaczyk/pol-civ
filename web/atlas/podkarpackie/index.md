@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/podkarpackie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/podkarpackie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Podkarpackie has the lowest personal income tax revenue per resident of the 16 voivodeships: 3,368 zł planned for 2026.
 

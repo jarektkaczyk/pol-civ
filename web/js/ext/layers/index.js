@@ -9,6 +9,7 @@
 import { createModel } from "./model.js";
 import { makeLayers } from "./layers.js";
 import { tips } from "./tips.js";
+import { registerTradeMotion } from "./tradeMotion.js";
 import { t } from "../../i18n.js";
 
 const TOGGLES = [
@@ -45,6 +46,8 @@ export function install(app) {
     if (app.data[name] !== undefined) apply(name, app.data[name]);
     else app.loadData(name).then((d) => apply(name, d), (err) => console.warn(`map layers: ${name} failed to load`, err));
   }
+
+  registerTradeMotion(app, { model, on });
 
   // For debugging and the gallery: the model and switches.
   app.mapArt = { model, on, layers };

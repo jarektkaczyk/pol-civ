@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/skawina/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/skawina/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Skawina liczy 23 756 mieszkańców (stan na 30 czerwca 2026 r.).
 

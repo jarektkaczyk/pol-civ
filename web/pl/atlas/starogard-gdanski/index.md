@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/starogard-gdanski/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/starogard-gdanski/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Starogard Gdański liczy 44 493 mieszkańców (stan na 30 czerwca 2026 r.). W latach 2015-2025 liczba ludności spadła o 7,5%.
 

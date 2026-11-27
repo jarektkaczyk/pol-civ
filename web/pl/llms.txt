@@ -52,10 +52,20 @@
 - [data/commuting.json](https://softonsofa.com/pol-civ/data/commuting.json): Dojazdy do pracy do 12 największych miast według macierzy gmin z NSP 2021.
 - [data/timeline.json](https://softonsofa.com/pol-civ/data/timeline.json): Roczna gęstość zaludnienia i zmiana liczby ludności na polskich heksach w latach 2015-2026.
 - [data/economy.json](https://softonsofa.com/pol-civ/data/economy.json): Z Polski na świat oraz Technologie i gry: zakłady, firmy i ośrodki z jednym faktem każdy oraz studia gier w każdym mieście.
+- [data/permits_monthly.json](https://softonsofa.com/pol-civ/data/permits_monthly.json): Pozwolenia na budowę nowych hal i magazynów według gmin i miesięcy, z rejestru GUNB.
+- [data/trains.json](https://softonsofa.com/pol-civ/data/trains.json): Wszystkie pociągi pasażerskie jednego zwykłego dnia roboczego: przewoźnik, numer, nazwa, stacje z godzinami i linia, po której jadą.
+- [data/flights.json](https://softonsofa.com/pol-civ/data/flights.json): Trasy lotnicze z głównych polskich lotnisk z liczbą pasażerów w każdym z ostatnich 12 miesięcy.
+- [data/power.json](https://softonsofa.com/pol-civ/data/power.json): Jedna doba systemu elektroenergetycznego co 15 minut: produkcja według paliw, wiatr, słońce, zapotrzebowanie i przepływy na każdej granicy, z liniami transgranicznymi, największymi farmami wiatrowymi i fotowoltaicznymi oraz mocą według powiatów.
+- [data/migration.json](https://softonsofa.com/pol-civ/data/migration.json): Zmiany miejsca pobytu stałego między 16 województwami (skąd i dokąd) w każdym roku.
+- [data/money.json](https://softonsofa.com/pol-civ/data/money.json): Pieniądze od państwa dla każdej gminy, powiatu i województwa w jednym roku: udziały w PIT i CIT, subwencja ogólna i korekta z tytułu zamożności.
+- [data/timelapse.json](https://softonsofa.com/pol-civ/data/timelapse.json): Noclegi turystów według województw w każdym z 36 ostatnich miesięcy oraz drugie tury wyborów prezydenckich i liczba ludności w kolejnych latach, do odtwarzania w czasie.
+- [data/smog.json](https://softonsofa.com/pol-civ/data/smog.json): Godzinowe stężenia PM2,5 na wszystkich automatycznych stacjach GIOŚ w tygodniu z najgorszym smogiem zimy 2025/26 oraz te same godziny na heksach w promieniu 40 km od stacji.
 - [data/sources.json](https://softonsofa.com/pol-civ/data/sources.json): Bibliografia: każde źródło z wydawcą, licencją, stanem danych i dokładnie wykorzystanymi plikami.
 
 ## Źródła
 
+- [Główny Inspektorat Ochrony Środowiska (GIOŚ)](https://powietrze.gios.gov.pl/pjp/content/api): Jakość powietrza: godzinowe stężenia pyłu PM2,5 na wszystkich stacjach automatycznych, zima 2025/26
+- [Eurostat; OurAirports; Wikidata](https://ec.europa.eu/eurostat/databrowser/view/avia_par_pl/default/table): Trasy lotnicze z polskich lotnisk: pasażerowie w kolejnych miesiącach
 - [Główny Urząd Statystyczny (GUS)](https://bdl.stat.gov.pl/bdl/dane/podgrup/temat/31/640/4318): NSP 2021: wykształcenie według powiatów i gmin
 - [Eurostat, GUS, Polska Agencja Inwestycji i Handlu (PAIH), raporty firm i artykuły prasowe](https://www.paih.gov.pl/): Z Polski na świat: fabryki, stocznie i wytwórcy polskich produktów
 - [Główny Urząd Statystyczny (GUS), Dziedzinowe Bazy Wiedzy](https://dbw.stat.gov.pl/): Udzielone patenty i nakłady na B+R
@@ -76,10 +86,12 @@
 - [Główny Urząd Statystyczny (GUS), API Banku Danych Lokalnych (BDL)](https://bdl.stat.gov.pl/bdl/start): Jednostki terytorialne Polski w 2026 r. (kody TERYT)
 - [Europejska Agencja Kosmiczna (konsorcjum ESA WorldCover)](https://esa-worldcover.org/): ESA WorldCover 2021 (v200), pokrycie terenu 10 m
 - [ETH Zurych, International Conflict Research (Schvitz i in. 2022)](https://icr.ethz.ch/data/cshapes/): CShapes 2.0: historyczne granice państw
+- [Ministerstwo Finansów (MF)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia): Dochody samorządów ustalane przez państwo: udziały w PIT i CIT, subwencja ogólna, korekta z tytułu zamożności
 - [Ministerstwo Przemysłu (sprawozdanie o górnictwie węgla kamiennego za 2025 r.), Wyższy Urząd Górniczy (WUG), KGHM, Sejm; lokalizacje z Wikidata i OpenStreetMap](https://www.gov.pl/web/wug/kwk): Kopalnie w Polsce: węgiel kamienny, węgiel brunatny, miedź i srebro, sól, siarka (zestawienie własne)
 - [Centralna Komisja Egzaminacyjna (CKE) i Centrum Informatyczne Edukacji (CIE)](https://mapa.wyniki.edu.pl/MapaEgzaminow/): Wyniki egzaminu ósmoklasisty i matury
 - [Ministerstwo Finansów (MF); Główny Urząd Statystyczny (GUS); metodologia RIO w Krakowie](https://www.gov.pl/web/finanse/bazy-danych8): Budżety i zadłużenie gmin w 2025 r.
-- [Główny Inspektorat Ochrony Środowiska (GIOŚ)](https://powietrze.gios.gov.pl/pjp/archives): Jakość powietrza: średnie roczne stężenia pyłów PM2,5 i PM10 oraz benzo(a)pirenu na stacjach pomiarowych
+- [Polskie Sieci Elektroenergetyczne S.A. (PSE, operator systemu przesyłowego); linie transgraniczne z OpenStreetMap](https://raporty.pse.pl/): System elektroenergetyczny Polski co 15 minut: produkcja energii według paliw i przepływy przez granice
+- [PKP Polskie Linie Kolejowe; Koleje Mazowieckie; konwersja do GTFS: Mikołaj Kuranowski](https://mkuran.pl/gtfs/): Rozkłady jazdy pociągów pasażerskich w Polsce (GTFS)
 - [Rada Ministrów (Dziennik Ustaw, przez API ELI Sejmu); PKW i GUS dla kodów jednostek](https://api.sejm.gov.pl/eli/acts/DU/2024/1395): Obszar objęty stanem klęski żywiołowej po powodzi w 2024 r.
 - [Państwowa Komisja Wyborcza (PKW)](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach): Wyniki wyborów prezydenckich w latach 2015, 2020 i 2025 oraz wyborów do Sejmu w 2023 r. według gmin
 - [Główny Urząd Statystyczny (GUS); Instytut Statystyki Kościoła Katolickiego (ISKK); OpenStreetMap; Wikidata](https://stat.gov.pl/spisy-powszechne/nsp-2021/nsp-2021-wyniki-ostateczne/): Wyznanie (NSP 2021), uczestnictwo w niedzielnej mszy według diecezji (ISKK) i diecezje

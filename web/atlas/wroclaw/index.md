@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/wroclaw/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/wroclaw/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Wrocław has 196 university students per 1,000 residents, the 2nd highest share of the 84 towns of 20,000+ with a university.
 

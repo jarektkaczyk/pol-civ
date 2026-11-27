@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/grudziadz/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/grudziadz/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Grudziądz had 86,425 residents on 30 June 2026. Between 2015 and 2025 it lost 9.9% of its residents.
 

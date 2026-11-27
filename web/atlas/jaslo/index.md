@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/jaslo/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/jaslo/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Registered unemployment around Jasło (powiat jasielski) was 13.1% in October 2026, the 7th highest for any of the 203 Polish towns with 20,000 or more people.
 

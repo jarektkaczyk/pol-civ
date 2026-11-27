@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/pulawy/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/pulawy/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Mediana wieku w mieście wynosi 49,3 roku. To szóste miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

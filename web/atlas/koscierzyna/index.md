@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/koscierzyna/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/koscierzyna/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Kościerzyna has the 3rd cleanest air of the 154 towns of 20,000+ with a measuring station within 25 km: PM2.5 averaged 10.8 µg/m³ in 2025 at the nearest station.
 

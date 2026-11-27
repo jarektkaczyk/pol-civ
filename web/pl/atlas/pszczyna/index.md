@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/pszczyna/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/pszczyna/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Pszczyna liczy 24 426 mieszkańców (stan na 30 czerwca 2026 r.).
 

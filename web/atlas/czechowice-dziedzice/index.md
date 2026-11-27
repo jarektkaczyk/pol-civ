@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/czechowice-dziedzice/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/czechowice-dziedzice/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Czechowice-Dziedzice had 34,510 residents on 30 June 2026.
 

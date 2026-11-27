@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/tychy/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/tychy/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Registered unemployment in Tychy was 2.6% in October 2026, the 7th lowest for any of the 203 Polish towns with 20,000 or more people.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/konin/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/konin/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Konin had 64,756 residents on 30 June 2026. Between 2015 and 2025 it lost 14.0% of its residents.
 

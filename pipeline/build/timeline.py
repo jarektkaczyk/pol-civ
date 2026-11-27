@@ -24,6 +24,14 @@ from .counties import projection
 REQUIRES = ["_world", "pl_hist_population", "pl_geo_lau", "lenses.json"]
 PRODUCES = ["timeline.json"]
 
+NOTES = [
+    "Density: residents per km2 of the hex's land on each date (GUS). Change: population on the date / "
+    "population on 31 December 2015 - 1.",
+    "From 31 December 2021 GUS counts are based on the 2021 census, earlier ones on the 2011 census: part "
+    "of the change between 2020 and 2021 comes from that rebasing.",
+    "Each year is on that year's gmina borders.",
+]
+
 LENS_DATE = "2026-06-30"  # the density lens date (GUS 30 June 2026)
 CHANGE_DATE = "2025-12-31"  # the change lens end date
 
@@ -92,13 +100,8 @@ def build() -> None:
         "cells": cells,
         "density": density,
         "growth": change,
-        "notes": [
-            "Density: residents per km2 of the hex's land on each date (GUS). Change: population on the date / "
-            "population on 31 December 2015 - 1.",
-            "From 31 December 2021 GUS counts are based on the 2021 census, earlier ones on the 2011 census: part "
-            "of the change between 2020 and 2021 comes from that rebasing.",
-            "Each year is on that year's gmina borders.",
-        ],
+        "notes": NOTES,
+        "rules": NOTES,  # the Almanac "Moving layers" page lists them for the population years
     })
     print(f"    {len(dates)} dates x {len(cells)} cells")
 

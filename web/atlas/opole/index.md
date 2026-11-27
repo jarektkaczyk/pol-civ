@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/opole/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/opole/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Opole had 124,260 residents on 30 June 2026.
 

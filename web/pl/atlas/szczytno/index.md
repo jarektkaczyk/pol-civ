@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/szczytno/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/szczytno/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W październiku 2026 r. stopa bezrobocia rejestrowanego w powiecie szczycieńskim wyniosła 11,5%. To dziesiąte miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

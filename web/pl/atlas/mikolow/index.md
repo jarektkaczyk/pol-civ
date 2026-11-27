@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/mikolow/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/mikolow/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Mikołów liczy 41 487 mieszkańców (stan na 30 czerwca 2026 r.). W latach 2015-2025 liczba ludności wzrosła o 3,9%.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/kujawsko-pomorskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/kujawsko-pomorskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Kujawsko-Pomorskie has the least tree cover of the 16 voivodeships: 31% of its land.
 

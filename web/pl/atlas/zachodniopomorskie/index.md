@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/zachodniopomorskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/zachodniopomorskie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W 2025 r. w województwie zachodniopomorskim przeciętne dalsze trwanie życia nowo narodzonych dziewczynek wynosiło 82,0 roku. To czwarte miejsce od końca wśród województw.
 

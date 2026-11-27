@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/mazowieckie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/mazowieckie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 30 czerwca 2026 r. województwo mazowieckie liczyło 5 502 043 mieszkańców. To najwyższy wynik wśród województw.
 

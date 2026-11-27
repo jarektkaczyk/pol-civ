@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/kujawsko-pomorskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/kujawsko-pomorskie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Drzewa pokrywają 31% powierzchni województwa kujawsko-pomorskiego. To najniższy wynik wśród województw.
 

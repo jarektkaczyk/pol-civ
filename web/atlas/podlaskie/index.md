@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/podlaskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/podlaskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Women in Podlaskie have the 2nd longest life expectancy of the 16 voivodeships: 83.7 years at birth in 2025.
 

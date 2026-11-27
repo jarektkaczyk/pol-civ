@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/lubelskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/lubelskie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W maju 2026 r. przeciętne miesięczne wynagrodzenie brutto w województwie lubelskim wyniosło 7982 zł. To najniższy wynik wśród województw.
 

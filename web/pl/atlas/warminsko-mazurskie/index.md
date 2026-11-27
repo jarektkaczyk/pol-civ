@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/warminsko-mazurskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/warminsko-mazurskie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W październiku 2026 r. stopa bezrobocia rejestrowanego w województwie warmińsko-mazurskim wyniosła 9,3%. To najwyższy wynik wśród województw.
 

@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/lukow/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/lukow/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W maju 2026 r. przeciętne miesięczne wynagrodzenie brutto w powiecie łukowskim wyniosło 7205 zł. To piąte miejsce od końca wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

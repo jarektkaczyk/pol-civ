@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/lodzkie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/lodzkie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Women in Łódzkie have the shortest life expectancy of the 16 voivodeships: 81.4 years at birth in 2025.
 

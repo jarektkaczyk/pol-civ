@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/lubuskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/lubuskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Lubuskie has the most tree cover of the 16 voivodeships: 60% of its land.
 

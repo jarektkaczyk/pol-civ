@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/krasnik/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/krasnik/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Plan na 2026 r. przewiduje w mieście dochody z PIT w wysokości 3235 zł na mieszkańca. To drugie miejsce od końca wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

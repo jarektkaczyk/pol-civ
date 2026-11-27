@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/pruszcz-gdanski/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/pruszcz-gdanski/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Pruszcz Gdański grew by 9.3% between 2015 and 2025, the 8th fastest growth of the 203 Polish towns with 20,000 or more people.
 

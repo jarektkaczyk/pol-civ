@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/dolnoslaskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/dolnoslaskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Dolnośląskie has the 2nd highest average gross wage of the 16 voivodeships: 9,208 zł a month in May 2026.
 

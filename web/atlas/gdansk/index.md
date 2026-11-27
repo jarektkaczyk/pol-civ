@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/gdansk/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/gdansk/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 The average gross wage in Gdańsk was 10,743 zł a month in May 2026, the 4th highest for any of the 203 Polish towns with 20,000 or more people.
 

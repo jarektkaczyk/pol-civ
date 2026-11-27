@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/zdunska-wola/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/zdunska-wola/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W maju 2026 r. przeciętne miesięczne wynagrodzenie brutto w powiecie zduńskowolskim wyniosło 7317 zł. To dziewiąte miejsce od końca wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

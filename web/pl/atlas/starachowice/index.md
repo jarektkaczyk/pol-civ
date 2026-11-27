@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/starachowice/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/starachowice/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Mediana wieku w mieście wynosi 49,6 roku. To czwarte miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

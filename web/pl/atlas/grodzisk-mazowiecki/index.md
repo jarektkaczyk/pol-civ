@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/grodzisk-mazowiecki/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/grodzisk-mazowiecki/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Mediana wieku w gminie Grodzisk Mazowiecki wynosi 41,2 roku. To szóste miejsce od końca wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

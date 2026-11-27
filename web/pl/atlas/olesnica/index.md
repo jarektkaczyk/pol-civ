@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/olesnica/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/olesnica/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Oleśnica liczy 34 498 mieszkańców (stan na 30 czerwca 2026 r.). W latach 2015-2025 liczba ludności spadła o 7,4%.
 

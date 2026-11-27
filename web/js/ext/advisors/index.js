@@ -66,7 +66,8 @@ export function install(app) {
   const tip = createMapTip();
   const canvas = document.getElementById("map");
 
-  const ensureData = () => (dataP ??= app.loadCounties().catch(() => null).then(() => (data = buildData(app))));
+  const ensureData = () => (dataP ??= Promise.all([app.loadCounties().catch(() => null), app.loadData("sources").catch(() => null)])
+    .then(() => (data = buildData(app))));
 
   // --- top-bar button ---------------------------------------------------------------------------------------------
   const btn = app.ui.addTopButton({

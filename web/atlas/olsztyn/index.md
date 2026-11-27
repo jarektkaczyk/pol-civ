@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/olsztyn/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/olsztyn/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Olsztyn is the 20th largest city in Poland, with 164,999 residents on 30 June 2026.
 

@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 30 czerwca 2026 r. Polska liczyła 37 242 958 mieszkańców. W latach 2015-2025 liczba ludności spadła o 2,9%.
 

@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/podlaskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/podlaskie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W 2025 r. w województwie podlaskim przeciętne dalsze trwanie życia nowo narodzonych dziewczynek wynosiło 83,7 roku. To drugie miejsce wśród województw.
 

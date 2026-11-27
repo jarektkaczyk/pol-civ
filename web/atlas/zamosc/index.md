@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/zamosc/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/zamosc/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Zamość had 56,521 residents on 30 June 2026. Between 2015 and 2025 it lost 12.3% of its residents.
 

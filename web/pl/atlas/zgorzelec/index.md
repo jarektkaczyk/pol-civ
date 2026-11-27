@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/zgorzelec/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/zgorzelec/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Zgorzelec liczy 27 941 mieszkańców (stan na 30 czerwca 2026 r.). W latach 2015-2025 liczba ludności spadła o 10,4%.
 

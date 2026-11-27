@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/bialystok/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/bialystok/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Białystok is the 10th largest city in Poland, with 288,476 residents on 30 June 2026.
 

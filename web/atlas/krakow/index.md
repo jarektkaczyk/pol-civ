@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/krakow/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/krakow/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Kraków is the 2nd largest city in Poland, with 819,493 residents on 30 June 2026.
 

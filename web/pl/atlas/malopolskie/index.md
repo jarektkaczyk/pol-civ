@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/malopolskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/malopolskie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W 2025 r. w województwie małopolskim na mieszkańca przypadało średnio 8,8 noclegu udzielonego turystom. To najwyższy wynik wśród województw.
 

@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/swietokrzyskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/swietokrzyskie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W latach 2015-2025 liczba ludności województwa świętokrzyskiego spadła o 8,7%. To najniższy wynik w rankingu zmiany liczby ludności województw.
 

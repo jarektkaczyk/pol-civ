@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/walcz/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/walcz/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Wałcz had 22,853 residents on 30 June 2026. Between 2015 and 2025 it lost 11.2% of its residents.
 

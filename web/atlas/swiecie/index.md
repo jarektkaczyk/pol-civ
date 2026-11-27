@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/swiecie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/swiecie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Świecie had 24,385 residents on 30 June 2026.
 

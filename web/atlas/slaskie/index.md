@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/slaskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/slaskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Śląskie is the 2nd most populous voivodeship, with 4,246,702 residents on 30 June 2026.
 

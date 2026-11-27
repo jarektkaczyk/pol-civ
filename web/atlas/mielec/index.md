@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/mielec/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/mielec/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Mielec had 55,847 residents on 30 June 2026. Between 2015 and 2025 it lost 7.6% of its residents.
 

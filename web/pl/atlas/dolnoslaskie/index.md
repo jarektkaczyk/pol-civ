@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/dolnoslaskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/dolnoslaskie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W maju 2026 r. przeciętne miesięczne wynagrodzenie brutto w województwie dolnośląskim wyniosło 9208 zł. To drugie miejsce wśród województw.
 

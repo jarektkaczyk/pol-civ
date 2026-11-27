@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/polkowice/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/polkowice/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 The average gross wage around Polkowice (powiat polkowicki) was 10,848 zł a month in May 2026, the 3rd highest for any of the 203 Polish towns with 20,000 or more people.
 

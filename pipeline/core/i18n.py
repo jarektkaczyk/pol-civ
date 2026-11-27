@@ -306,7 +306,7 @@ def keys_in_js(js_dir: Path | None = None) -> tuple[dict[str, list[str]], dict[s
 # Data text fields shown to readers, by file: a path of keys, "[]" for every list item, "*" for every dict value.
 # The browser passes each of these values through t(); proper names (places, units, operators) are not listed.
 DATA_TEXT: dict[str, list[str]] = {
-    "lenses.json": ["groups[].name", "lenses[].name", "lenses[].short_name", "lenses[].description", "lenses[].note", "lenses[].unit",
+    "lenses.json": ["groups[].name", "lenses[].name", "lenses[].short_name", "lenses[].description", "lenses[].scale_note", "lenses[].note", "lenses[].unit",
                     "lenses[].categories[].name", "lenses[].categories[].description", "lenses[].legend[].label"],
     "world.json": ["tables.water[].name", "tables.relief[].name", "tables.cover[].name", "tables.water[].rule",
                    "tables.relief[].rule", "tables.cover[].rule", "tables.notes[]"],
@@ -318,7 +318,7 @@ DATA_TEXT: dict[str, list[str]] = {
                        "catalog[].description", "catalog[].caveat", "catalog[].sub.*", "catalog[].badge.label",
                        "catalog[].badge.labels.*", "industries.*.title", "cities.*.badge.tpl"],
     "disasters.json": ["*.rule", "*.name", "*.label", "*.note"],
-    "trade.json": ["rule", "path_note", "modes[].name", "road_freight.fields[].label", "units.*"],
+    "trade.json": ["rule", "rules[]", "attribution.processed", "attribution.disclaimer", "path_note", "modes[].name", "road_freight.fields[].label", "units.*"],
     "metros.json": ["rule"],
     "military.json": ["caveats", "caveats[]", "components[].name", "components[].description", "rule", "rules.*",
                       "national.spending.*.name", "national.spending.*.note", "ranges[].kind"],
@@ -330,17 +330,26 @@ DATA_TEXT: dict[str, list[str]] = {
     "wonders.json": ["rules[].text", "wonders[].name", "wonders[].short", "wonders[].component",
                      "wonders[].metrics.category", "wonders[].metrics.record", "wonders[].metrics.unit",
                      "wonders[].metrics.unit_type", "wonders[].note"],
-    "commuting.json": ["rule", "notes[]"],
+    "commuting.json": ["rule", "rules[]", "notes[]"],
     "history.json": ["layers[].label", "layers[].labels[].name", "layers[].lines[].tip", "rules[]", "licence", "notes[]"],
-    "timeline.json": ["notes[]", "rule"],
+    "timeline.json": ["notes[]", "rule", "rules[]"],
     "economy.json": ["layers[].name", "kinds[].name", "items[].fact", "items[].label", "rules.*"],
+    "timelapse.json": ["rules[]"],
+    "smog.json": ["rules[]"],
+    "trains.json": ["rules[]", "attribution.processed"],
+    "flights.json": ["rules[]", "attribution.processed", "attribution.disclaimer"],
+    "permits_monthly.json": ["rules[]", "vintage"],
+    "power.json": ["rules[]", "groups[].label", "attribution.processed"],
+    "migration.json": ["rules[]"],
+    "money.json": ["rules[]", "fields[].label", "needs_parts[]", "state.name"],
     "sources.json": ["[].title", "[].description", "[].publisher", "[].license", "[].vintage", "[].used_for[]",
                      "[].notes[]", "[].caveats[]"],
 }
 # Vintage lines are shown in the Almanac and in lens notes.
 for _name in ("lenses.json", "nation.json", "counties.json", "powiaty.json", "citizens.json", "districts.json",
               "disasters.json", "trade.json", "metros.json", "military.json", "infrastructure.json", "resources.json",
-              "wonders.json", "commuting.json", "history.json", "timeline.json", "economy.json"):
+              "wonders.json", "commuting.json", "history.json", "timeline.json", "economy.json", "trains.json",
+              "flights.json", "timelapse.json", "smog.json"):
     DATA_TEXT[_name] += ["vintage", "vintage.*", "gdp_vintage"]
 
 

@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/kielce/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/kielce/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Kielce zajmują osiemnaste miejsce w Polsce pod względem liczby mieszkańców. Liczą 177 980 mieszkańców (stan na 30 czerwca 2026 r.).
 

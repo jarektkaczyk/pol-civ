@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/walbrzych/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/walbrzych/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W latach 2015-2025 liczba mieszkańców miasta spadła o 15,5%. Pod względem tempa spadku Wałbrzych zajmuje drugie miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

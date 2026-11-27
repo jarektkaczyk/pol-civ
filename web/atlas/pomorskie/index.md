@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/pomorskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/pomorskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Pomorskie grew by 2.2% between 2015 and 2025, the 2nd fastest growth of the 16 voivodeships.
 

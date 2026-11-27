@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/slaskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/slaskie/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 30 czerwca 2026 r. województwo śląskie liczyło 4 246 702 mieszkańców. To drugie miejsce wśród województw.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/sandomierz/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/sandomierz/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Sandomierz has the 3rd oldest population of the 203 Polish towns with 20,000 or more people: a median age of 49.9 years.
 

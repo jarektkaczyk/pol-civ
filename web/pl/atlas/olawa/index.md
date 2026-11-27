@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/olawa/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/olawa/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Oława liczy 32 872 mieszkańców (stan na 30 czerwca 2026 r.). W latach 2015-2025 liczba ludności wzrosła o 1,1%.
 

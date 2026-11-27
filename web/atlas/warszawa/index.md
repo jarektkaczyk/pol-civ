@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/warszawa/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/warszawa/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Warszawa is the capital and the largest city of Poland, with 1,866,929 residents on 30 June 2026.
 

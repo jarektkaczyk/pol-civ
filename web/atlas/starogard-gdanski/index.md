@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/starogard-gdanski/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/starogard-gdanski/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Starogard Gdański had 44,493 residents on 30 June 2026. Between 2015 and 2025 it lost 7.5% of its residents.
 

@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/opole/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/opole/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Opole liczy 124 260 mieszkańców (stan na 30 czerwca 2026 r.).
 

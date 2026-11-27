@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/klodzko/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/klodzko/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W październiku 2026 r. stopa bezrobocia rejestrowanego w powiecie kłodzkim wyniosła 13,4%. To szóste miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

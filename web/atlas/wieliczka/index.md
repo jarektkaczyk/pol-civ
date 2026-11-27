@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/wieliczka/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/wieliczka/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 The gmina of Wieliczka has the 5th youngest population of the 203 Polish towns with 20,000 or more people: a median age of 41.0 years.
 

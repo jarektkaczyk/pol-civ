@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/sanok/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/sanok/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Sanok had 33,328 residents on 30 June 2026. Between 2015 and 2025 it lost 13.0% of its residents.
 

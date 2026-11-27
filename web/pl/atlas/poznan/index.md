@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/poznan/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/poznan/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Na 1000 mieszkańców przypada tu 237 studentów. To najwyższy wynik wśród 84 miast liczących co najmniej 20 tys. mieszkańców, w których działa uczelnia.
 

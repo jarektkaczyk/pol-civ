@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/pszczyna/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/pszczyna/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Pszczyna had 24,426 residents on 30 June 2026.
 

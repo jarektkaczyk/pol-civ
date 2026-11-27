@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/bialystok/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/bialystok/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Białystok zajmuje dziesiąte miejsce w Polsce pod względem liczby mieszkańców. Liczy 288 476 mieszkańców (stan na 30 czerwca 2026 r.).
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/koszalin/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/koszalin/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Koszalin has the 4th cleanest air of the 154 towns of 20,000+ with a measuring station within 25 km: PM2.5 averaged 10.9 µg/m³ in 2025 at the nearest station.
 

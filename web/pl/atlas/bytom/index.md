@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/bytom/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/bytom/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W latach 2015-2025 liczba mieszkańców miasta spadła o 15,3%. Pod względem tempa spadku Bytom zajmuje trzecie miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

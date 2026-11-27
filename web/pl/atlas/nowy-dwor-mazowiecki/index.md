@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/nowy-dwor-mazowiecki/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/nowy-dwor-mazowiecki/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Nowy Dwór Mazowiecki liczy 28 344 mieszkańców (stan na 30 czerwca 2026 r.). W latach 2015-2025 liczba ludności wzrosła o 0,2%.
 

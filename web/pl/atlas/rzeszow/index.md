@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/rzeszow/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/rzeszow/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Na 1000 mieszkańców przypada tu 177 studentów. To piąte miejsce wśród 84 miast liczących co najmniej 20 tys. mieszkańców, w których działa uczelnia.
 

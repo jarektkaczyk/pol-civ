@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/tychy/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/tychy/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W październiku 2026 r. stopa bezrobocia rejestrowanego w mieście wyniosła 2,6%. To siódme miejsce od końca wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

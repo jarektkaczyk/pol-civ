@@ -57,7 +57,9 @@ _CSP_COMMON = ("default-src 'self'; script-src 'self' https://eu-assets.i.postho
                "connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com https://cloudflareinsights.com; "
                "img-src 'self' data: blob:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'")
 ATLAS_CSP = _CSP_COMMON + "; style-src 'self'"
-APP_CSP = _CSP_COMMON + "; style-src 'self' 'unsafe-inline'"  # the app sets inline styles from JS
+# The app also reads today's power figures from the PSE open API (ext/power).
+APP_CSP = (_CSP_COMMON.replace("https://cloudflareinsights.com;", "https://cloudflareinsights.com https://api.raporty.pse.pl;")
+           + "; style-src 'self' 'unsafe-inline'")  # the app sets inline styles from JS
 MAIN_OG = "og-image.jpg"
 MAIN_OG_PL = "og/pl/main.jpg"
 # Cloudflare Web Analytics is injected by js/app/analytics.js (token in js/app/config.js) under the PostHog guard.
@@ -1710,6 +1712,36 @@ FILE_INFO = {
     "economy.json": ("Made in Poland and Tech and games: product and tech sites with one fact each, and the game studios of each town.",
                      ["items (layer, kind, name, place, fact, year, ref, x, y, cell, county, state)", "kinds", "rules"],
                      ["pl_econ_champions", "pl_tech_sites"]),
+    "permits_monthly.json": ("Building permits for new factories and warehouses per gmina and month, from the GUNB permit register.",
+                             ["months", "gminas (code, name, x, y)", "counts (month, gmina, permits)", "national", "rules"],
+                             ["pl_econ_permits"]),
+    "trains.json": ("Every passenger train of one ordinary weekday: operator, number, name, stops with times and the line it runs on.",
+                    ["trips (op, cat, no, name, p, t)", "patterns (shape, stops, d)", "shapes", "stations (name, x, y)",
+                     "operators", "rules", "attribution"], ["pl_rail_gtfs"]),
+    "flights.json": ("Air routes from the main Polish airports with passengers per month over the newest 12 months.",
+                     ["routes (from, to, value, total, end, bearing, km)", "airports (icao, name, label, city, country, x, y)",
+                      "months", "rules"], ["pl_air_routes"]),
+    "power.json": ("One day of the power system every 15 minutes: generation by fuel, wind, solar, demand and the flows "
+                   "on each border, with the border lines, the largest wind and solar sites and capacity by powiat.",
+                   ["t", "mix (by fuel group)", "wind", "solar", "demand", "neighbours (code, net, lines)",
+                    "wind_farms", "solar_farms", "res_powiat", "live", "rules", "attribution"],
+                   ["pl_power_pse", "pl_energy_plants", "pl_energy_res"]),
+    "migration.json": ("Moves of permanent residence between the 16 voivodeships, origin by destination, every year.",
+                       ["years", "regions (code, name, capital, x, y, in, out, net)", "flows (from, to, values, path)",
+                        "rules"], ["pl_migration_od"]),
+    "money.json": ("State money for each gmina, powiat and voivodeship in one year: PIT and CIT shares, general subsidy "
+                   "and the wealth correction.",
+                   ["units (code, level, kind, name, x, y, pit, cit, subsidy, total, correction, needs)", "fields",
+                    "rules"], ["pl_local_finance_flows"]),
+    "timelapse.json": ("Tourist nights per voivodeship for each of the newest 36 months, and the presidential runoffs "
+                       "and population years that play over time.",
+                       ["states", "tourism (months, nights, per_resident, national, population)",
+                        "elections (frames: year, lens, candidate, share, turnout)", "population", "rules"],
+                       ["pl_tourism_monthly", "pl_stats_population", "pl_soc_elections", "pl_hist_population"]),
+    "smog.json": ("Hourly PM2.5 at every automatic GIOŚ station in the week with the worst smog of winter 2025/26, "
+                  "and the same hours on hexes within 40 km of a station.",
+                  ["start", "hours", "stations (id, name, city, x, y, pm25)", "cells", "values", "national_hourly",
+                   "peak", "rules"], ["pl_air_hourly"]),
     "sources.json": ("The bibliography: every source with publisher, licence, vintage and the exact files used.", ["id", "publisher", "license", "vintage", "files"], []),
 }
 
@@ -1734,6 +1766,20 @@ def _rows(name: str, doc) -> int | None:
         return len(doc.get("layers") or []) or None
     if name == "timeline.json":
         return len(doc.get("cells") or []) or None
+    if name == "trains.json":
+        return len(doc.get("trips") or []) or None
+    if name == "permits_monthly.json":
+        return len(doc.get("gminas") or []) or None
+    if name == "power.json":
+        return len(doc.get("t") or []) or None
+    if name == "migration.json":
+        return len(doc.get("flows") or []) or None
+    if name == "money.json":
+        return len(doc.get("units") or []) or None
+    if name == "timelapse.json":
+        return len((doc.get("tourism") or {}).get("months") or []) or None
+    if name == "smog.json":
+        return len(doc.get("stations") or []) or None
     return None
 
 
@@ -1809,6 +1855,14 @@ FILE_INFO_PL = {
     "commuting.json": "Dojazdy do pracy do 12 największych miast według macierzy gmin z NSP 2021.",
     "timeline.json": "Roczna gęstość zaludnienia i zmiana liczby ludności na polskich heksach w latach 2015-2026.",
     "economy.json": "Z Polski na świat oraz Technologie i gry: zakłady, firmy i ośrodki z jednym faktem każdy oraz studia gier w każdym mieście.",
+    "permits_monthly.json": "Pozwolenia na budowę nowych hal i magazynów według gmin i miesięcy, z rejestru GUNB.",
+    "trains.json": "Wszystkie pociągi pasażerskie jednego zwykłego dnia roboczego: przewoźnik, numer, nazwa, stacje z godzinami i linia, po której jadą.",
+    "flights.json": "Trasy lotnicze z głównych polskich lotnisk z liczbą pasażerów w każdym z ostatnich 12 miesięcy.",
+    "timelapse.json": "Noclegi turystów według województw w każdym z 36 ostatnich miesięcy oraz drugie tury wyborów prezydenckich i liczba ludności w kolejnych latach, do odtwarzania w czasie.",
+    "smog.json": "Godzinowe stężenia PM2,5 na wszystkich automatycznych stacjach GIOŚ w tygodniu z najgorszym smogiem zimy 2025/26 oraz te same godziny na heksach w promieniu 40 km od stacji.",
+    "power.json": "Jedna doba systemu elektroenergetycznego co 15 minut: produkcja według paliw, wiatr, słońce, zapotrzebowanie i przepływy na każdej granicy, z liniami transgranicznymi, największymi farmami wiatrowymi i fotowoltaicznymi oraz mocą według powiatów.",
+    "migration.json": "Zmiany miejsca pobytu stałego między 16 województwami (skąd i dokąd) w każdym roku.",
+    "money.json": "Pieniądze od państwa dla każdej gminy, powiatu i województwa w jednym roku: udziały w PIT i CIT, subwencja ogólna i korekta z tytułu zamożności.",
     "sources.json": "Bibliografia: każde źródło z wydawcą, licencją, stanem danych i dokładnie wykorzystanymi plikami.",
 }
 

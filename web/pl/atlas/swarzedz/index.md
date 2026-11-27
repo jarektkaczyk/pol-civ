@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/swarzedz/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/swarzedz/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W październiku 2026 r. stopa bezrobocia rejestrowanego w powiecie poznańskim wyniosła 1,4%. To najniższy wynik wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

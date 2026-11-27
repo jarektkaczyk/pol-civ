@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/zachodniopomorskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/zachodniopomorskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Women in Zachodniopomorskie have the 4th shortest life expectancy of the 16 voivodeships: 82.0 years at birth in 2025.
 

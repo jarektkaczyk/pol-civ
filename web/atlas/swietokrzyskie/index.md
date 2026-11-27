@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/swietokrzyskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/swietokrzyskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Świętokrzyskie lost 8.7% of its residents between 2015 and 2025, the steepest fall of the 16 voivodeships.
 

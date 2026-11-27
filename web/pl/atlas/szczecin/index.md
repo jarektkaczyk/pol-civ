@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/szczecin/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/szczecin/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Szczecin zajmuje siódme miejsce w Polsce pod względem liczby mieszkańców. Liczy 382 271 mieszkańców (stan na 30 czerwca 2026 r.).
 

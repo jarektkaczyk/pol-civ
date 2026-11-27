@@ -365,7 +365,8 @@ a `check(web_dir)` (see Pipeline conventions). Shared rules:
 * Rules that pick things (districts, wonders, routes) are published inside the file as text (`rule` / `rules`) so the UI
   and the Almanac can quote them.
 * **Loading** (browser): `infrastructure`, `military`, `wonders`, `trade` load eagerly right after the first frame (keep
-  each **under ~300 kB**); `citizens`, `districts`, `disasters`, `economy` load on demand with `app.loadData(name)`.
+  each **under ~300 kB**); `citizens`, `districts`, `disasters`, `economy`, `commuting`, `permits_monthly` load on
+  demand with `app.loadData(name)`.
 
 ### citizens.json (lazy)
 
@@ -489,6 +490,7 @@ the drawn paths prefer mapped transport links.
   "sources": ["pl_transport_freight"],
   "rule": "The 30 largest published rail freight flows between Polish voivodeships...",
   "path_note": "The source gives each shipment's origin and destination region, not its route...",
+  "rules": ["<rule>", "<path_note>", "On the moving map, each wagon stands for the same tonnage on every route..."],
   "units": {"value_kt": "thousand tonnes"},
   "modes": [{"id": "rail", "name": "Rail"}],
   "national_kt": {"interregional_rail": 80569.8},
@@ -507,7 +509,9 @@ the drawn paths prefer mapped transport links.
 
 The file contains 16 zones. The route rule keeps the largest 30 bidirectional pairs at least 100 km apart. Each path is
 a neighbouring-cell chain and is a drawing aid. Eurostat does not publish a road origin-destination matrix. The 2025
-road values stay as NUTS3 loading and unloading totals and never become invented routes.
+road values stay as NUTS3 loading and unloading totals and never become invented routes. The moving wagons
+(`ext/layers/tradeMotion.js`, a motion layer on the "day" axis) split about 150 trains over the routes in proportion to
+`value_kt`, half each way; at the country view only the 15 routes drawn there carry them.
 
 ### military.json (eager)
 
@@ -638,6 +642,7 @@ Built by `pipeline/build/commuting.py` from `pl_flows_commuting` (GUS NSP 2021 c
   "version": 1, "vintage": "NSP 2021 (31 March 2021), matrix published 31 January 2024",
   "sources": ["pl_flows_commuting"],
   "rule": "The 12 most populous cities (30 June 2026). Into each: the flows ... of 250 people or more, the largest 40.",
+  "rules": ["<the rule above>", "On the moving map, dots travel into each city in the morning ... for show only."],
   "cities": [{"id": "1465011", "name": "Warszawa", "x": 478.3, "y": 323.1,   // the cities.json banner point
               "commuters_in": 390395, "commuters_out": 56045,             // all flows, incl. those under 3 people
               "arcs": [{"from": "1418043", "name": "Piaseczno", "value": 15550, "x": 481.0, "y": 340.2}]}]
@@ -645,13 +650,16 @@ Built by `pipeline/build/commuting.py` from `pl_flows_commuting` (GUS NSP 2021 c
 ```
 
 * `value` = wage employees living in gmina `from` and working in the city (whole counts). Arc start = the mean of the
-  home gmina's hexes. Urban-rural gminas are whole gminas (GUS publishes town and rural parts; the source adds them).
+  home gmina's hexes. The moving commuters (`ext/commuting/motion.js`, a motion layer on the "day" axis) leave home
+  05:00-09:00 and the city 15:00-18:00 on a smooth curve, with slots per arc proportional to `value` (about 1,400 over
+  all arcs). The census has no hours, so `rules[1]` says the hours are for show. Urban-rural gminas are whole gminas (GUS publishes town and rural parts; the source adds them).
 
 ### timeline.json (lazy)
 
 Built by `pipeline/build/timeline.py` from `pl_hist_population` (GUS bulk population tables). Loaded by
-`ext/timeline` when the density or the change lens is first shown; it drives the year slider in their legend
-(`#year=2019` in the URL; the key is left out at the lens's own date).
+`ext/timeline` when the density or the change lens is first shown; it plays the years on the motion clock (year axis,
+`#t=2019`; an old `#year=2019` link still opens that year). `rules` repeats `notes` for the Almanac "Moving layers"
+page. Without the motion engine the legend gets its own play button and year slider.
 
 ```jsonc
 {
@@ -670,6 +678,63 @@ Built by `pipeline/build/timeline.py` from `pl_hist_population` (GUS bulk popula
   density lens times population(date) / population(30 June 2026) of each gmina, so the last date equals the lens.
   Change: population(date) / population(31 Dec 2015) - 1 per gmina, spread with the change lens's weights (0 on 2015).
 * Each date is on that date's gmina borders; from 31 December 2021 GUS counts are rebased on the 2021 census.
+
+### timelapse.json (lazy)
+
+Built by `pipeline/build/timelapse.py` from `pl_tourism_monthly` (GUS BDL P2882), `pl_stats_population`,
+`pl_soc_elections`, `lenses.json` and `timeline.json`. Feeds the time-lapse lenses on the shared motion clock.
+
+```jsonc
+{
+  "version": 1, "vintage": {"tourism": "...", "elections": "...", "population": "..."},
+  "sources": ["pl_tourism_monthly", "pl_stats_population", "pl_soc_elections", "pl_hist_population"],
+  "states": ["02", ..., "32"],                    // TERYT2, world.json `states` order (a hex's `owner` indexes it)
+  "tourism": {
+    "axis": "month", "months": ["2023-10", ..., "2026-09"],      // the newest 36 published months
+    "nights": [[int|null]],                       // one row per month, one value per entry of `states`
+    "per_resident": [[float|null]],               // nights / population on `population_date`
+    "national": [int|null],                       // sum of the 16 voivodeships per month (null if one is missing)
+    "population": [int], "population_date": "2025-12-31"
+  },
+  "elections": {"axis": "year", "frames": [
+    {"year": 2015, "date": "2015-05-24", "lens": "vote_2015", "candidate": "Andrzej Duda",
+     "opponent": "Bronisław Komorowski", "share": 0.5155, "turnout": 0.5534}, ...]},   // national results, 0..1
+  "population": {"axis": "year", "file": "timeline.json", "lenses": ["density", "growth"],
+                 "first": "2015-12-31", "last": "2026-06-30"},
+  "rules": ["..."]
+}
+```
+
+* Tourism is published per voivodeship only (BDL levels 5 and 6 are empty); every hex shows its voivodeship.
+* Election frames name lenses in `lenses.json` that share one ramp, domain and scale (the check fails otherwise).
+  Between two runoffs the browser may blend the two lenses' colours; numbers exist only for the runoff years.
+* The lenses `tourism_monthly` and `smog_week` live in `lenses.json` (built by `lenses_more_d.py`) as one still
+  frame: the newest month, and the hour with the highest national mean. Their `time` block names the axis and the
+  file the browser plays them from: `{"axis": "month", "file": "timelapse", "first", "last", "shown"}` and
+  `{"axis": "hour", "file": "smog", "start", "hours", "shown"}` (`shown` = the hour index of the still frame).
+
+### smog.json (lazy)
+
+Built by `pipeline/build/smog.py` from `pl_air_hourly` (GIOŚ hourly PM2.5). The worst smog week of winter
+2025/26, one frame per hour.
+
+```jsonc
+{
+  "version": 1, "vintage": "GIOS hourly PM2.5, ...", "sources": ["pl_air_hourly"],
+  "axis": "hour", "start": "2026-01-18T00:00+01:00", "hours": 168, "unit": "ug/m3",  // hour h starts at start + h
+  "national_mean": 58.3, "national_hourly": [float|null],    // mean over the stations reporting each hour
+  "peak": {"value": 503.1, "station": "Łomża, ul. Sikorskiego", "hour": 71},       // highest station hour of the week
+  "stations": [{"id": "MpKrakAlKras", "name": "...", "city": "Kraków", "x": 0.0, "y": 0.0, "cell": 0,
+                "pm25": [float|null]}],                     // one value per hour, as GIOŚ published it
+  "cells": [int],                                           // Polish land hexes within 40 km of a station
+  "values": [[int|null]],                                   // one row per hour, one whole ug/m3 per entry of `cells`
+  "rules": ["..."]
+}
+```
+
+* A hex value is the inverse-distance-weighted mean (power 2, a station inside the hex counts as 1 km away) of
+  the stations within 40 km that report that hour; null when none do.
+* GIOŚ time is UTC+1 all year; its stamp hh:00 closes the hour, so `values[0]` is GIOŚ's stamp `start` + 1 h.
 
 ### economy.json (lazy)
 
@@ -706,6 +771,259 @@ switch is first turned on, and by the City View for its "Made here" block.
 * `county` is the gmina the point lies in, by point in polygon against the LAU 2024 outlines (`county_by: "polygon"`);
   a point on the coast outside every outline takes the gmina of its land hex (`county_by: "hex"`). `cell` is the
   nearest Polish land hex. Studio positions are their headquarters town, so the browser shows one marker per town.
+
+### trains.json (lazy, motion layer)
+
+Built by `pipeline/build/trains.py` from `pl_rail_gtfs`: every passenger train of one ordinary Wednesday. Loaded by the
+Trains motion layer on first use. About 3 MB (target under 4 MB).
+
+```jsonc
+{
+  "version": 1, "vintage": "PKP PLK timetable via GTFS feed 2026-11-27; weekday 2026-12-16",
+  "sources": ["pl_rail_gtfs"], "day": "2026-12-16", "period": "2026-12-16", "unit": "s",
+  "rules": ["...one sentence per rule..."],
+  "attribution": {"credit": ["PKP Polskie Linie Kolejowe S.A.", "Koleje Mazowieckie - KM sp. z o.o.", "Mikołaj Kuranowski (GTFS, mkuran.pl/gtfs)"],
+                  "created": "2026-11-27T01:45Z", "retrieved": "2026-11-27T06:52Z",   // feed version and download time, UTC
+                  "processed": "Converted from the GTFS feed for this map: ...",     // translated data text
+                  "feed": ["...lines of the feed's attributions.txt..."]},
+  "operators": [{"id": "IC", "name": "PKP Intercity", "long_distance": true, "trips": 589}],  // long distance first
+  "stations": [{"name": "Kraków Główny", "x": 396.1, "y": 560.2}],
+  "shapes": [[x0, y0, x1, y1, ...]],               // map km, 0.1 km, Douglas-Peucker 0.3 km, each line once
+  "patterns": [{"shape": 12, "stops": [41, 7, 903], "d": [0.0, 4.4, 294.9], "tech": [1]}],
+  "trips": [{"op": 0, "cat": "EIP", "no": "1300/1", "name": null, "p": 812, "t": [23940, 360, 300, 240, 60, 7980, 0]}],
+  "range": [-26400, 123900],
+  "dropped": {}
+}
+```
+
+* `patterns[].stops` index `stations`; `d` is each stop's distance (km) along its shape, measured on the stored
+  polyline, so the browser places a train with the cumulative lengths of that polyline. `tech` lists stop positions
+  where passengers may not board or alight (left out when empty).
+* `trips[].t` = [departure from the first stop, then for each next stop: running seconds, dwell seconds]. Times count
+  from 00:00 of `day`: negative for a night train that left the evening before, above 86,400 for one that arrives the
+  next morning. A train is on the map while `t[0] <= clock <= last arrival`.
+* `op` indexes `operators`; `cat` is the PKP PLK category code (`EIP`, `IC`, `TLK`, `R`, `Os`, `S1`, ...); `no` the
+  train number; `name` the train name or null.
+* `attribution` is what the PKP PLK and Koleje Mazowieckie re-use terms ask for (source, when the data was made and
+  obtained, that it was processed); the Almanac's "Moving layers" page shows it. A motion data file may carry the same
+  object: `credit` (names), `created` (or null), `retrieved` (UTC), `processed`, and an optional `disclaimer`. With
+  `created` null the Almanac writes "Source: <credit>, retrieved <date>".
+* `dropped` counts trips left out by the builder (station without coordinates) or drawn on straight lines (no shape).
+
+### flights.json (lazy, motion layer)
+
+Built by `pipeline/build/flights.py` from `pl_air_routes` (Eurostat `avia_par_pl` plus OurAirports and Wikidata).
+About 0.1 MB.
+
+```jsonc
+{
+  "version": 1, "vintage": "Eurostat avia_par_pl 2024-01 to 2024-12 (data updated 2025-10-22)",
+  "sources": ["pl_air_routes"], "months": ["2024-01", "...", "2024-12"], "period": "2024-01/2024-12",
+  "unit": "passengers", "rules": ["..."],
+  "airports": [
+    {"icao": "EPWA", "iata": "WAW", "name": "Warszawa-Chopin", "label": "Warszawa-Chopin", "label_pl": "Warszawa-Chopin",
+     "city": "Warsaw", "city_pl": "Warszawa",
+     "country": "PL", "country_name": "Poland", "polish": true, "x": 475.8, "y": 330.6, "on_map": true,
+     "routes": 92, "top": [12, 40, ...], "value": [1234567, ...]},
+    {"icao": "LGAV", "iata": "ATH", "name": "Athens Eleftherios Venizelos International Airport", "label": "Athens International Airport \"Eleftherios Venizelos\"",
+     "label_pl": "Ateny", "city": "Athens", "city_pl": "Ateny",
+     "country": "GR", "country_name": "Greece", "polish": false, "x": null, "y": null, "on_map": false}
+  ],
+  "routes": [{"from": 10, "to": 37, "domestic": false, "value": [9603, ...], "unit": "passengers",
+              "total": 657567, "end": [682.5, 695.3], "bearing": 151.7, "km": 1864}]
+}
+```
+
+* `value` = passengers carried on the route (both directions) in each month of `months`; null = no value.
+  Polish airports also carry `value` (the sum of their routes per month, not the airport total), `routes` and `top`
+  (indices of their 10 largest routes by 12-month total).
+* `name` = OurAirports name (Polish airports: the project's Polish name). `label` / `label_pl` = the airport's short
+  Wikidata label in English and Polish ("London Heathrow" / "Londyn-Heathrow"); `city` / `city_pl` = the place it
+  serves (Wikidata P931; it can be a region or metro area, for example "Greater Manchester"), null when unknown.
+* `end` = the partner airport (map km) when it is on the map, otherwise the point where the great circle from the
+  Polish airport leaves the map; `bearing` = initial true bearing (degrees), `km` = great-circle distance.
+* Domestic routes are reported by both airports, so each appears twice (once per end): draw one of them.
+* `attribution` = `{"credit": ["Eurostat (avia_par_pl)"], "created": null, "retrieved": "2026-11-27T07:00Z",
+  "processed": "We selected the 12 latest months, ...", "disclaimer": "Eurostat is not responsible for the changes."}`:
+  what Eurostat's re-use notice asks for modified data. `trade.json` carries the same object for its Eurostat freight
+  data. `processed` and `disclaimer` are translated data text.
+
+### power.json (lazy, motion layer)
+
+Built by `pipeline/build/power.py` from `pl_power_pse` (PSE reports `his-gen-pal`, `his-wlk-cal`, `przeplywy-mocy`;
+OSM border lines), `pl_energy_plants` and `pl_energy_res`: the newest complete day of the grid, the fallback of the
+"Power now" layer, which first asks PSE for today with the `live` request. About 60 kB.
+
+```jsonc
+{
+  "version": 1, "vintage": "PSE 2026-11-26 (15-minute data); OpenStreetMap 2026-11-27",
+  "sources": ["pl_power_pse", "pl_energy_plants", "pl_energy_res"], "rules": ["..."],
+  "unit": "MW", "period": "15 min", "day": "2026-11-26", "timezone": "Europe/Warsaw", "step": 900,
+  "t": [0, 900, ...],                      // start of each quarter, seconds from local midnight (96 values)
+  "utc": ["2026-11-25 23:15:00", ...],     // PSE dtime_utc (end of the quarter)
+  "groups": [{"key": "hard_coal", "label": "Hard coal", "codes": ["B05"]}],   // ENTSO-E production types per group
+  "mix": {"hard_coal": [MW per quarter], ...},
+  "wind": [MW], "solar": [MW], "demand": [MW],
+  "neighbours": [{"code": "DE", "name": "Germany", "unit": "MW", "sections": ["DE-PL", "PL-DE"],
+                  "net": [MW per quarter, + = into Poland],
+                  "lines": [{"id": "ic:DE:way/...", "name": "...", "voltage_kv": [400], "hvdc": false,
+                             "x": 34.9, "y": 211.6,            // border crossing, map km
+                             "path": [x0, y0, ...],            // Polish side first; ends on the map edge when "edge"
+                             "edge": false, "bearing": 238.0}]}],
+  "wind_farms": [{"id", "name", "kind": "onshore" | "offshore", "status", "mw", "x", "y"}],
+  "solar_farms": [{"id", "name", "kind": "solar", "status", "mw", "x", "y"}],
+  "res_powiat": [{"code": "0201", "name": "...", "x", "y", "wind_mw", "solar_mw"}], "res_as_of": "2026-09-30",
+  "live": {"base": "https://api.raporty.pse.pl/api/", "reports": {"mix": "his-gen-pal", "totals": "his-wlk-cal",
+           "flows": "przeplywy-mocy"}, "filter": "business_date eq '{day}'", "first": 2000,
+           "timezone": "Europe/Warsaw", "timeout_ms": 4000},
+  "attribution": {"credit": ["PSE S.A."], "created": "2026-11-27T01:52Z", "retrieved": "2026-11-27T07:07Z",
+                  "processed": "..."}
+}
+```
+
+* The browser sends only `GET <base><report>?$filter=<filter with today's Warsaw date, URL-encoded>&$first=2000`,
+  without credentials or referrer, and keeps the quarters that have demand, wind, solar, 10+ production types and
+  every border. Fewer than 4 such quarters or an error: it plays the stored day. No answer within `timeout_ms`: it
+  plays the stored day and switches to today if the answer still comes (the request is cut after 20 s).
+
+### migration.json (lazy, motion layer)
+
+Built by `pipeline/build/migration.py` from `pl_migration_od` (GUS BDL P1358). About 100 kB.
+
+```jsonc
+{
+  "version": 1, "vintage": "GUS BDL P1358, years 1995 to 2025", "sources": ["pl_migration_od"], "rules": ["..."],
+  "unit": "persons", "period": "year", "years": [1995, ..., 2025],
+  "regions": [{"code": "14", "abbr": "MZ", "name": "Mazowieckie", "capital": "Warszawa", "x": 478.3, "y": 323.1,
+               "in": [per year], "out": [per year], "net": [per year]}],
+  "flows": [{"from": "06", "to": "14", "unit": "persons", "values": [per year, null = not published],
+             "path": [x0, y0, ...]}]            // an arc between the two capitals, bowed left of the direction
+}
+```
+
+### money.json (lazy, motion layer)
+
+Built by `pipeline/build/money.py` from `pl_local_finance_flows` (Ministry of Finance, amounts for one year). About
+780 kB.
+
+```jsonc
+{
+  "version": 1, "vintage": "MF, amounts for 2026 (final, budget act)", "sources": ["pl_local_finance_flows"],
+  "rules": ["..."], "year": 2026, "unit": "PLN", "period": "year",
+  "state": {"name": "State budget", "x": 478.3, "y": 323.1},
+  "fields": [{"key": "pit", "label": "PIT share"}, ...],
+  "needs_parts": ["Equalising", "Education", "Development", "Ecological", "Supplementary"],
+  "units": [{"code": "1465011", "level": "gmina" | "powiat" | "voivodeship",
+             "kind": "gmina" | "city_powiat" | "powiat" | "voivodeship", "name": "Warszawa", "x": 478.3, "y": 323.1,
+             "pit": 15008095026, "cit": 3374553800, "subsidy": 302443273, "total": 18685092099,
+             "correction": 941414099,           // wealth correction (art. 32), 0 when none; already taken off
+             "pit_calc": 15008095026, "cit_calc": 3374553800, "needs": 6771300679, "needs_parts": [5 values]}]
+}
+```
+
+### permits_monthly.json (lazy)
+
+Built by `pipeline/build/permits_monthly.py` from the cached GUNB permit register zips (`data/raw/pl_econ_permits/`),
+read through the `pl_econ_permits` source code: only six columns are read, never investor or designer names. Loaded by
+`ext/permits` when the "New factories and warehouses" switch is first turned on; it drives that time-lapse.
+
+```jsonc
+{
+  "version": 1, "vintage": "GUNB permit register, file of 2026-11-25; decisions 2016-01 to 2026-10",
+  "sources": ["pl_econ_permits"],
+  "rules": ["Each marker is one building permit decision for a new industrial or storage building ...", "..."],
+  "unit": "decisions",
+  "months": ["2016-01", "2016-02", "...", "2026-10"],        // every month, oldest first
+  "gminas": [{"code": "0201011", "name": "Bolesławiec", "x": 102.2, "y": 425.8}],   // only gminas with a decision
+  "counts": [0, 28, 1, 0, 31, 2, "..."],                      // flat [month index, gmina index, decisions] triples
+  "national": [51, 121, "..."],                               // decisions per month (sum of that month's counts)
+  "total": 36734,
+  "notes": ["..."]
+}
+```
+
+* A decision is a unique (issuing authority, decision number) pair in building category XVIII (industrial and storage
+  buildings) with works "budowa nowego", counted once per gmina in the month of its earliest decision date. A decision
+  for buildings in two gminas counts in each, as in the `pl_econ_permits` lens.
+* `months` runs from 2016-01 (the register's first month) to the newest month the files cover in full (the month before
+  the file date, or the file date's month when the file is dated on its last day).
+* `x`, `y` = the area centroid of the gmina's LAU outline in map km (the hex mean when a gmina has no outline). TERC
+  codes of town and rural parts map to the whole gmina, Warsaw districts to the city, as in `pl_econ_permits`.
+* `counts` triples are sorted by month, then gmina. `national[k]` is the sum of the counts of month `k`.
+
+## Motion layers (browser)
+
+Animated map layers share one clock (`web/js/ext/motion/`, installed first and exposed as `app.motion`). A layer's
+static art (arcs, routes) stays a static layer in the cached map; the moving part is a motion layer drawn every frame in
+one overlay (z 92, under the city banners).
+
+```js
+app.motion.register({
+  id: "trains",                 // also the Map-menu toggle id (the layer registers its own toggle with app.ui.addMapToggle)
+  name: t("Trains"),            // optional: the name the Almanac shows (the toggle label)
+  data: "trains",               // optional: the web/data file whose rules, sources, vintage and attribution the Almanac shows
+  axis: "day",                  // "day" | "hour" | "month" | "year" | "live": what the clock counts for this layer
+  range: [0, 86400],            // day: seconds; hour: hour index (app.motion.hour("2026-01-18T00:00"));
+                                // month: month index (app.motion.month("2016-01")); year: 1995..2025; live: null.
+                                // May be a getter (a range that depends on the data, read every frame).
+  step: 60,                     // optional: the scrubber snaps to it
+  speed: 1440,                  // axis units per real second at 1x (day: 1440 = 24 h in 60 s)
+  start: 23400,                 // optional: the clock value when the layer first takes the clock (default range[0])
+  loop: true,                   // optional: wrap at the end (default true on "day"); else play stops on the last value
+  z: 10,                        // optional: draw order among motion layers
+  label(t) { return "08:15"; },             // the clock text, localized
+  status(t) { return "8,492 permits"; },    // optional: a running count beside the scrubber, localized
+  active() { return on; },                  // is the layer on (read every frame)
+  load() { return Promise; },               // lazy data load, called once on first activation
+  draw(ctx, vp, t, o) { return dotsDrawn; },// per frame; ctx in world km; vp = {x0, y0, x1, y1, s, cam, dpr};
+                                            // o = {Rpx, lens, dpr, s, cam}; return the number of dots drawn
+  hit(mx, my) { return {html} | null; },    // optional hover card; screen css px; html is escaped by the layer
+  filter(sel) {},                           // optional: the "select" payload ({kind: "city", city} | {kind: "state", ...}
+                                            // | null) when the selection changes or the layer turns on
+});
+app.motion.clock    // {t, axis, layer, playing, speed (1 | 4 | 16), play(), pause(), toggle(), seek(t), setSpeed(k), axisOf(id)}
+app.motion.particles(path, {slots, speed, shape: "dot" | "wagon", seed, dir, offset, size, color, cars})
+  // -> {len, slots, travel, bbox, at(d), draw(ctx, vp, t, {density, alpha, dir, size, color, cars, gap, offset}) -> dots}
+app.motion.month("2018-06") -> 24221;  app.motion.monthIso(24221) -> "2018-06";  app.motion.hhmm(29700) -> "08:15"
+app.motion.hour("2026-01-20T23:00") -> 491375;  app.motion.hourIso(491375) -> "2026-01-20T23:00"
+  // hour axis: whole hours since 1970-01-01T00:00 on the data's own wall clock (no time zone, no DST)
+app.motion.layers() -> [{id, name, data, axis, on, loaded, t}];  app.motion.stats() -> {frames, dots, drawMs}
+```
+
+* **Clock.** One clock bar (play/pause, time label, scrubber, the layer's `status`, speed 1x/4x/16x) sits above the lens
+  dock while any motion layer is on. It follows the axis of the most recently enabled layer; layers on another axis hold
+  their last frame. Each axis keeps its own value, so switching back resumes where it was. `clock.speed` is the multiplier
+  of each layer's `speed`. A day layer loops; a time-lapse stops on its last value and the play button replays it.
+* **Frames.** Clock time comes from `performance.now()` (frame gaps are capped at 0.25 s). While a motion layer is on
+  and the clock plays, the overlay asks main for the next frame; it stops when the clock pauses, when no motion layer is
+  on and while the tab is hidden. A fake clock (Playwright `page.clock`) drives it frame by frame.
+* **Reduced motion.** With `prefers-reduced-motion: reduce` nothing plays by itself: the layer draws one still frame at
+  its `start` and the play button works on demand.
+* **URL.** `#t=` keeps the clock value in the axis's own form: `08:15` (day), `2026-01-20T23:00` (hour), `2018-06`
+  (month), `2019` (year). It is
+  written when the clock is paused, sought or stops, never while it plays (so a playing clock adds no history entries).
+  The layers that are on stay in `layers=`. A link with `t=` opens paused at that value.
+* **particles.** A dot's place is a pure function of `t`, so pause and scrub are exact. `slots` dots are spread along the
+  path; `density(tDepart)` (0..1, or a number) says how many slots carry a dot for trips that left at `tDepart`, so a dot
+  appears or vanishes only at the path ends. Sprites are cached per shape, colour, size and device scale; dots are drawn
+  in screen pixels and the path is culled by its bounding box.
+* **Budget.** At most about 3,000 moving dots and 60 fps on a mid-range phone (390x844, 4x CPU throttling in headless
+  Chromium). Use level of detail by zoom (fewer cars per train, fewer routes at the country view) and cull to `vp`.
+* **Hover.** A static layer `motion-hit` (z 86, draws nothing) asks the active motion layers' `hit()`, newest first.
+* **Layers now.** `commuters` (day; `ext/commuting/motion.js`), `trade` (day; `ext/layers/tradeMotion.js`), `permits`
+  (month, 2016-01 to the newest month; `ext/permits`), `trains` (day, one Wednesday; `ext/trains`, static layer
+  `train-stations`), `flights` (month, loops over the 12 months; `ext/flights`, static layers `flight-routes` and
+  `flight-airports`), `power` (day, today from PSE or the stored day; `ext/power`), `migration` (year, 1995 to
+  2025; `ext/migration`), `money` (live, one year; `ext/money`, static layer `money-units`). Their toggles keep their
+  ids (`layers=commuters,trade,permits,trains,flights,power,migration,money`).
+  Lens layers have no toggle: they are on while their lens is shown (`ext/timelapse`, `ext/timeline`):
+  `tourism-monthly` (month, the newest 36 months; lens `tourism_monthly`), `smog-week` (hour, one week; lens
+  `smog_week`), `vote-morph` (year, 2015 to 2025; lenses `vote_2015`, `vote_2020`, `vote`, the shown lens follows the
+  runoff the clock has reached) and `population` (year, 2015 to June 2026; lenses `density`, `growth`). Each swaps its
+  lens's `values` and recolours the static map only when the shown moment changes (a month, an hour, a quarter year
+  of the vote blend, a year); a pick of the lens after load seeks the clock to that lens's start.
+* **Almanac.** The "Moving layers" page lists every registered layer by `name`, with the `rules`, `sources`,
+  `vintage` and `attribution` of its `data` file (loaded on demand), so a new motion layer needs no Almanac code.
 
 ## data/index.json
 
@@ -760,8 +1078,10 @@ saved by `download_prefix()` has a `partial` note in the manifest, and its `sha2
 
 Extensions live in `web/js/ext/<name>/index.js` and export `install(app)`; `ext/index.js` loads `cityView`, `advisors`,
 `layers` (roads, rail, forts, ports, airports, wonders and trade routes), `history` (1914 and interwar borders),
-`commuting` (commuter arcs), `timeline` (the year slider of the population lenses) and `economy` (the "Made in Poland"
-and "Tech and games" sites). The API:
+`commuting` (commuter arcs), `timeline` (the year slider of the population lenses), `economy` (the "Made in Poland"
+and "Tech and games" sites), `motion` (the shared clock of the animated layers, installed first; see "Motion layers")
+`permits` (the time-lapse of permits for new factories and warehouses), `trains` (a day of passenger trains) and
+`flights` (a year of air routes). The API:
 
 **Data.**
 * `app.data.<name>`: the core files (`world`, `cities`, `states`, `nation`, `lenses`, `resources`, `sources`) are loaded

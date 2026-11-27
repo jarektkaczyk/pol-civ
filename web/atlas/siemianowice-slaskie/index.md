@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/siemianowice-slaskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/siemianowice-slaskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Siemianowice Śląskie had 62,097 residents on 30 June 2026. Between 2015 and 2025 it lost 8.7% of its residents.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/lomza/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/lomza/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Łomża had 58,706 residents on 30 June 2026. Between 2015 and 2025 it lost 6.1% of its residents.
 

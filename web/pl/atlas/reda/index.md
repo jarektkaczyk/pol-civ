@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/reda/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/reda/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W latach 2015-2025 liczba mieszkańców miasta wzrosła o 21,0%. Pod względem tempa wzrostu Reda zajmuje czwarte miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

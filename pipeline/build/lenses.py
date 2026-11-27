@@ -20,11 +20,12 @@ from .lenses_more_a import LENSES_A, lens_values
 from .yields import Economy
 from .lenses_more_b import REQUIRES_B, lenses_b  # identity, commuting and EU funds lenses (lenses_more_b.py)
 from .lenses_more_c import GROUPS_C, LENSES_C, REQUIRES_C  # enterprise lenses (lenses_more_c.py)
+from .lenses_more_d import REQUIRES_D, lenses_d  # time-lapse lenses: tourist nights by month, smog week
 
 REQUIRES = ["_world", "pl_geo_teryt", "pl_geo_lau", "pl_geo_fua", "pl_stats_population", "pl_stats_labour", "pl_stats_prosperity",
             "pl_gdp", "pl_foreigners", "pl_census_2021", "pl_soc_elections", "pl_soc_faith", "pl_soc_air",
             "pl_soc_health", "pl_soc_universities", "pl_soc_disasters", "pl_more_gus", "pl_more_exams",
-            "pl_more_finance"] + REQUIRES_B + REQUIRES_C
+            "pl_more_finance"] + REQUIRES_B + REQUIRES_C + REQUIRES_D
 PRODUCES = ["lenses.json"]
 
 GROUPS = [
@@ -112,7 +113,7 @@ LAND = {
                   "Share of the hex's land that is built up (ESA WorldCover 2021)."),
 }
 DIGITS = {"pct": 4, "float": 2, "years": 1, "pln": 0, "int": 0}
-DOMAIN_NOTE = " Colours span the 2nd to 98th percentile of hexes; values beyond are drawn at the end colours."
+DOMAIN_NOTE = "Colours span the 2nd to 98th percentile of hexes; values beyond are drawn at the end colours."  # Almanac only
 
 # The dock has little horizontal room. The legend keeps the full statistical name; only dock buttons use these.
 SHORT_NAMES = {
@@ -218,6 +219,7 @@ def build() -> None:
             vals = spread(weights, gv, DIGITS.get(metric["format"], 2))
         lenses.append({**base, "format": metric["format"], "scale": scale, "ramp": R[ramp], "values": vals, **extra})
     lenses += lenses_b(world, units, weights, R, GROUPS)
+    lenses += lenses_d(world, R, percentile_domain)
 
     pct = world.get("pct")
     if pct:
@@ -236,7 +238,7 @@ def build() -> None:
         if "domain" in lens:
             continue
         lens["domain"] = percentile_domain(lens["values"], lens["scale"] == "log")
-        lens["description"] += DOMAIN_NOTE
+        lens["scale_note"] = DOMAIN_NOTE
     groups = [g for g in GROUPS if any(l["group"] == g["id"] for l in lenses)]
     vint = "; ".join(v for v in (stats.vintage(s) for s in ("pl_stats_population", "pl_soc_elections")) if v)
     write_web("lenses.json", {"vintage": vint, "groups": groups, "lenses": lenses})

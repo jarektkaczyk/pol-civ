@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/pabianice/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/pabianice/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Pabianice had 58,883 residents on 30 June 2026. Between 2015 and 2025 it lost 11.3% of its residents.
 

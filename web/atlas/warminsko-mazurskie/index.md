@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/warminsko-mazurskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/warminsko-mazurskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Warmińsko-Mazurskie has the highest registered unemployment of the 16 voivodeships: 9.3% in October 2026.
 

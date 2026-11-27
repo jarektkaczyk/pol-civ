@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/nysa/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/nysa/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Nysa liczy 39 591 mieszkańców (stan na 30 czerwca 2026 r.).
 

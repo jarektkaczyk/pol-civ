@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/wieliczka/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/wieliczka/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Mediana wieku w gminie Wieliczka wynosi 41,0 roku. To piąte miejsce od końca wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/walbrzych/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/walbrzych/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Wałbrzych lost 15.5% of its residents between 2015 and 2025, the 2nd steepest fall of the 203 Polish towns with 20,000 or more people.
 

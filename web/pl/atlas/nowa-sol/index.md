@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/nowa-sol/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/nowa-sol/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 Nowa Sól liczy 35 112 mieszkańców (stan na 30 czerwca 2026 r.). W latach 2015-2025 liczba ludności spadła o 10,8%.
 

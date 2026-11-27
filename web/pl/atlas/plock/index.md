@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/plock/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/plock/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W maju 2026 r. przeciętne miesięczne wynagrodzenie brutto w mieście wyniosło 10 718 zł. To piąte miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

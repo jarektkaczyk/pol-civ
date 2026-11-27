@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/olawa/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/olawa/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Oława had 32,872 residents on 30 June 2026. Between 2015 and 2025 it grew by 1.1%.
 

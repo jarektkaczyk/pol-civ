@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/mlawa/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/mlawa/
-Ostatnia aktualizacja: 2026-11-26
+Ostatnia aktualizacja: 2026-11-27
 
 W maju 2026 r. przeciętne miesięczne wynagrodzenie brutto w powiecie mławskim wyniosło 7086 zł. To czwarte miejsce od końca wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

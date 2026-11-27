@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/malopolskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/malopolskie/
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
 Małopolskie has the most tourist nights per resident of the 16 voivodeships: 8.8 in 2025.
 
