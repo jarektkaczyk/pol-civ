@@ -407,24 +407,30 @@ export function createMapToggles({ dock, after, area, hash, onChange }) {
   const glyph = (ic, size) => (ic ? (hasIcon(ic) ? icon(ic, "•", { size }) : `<span class="emoji" aria-hidden="true">${esc(ic)}</span>`) : "");
 
   // URL: layers=a,b (the ones on) while anything differs from its default; "none" = every toggle off.
-  const pending = () => (wanted ? [...wanted].filter((id) => id !== "none" && !toggles.has(id)) : []);
+  // A toggle added with keepDefault (on by default, newer than many shared links) keeps its default when a list does
+  // not name it; it is written as "-id" when switched off, so "layers=roads,rail" from an older link keeps it on.
+  const pending = () => (wanted ? [...wanted].filter((id) => id !== "none" && !id.startsWith("-") && !toggles.has(id)) : []);
+  const wantOn = (t) => (!wanted ? t.def : wanted.has(t.id) ? true : t.keepDefault && !wanted.has(`-${t.id}`) ? t.def : false);
   function hashGet() {
     const list = [...toggles.values()];
     const waiting = pending();
     if (!waiting.length && list.every((t) => isOn(t) === t.def)) return wanted && !list.length ? [...wanted].join(",") : null;
     const on = [...list.filter(isOn).map((t) => t.id), ...waiting];
-    return on.length ? on.join(",") : "none";
+    const off = list.filter((t) => t.keepDefault && t.def && !isOn(t)).map((t) => `-${t.id}`);
+    return [...(on.length ? on : ["none"]), ...off].join(",");
   }
   const parse = (v) => new Set(String(v).split(",").map((s) => s.trim()).filter(Boolean));
   function hashSet(v) {
     wanted = v == null ? null : parse(v);
-    for (const t of toggles.values()) setOn(t, wanted ? wanted.has(t.id) : t.def);
+    for (const t of toggles.values()) setOn(t, wantOn(t));
     render();
     onChange?.();
   }
   // After a change in the menu the URL follows the switches (plus ids still waiting for their toggle).
   const syncWanted = () => {
-    if (wanted) wanted = new Set([...[...toggles.values()].filter(isOn).map((t) => t.id), ...pending()]);
+    if (!wanted) return;
+    const list = [...toggles.values()];
+    wanted = new Set([...list.filter(isOn).map((t) => t.id), ...list.filter((t) => t.keepDefault && t.def && !isOn(t)).map((t) => `-${t.id}`), ...pending()]);
   };
   hash.register("layers", { get: hashGet, set: hashSet });
 
@@ -505,14 +511,14 @@ export function createMapToggles({ dock, after, area, hash, onChange }) {
     return true;
   }
 
-  function add({ id, label, icon: ic = "", get, set, title = "", default: def, menu = true } = {}) {
+  function add({ id, label, icon: ic = "", get, set, title = "", default: def, menu = true, keepDefault = false } = {}) {
     if (!id || typeof get !== "function" || typeof set !== "function") throw new Error("addMapToggle({id, label, icon, get, set})");
-    const t = { id: String(id), label: label || String(id), icon: ic, title, get, set, def: false, menu: menu !== false };
+    const t = { id: String(id), label: label || String(id), icon: ic, title, get, set, def: false, menu: menu !== false, keepDefault: !!keepDefault };
     t.def = def === undefined ? isOn(t) : !!def;
     toggles.set(t.id, t);
     ensureDom();
     if (wanted) {
-      setOn(t, wanted.has(t.id));
+      setOn(t, wantOn(t));
       onChange?.();
     }
     render();

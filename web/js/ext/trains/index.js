@@ -173,11 +173,13 @@ function activeAt(m, t) {
 export function install(app) {
   const motion = app.motion;
   if (!motion) return;
-  // On by default unless the URL lists the layers (then it is on only when listed). `byDefault` stays true until the
+  // On by default. `byDefault` stays true until the
   // user switches it: the clock then opens at the current time in Poland and gives way to any other motion layer.
+  // A layers= list that does not name trains (an older link) keeps them on; "-trains" turns them off.
   const listed = app.hash?.value?.("layers");
-  let on = listed == null ? true : String(listed).split(",").map((s) => s.trim()).includes("trains");
-  let byDefault = listed == null;
+  const tokens = listed == null ? [] : String(listed).split(",").map((s) => s.trim());
+  let on = !tokens.includes("-trains");
+  let byDefault = !tokens.includes("trains") && !tokens.includes("-trains");
   let model = null;
   let loading = null;
   let focus = null; // {stations: Set, key} | null: only the trains through these stations
@@ -414,7 +416,7 @@ export function install(app) {
   });
 
   app.ui.addMapToggle({
-    id: "trains", label: t("Trains"), icon: "t-rail", default: true, menu: false,
+    id: "trains", label: t("Trains"), icon: "t-rail", default: true, keepDefault: true, menu: false,
     title: t("Every passenger train of one weekday, on the move"),
     get: () => on,
     set: (v) => {
