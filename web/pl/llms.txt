@@ -1,6 +1,6 @@
-# Polska na mapie strategicznej opartej na danych publicznych
+# Polska w stylu Civ
 
-> Na mapie strategicznej Polski można porównać miasta i ich zasoby, obejrzeć rzeźbę terenu i sprawdzić rozmieszczenie surowców. Atlas zawiera dane dla Polski, 16 województw i 203 miast liczących co najmniej 20 tys. mieszkańców. Przy danych podano datę i źródło, m.in. GUS, Eurostat, PKW, GIOŚ i UNESCO.
+> Na mapie Polski w stylu Civ można porównać miasta i ich zasoby, obejrzeć rzeźbę terenu i sprawdzić rozmieszczenie surowców. Atlas zawiera dane dla Polski, 16 województw i 203 miast liczących co najmniej 20 tys. mieszkańców. Przy danych podano datę i źródło, m.in. GUS, Eurostat, PKW, GIOŚ i UNESCO.
 
 30 czerwca 2026 r. Polska liczyła 37 242 958 mieszkańców. Wersja angielska: https://softonsofa.com/pol-civ/llms.txt
 
@@ -109,7 +109,7 @@
 
 ## Jak cytować
 
-- [Cytowanie serwisu](https://softonsofa.com/pol-civ/pl/atlas/): "Polska na mapie strategicznej opartej na danych publicznych", Jarek Tkaczyk, https://softonsofa.com/pol-civ/pl/, z adresem strony i datą odczytu
+- [Cytowanie serwisu](https://softonsofa.com/pol-civ/pl/atlas/): "Polska w stylu Civ", Jarek Tkaczyk, https://softonsofa.com/pol-civ/pl/, z adresem strony i datą odczytu
 - [Cytowanie danych](https://softonsofa.com/pol-civ/data/sources.json): podaj wydawcę i rok danych. Spis źródeł znajduje się na końcu każdej strony atlasu.
 - [Kod źródłowy](https://github.com/jarektkaczyk/pol-civ): kod jest dostępny na licencji MIT. Warunki wykorzystania danych określają ich wydawcy.
 

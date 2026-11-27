@@ -1,6 +1,6 @@
-# Polska: Poland as a strategy map built from real data
+# Polska: Poland, the Civ way
 
-> Polska draws real Poland as a hex strategy map: terrain, towns, yields, lenses and resources, every figure from a public source (GUS, Eurostat, PKW, GIOŚ, UNESCO and others). The atlas has a text page with dated, sourced figures for Poland, each of the 16 voivodeships and each of the 203 towns of 20,000 or more people.
+> Polska draws real Poland, the Civ way: terrain, towns, yields, lenses and resources, every figure from a public source (GUS, Eurostat, PKW, GIOŚ, UNESCO and others). The atlas has a text page with dated, sourced figures for Poland, each of the 16 voivodeships and each of the 203 towns of 20,000 or more people.
 
 Poland had 37,242,958 residents on 30 June 2026. Pages are in English; place names keep their Polish spelling. Polish version: https://softonsofa.com/pol-civ/pl/llms.txt
 
@@ -109,7 +109,7 @@ Poland had 37,242,958 residents on 30 June 2026. Pages are in English; place nam
 
 ## How to cite
 
-- [Cite this site](https://softonsofa.com/pol-civ/atlas/): "Polska: Poland as a strategy map built from real data", Jarek Tkaczyk, https://softonsofa.com/pol-civ/, with the page URL and the date you read it
+- [Cite this site](https://softonsofa.com/pol-civ/atlas/): "Polska: Poland, the Civ way", Jarek Tkaczyk, https://softonsofa.com/pol-civ/, with the page URL and the date you read it
 - [Cite the figures](https://softonsofa.com/pol-civ/data/sources.json): name the original publisher and year given next to each figure; the atlas pages list them under Sources
 - [Source code](https://github.com/jarektkaczyk/pol-civ): MIT licence; the data stay under their publishers' terms
 

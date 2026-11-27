@@ -45,7 +45,7 @@ RUN_LAST = True
 
 SITE_URL = "https://softonsofa.com/pol-civ/"
 SITE_NAME = "Polska"
-APP_TITLE = "Polska: Poland as a strategy map built from real data"
+APP_TITLE = "Polska: Poland, the Civ way"
 AUTHOR = {"@type": "Person", "name": "Jarek Tkaczyk", "url": "https://softonsofa.com/"}
 REPO_URL = "https://github.com/jarektkaczyk/pol-civ"
 LANGS = ("en", "pl")
@@ -1878,7 +1878,7 @@ def llms_txt(d: Data, pages: list[dict], catalog: dict, lang: str = "en") -> str
     pop = num(n.get("population"))
     if f.pl:
         out = [f"# {I.t(APP_TITLE, 'pl')}", ""]
-        out.append("> Na mapie strategicznej Polski można porównać miasta i ich zasoby, obejrzeć rzeźbę terenu "
+        out.append("> Na mapie Polski w stylu Civ można porównać miasta i ich zasoby, obejrzeć rzeźbę terenu "
                    "i sprawdzić rozmieszczenie surowców. Atlas zawiera dane dla Polski, 16 województw i "
                    f"{pl_count(len(d.view_towns), 'miasta', 'miast', 'miast')} liczących co najmniej 20 tys. mieszkańców. "
                    "Przy danych podano datę i źródło, m.in. GUS, Eurostat, PKW, GIOŚ i UNESCO.")
@@ -1893,7 +1893,7 @@ def llms_txt(d: Data, pages: list[dict], catalog: dict, lang: str = "en") -> str
                 f"- [Pełny tekst]({pre}llms-full.txt): wszystkie strony atlasu w jednym pliku Markdown"]
     else:
         out = [f"# {APP_TITLE}", ""]
-        out.append("> Polska draws real Poland as a hex strategy map: terrain, towns, yields, lenses and resources, every figure from a "
+        out.append("> Polska draws real Poland, the Civ way: terrain, towns, yields, lenses and resources, every figure from a "
                    "public source (GUS, Eurostat, PKW, GIOŚ, UNESCO and others). The atlas has a text page with dated, sourced figures "
                    f"for Poland, each of the 16 voivodeships and each of the {len(d.view_towns)} towns of 20,000 or more people.")
         out.append("")
@@ -1933,7 +1933,7 @@ def llms_txt(d: Data, pages: list[dict], catalog: dict, lang: str = "en") -> str
         out += ["## Miasta (opcjonalnie)", ""]
     else:
         out += ["## How to cite", "",
-                f"- [Cite this site]({SITE_URL}atlas/): \"Polska: Poland as a strategy map built from real data\", Jarek Tkaczyk, {SITE_URL}, with the page URL and the date you read it",
+                f"- [Cite this site]({SITE_URL}atlas/): \"Polska: Poland, the Civ way\", Jarek Tkaczyk, {SITE_URL}, with the page URL and the date you read it",
                 f"- [Cite the figures]({SITE_URL}data/sources.json): name the original publisher and year given next to each figure; the atlas pages list them under Sources",
                 f"- [Source code]({REPO_URL}): MIT licence; the data stay under their publishers' terms", ""]
         out += ["## Optional", ""]
@@ -1966,9 +1966,9 @@ def app_jsonld(d: Data, catalog: dict, date: str, lang: str = "en", image: str =
     site = {"@type": "WebSite", "@id": home + "#website", "name": SITE_NAME, "alternateName": "pol-civ", "url": home,
             "inLanguage": lang, "author": AUTHOR}
     appn = {"@type": "WebApplication", "@id": home + "#app", "name": SITE_NAME, "alternateName": "pol-civ", "url": home,
-            "description": ("Prawdziwa Polska jako mapa turowej gry strategicznej: heksagonalny teren, miasta i ich zasoby, "
+            "description": ("Prawdziwa Polska w stylu Civ: heksagonalny teren, miasta i ich zasoby, "
                             "warstwy dla każdej gminy oraz doradcy, a każda liczba z publicznego źródła." if pl else
-                            "Real Poland drawn as a turn-based strategy map: hex terrain, towns with yields, lenses for every gmina "
+                            "Real Poland, the Civ way: hex terrain, towns with yields, lenses for every gmina "
                             "and advisors, every figure from a public source."),
             "applicationCategory": "EducationalApplication",
             "operatingSystem": "Dowolny (przeglądarka internetowa)" if pl else "Any (web browser)",

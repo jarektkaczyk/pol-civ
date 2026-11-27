@@ -1,10 +1,10 @@
-# pol-civ: Poland as a strategy map, built from real data
+# pol-civ: Poland, the Civ way
 
 **Live map:** [English](https://softonsofa.com/pol-civ/) | [Polski](https://softonsofa.com/pol-civ/pl/)
 
-![Poland drawn as a 4X strategy map: painted hex terrain, the Baltic coast, rivers, voivodeships and town banners](docs/images/hero.jpg)
+![Poland, the Civ way: painted hex terrain, the Baltic coast, rivers, voivodeships and town banners](docs/images/hero.jpg)
 
-A visualizer (not a game) that draws the **real** Poland like a turn-based strategy map. Hex terrain comes from elevation and land-cover data. Towns carry yield banners built from GDP and jobs. Resources are real power plants, mines and offshore wind farms. Motorways, railways, ports, airports, garrisons and wonders sit on the tiles. There are lenses for 2,479 gminas, a City View for 204 towns, and a council of advisors named after the offices of the old Commonwealth. Every number traces back to a public source in the in-app **Almanac**.
+A visualizer (not a game) that draws the **real** Poland, the Civ way. Hex terrain comes from elevation and land-cover data. Towns carry yield banners built from GDP and jobs. Resources are real power plants, mines and offshore wind farms. Motorways, railways, ports, airports, garrisons and wonders sit on the tiles. There are lenses for 2,479 gminas, a City View for 204 towns, and a council of advisors named after the offices of the old Commonwealth. Every number traces back to a public source in the in-app **Almanac**.
 
 pol-civ is a fork of [usaciv](https://karpathy.ai/usaciv) by Andrej Karpathy (MIT). The engine, the art system and the architecture are his. This fork replaces every US dataset with Polish and European public data and retunes the map, the towns and the text for Poland.
 

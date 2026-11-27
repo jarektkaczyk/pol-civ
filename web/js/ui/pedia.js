@@ -36,7 +36,7 @@ export function initPedia(data) {
   const pages = {
     "About this map": () => `
       ${h2("pedia", "📖", t("About this map"))}
-      <p>${th(t("This is real Poland, drawn like a strategy game. Every tile, town and number comes from public data, listed under {sources}."), { sources: `<i>${esc(t("Sources"))}</i>` })}</p>
+      <p>${th(t("This is real Poland, the Civ way. Every tile, town and number comes from public data, listed under {sources}."), { sources: `<i>${esc(t("Sources"))}</i>` })}</p>
       <h4>${esc(t("How it is built"))}</h4>
       <p>${esc(t("The country is projected (Albers equal-area) and cut into {cols} by {rows} hexes, each {size} km corner to corner. Each hex belongs to the voivodeship, powiat and gmina under its centre. Terrain comes from the elevation and land-cover samples inside each hex.", { cols: data.world.grid.cols, rows: data.world.grid.rows, size: data.world.grid.radius * 2 }))}</p>
       <p>${th(t("{towns} are the seats of gminas with town rights, placed at the town itself. The bigger ones, the cities with powiat rights and the towns of 20,000 people or more, open a full town screen."), { towns: `<b>${esc(t("Towns"))}</b>` })}
@@ -70,7 +70,7 @@ export function initPedia(data) {
       };
       return `
       ${h2("y-production", "⚙️", t("Yields"))}
-      <p>${esc(t("The yields of a strategy game, mapped onto real figures. Job-based yields count the people working in a group of industries (the PKD sections of the Polish classification of activities)."))} <b>${esc(t("Gold is GDP"))}</b>.</p>
+      <p>${esc(t("Civ-style yields, mapped onto real figures. Job-based yields count the people working in a group of industries (the PKD sections of the Polish classification of activities)."))} <b>${esc(t("Gold is GDP"))}</b>.</p>
       <table>${data.nation.yields.map((y) => `<tr><td class="ic" style="color:${esc(y.color)}">${glyph(y, 26)}</td><td><b style="color:${esc(y.color)}">${esc(y.key === "gold" ? t("{yield} (GDP)", { yield: t(y.label) }) : t(y.label))}</b><br>${esc(y.description ? t(y.description) : RULE[y.key] || "")}</td></tr>`).join("")}</table>
       <h4>${esc(t("Badges"))}</h4>
       <p>${esc(t("A town's badge comes from the first of these rules that holds: Capital city (Warszawa); Port city (a seaport within 10 km); Copper town (a copper mine or smelter within 15 km); Coal town (a hard coal or lignite mine within 15 km); Tech city (information and communication at least twice the national share of workers, and at least 4% of them); University town (university students equal to at least 10% of residents); Spa town (\"Zdrój\" in the official name); Tourist town (hotels and restaurants at least twice the national share of workers); Industrial town (mining and manufacturing at least 1.5 times the national share); Garrison town (a military unit or base within 5 km)."))}

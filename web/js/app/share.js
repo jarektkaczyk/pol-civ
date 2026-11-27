@@ -109,7 +109,7 @@ export function composeImage(info, { height = IMG_H } = {}) {
   spaced(ctx, 0);
   ctx.fillStyle = "#b9ab88";
   ctx.font = `italic 17px ${SERIF}`;
-  ctx.fillText(t("as a strategy game, built from real public data"), 110, cy + 28);
+  ctx.fillText(t("Poland, the Civ way"), 110, cy + 28);
 
   // Lens + legend ramp
   const mx = 640;

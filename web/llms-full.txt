@@ -1,4 +1,4 @@
-# Polska: Poland as a strategy map built from real data: full text
+# Polska: Poland, the Civ way: full text
 
 Every atlas page of https://softonsofa.com/pol-civ/ as compact markdown. Generated 2026-11-27. Each figure gives its date and publisher.
 

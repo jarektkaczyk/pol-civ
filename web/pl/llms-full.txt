@@ -1,4 +1,4 @@
-# Polska na mapie strategicznej opartej na danych publicznych: pełny tekst
+# Polska w stylu Civ: pełny tekst
 
 Tekst atlasu https://softonsofa.com/pol-civ/pl/atlas/ w formacie Markdown. Stan na 2026-11-27. Przy danych podano daty i wydawców.
 
