@@ -5,6 +5,9 @@ import { t, num, date } from "../i18n.js";
 import { parseHex, luminance } from "../color.js";
 import { icon, glyph } from "./icon.js";
 
+// Links from data files open only as http(s); anything else (javascript:, data:) becomes an inert "#".
+const safeUrl = (u) => (/^https?:\/\//i.test(String(u ?? "")) ? String(u) : "#");
+
 const COVER_ICON = { forest_deciduous: "l-forest", forest_evergreen: "l-forest", forest_mixed: "l-forest", cropland: "l-farmland", pasture: "l-farmland", urban: "l-developed" };
 // Glyph colour that reads on a resource medallion (dark on light faces such as nuclear yellow or silver).
 const inkOn = (hex) => {
@@ -28,7 +31,7 @@ export function initPedia(data) {
 
   // A translated text with HTML pieces: the text is escaped, then each {name} of `html` is replaced by its markup.
   const th = (text, html = {}) => esc(text).replace(/\{(\w+)\}/g, (m, k) => (k in html ? html[k] : m));
-  const ext = (href, text) => `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(text)}</a>`;
+  const ext = (href, text) => `<a href="${esc(safeUrl(href))}" target="_blank" rel="noopener">${esc(text)}</a>`;
 
   const pages = {
     "About this map": () => `
@@ -171,7 +174,7 @@ export function initPedia(data) {
             : esc(a.retrieved ? t("Source: {source}, retrieved {retrieved}", { source: (a.credit || []).join("; "), retrieved: date(String(a.retrieved).slice(0, 10)) })
               : t("Source: {source}", { source: (a.credit || []).join("; ") }))}
             ${a.processed ? `<br>${esc(t(a.processed))}` : ""}${a.disclaimer ? `<br>${esc(t(a.disclaimer))}` : ""}
-            ${a.original?.url ? `<br>${t("Original data: {link} ({size}, SHA-256 {hash})", { link: `<a href="${esc(a.original.url)}" rel="noopener">${esc(a.original.url.replace(/^https?:\/\//, ""))}</a>`, size: `${num((a.original.bytes || 0) / 1e6, 1)} MB`, hash: `<code style="word-break:break-all">${esc(String(a.original.sha256 || ""))}</code>` })}` : ""}</p>` : ""}
+            ${a.original?.url ? `<br>${t("Original data: {link} ({size}, SHA-256 {hash})", { link: `<a href="${esc(safeUrl(a.original.url))}" rel="noopener">${esc(a.original.url.replace(/^https?:\/\//, ""))}</a>`, size: `${num((a.original.bytes || 0) / 1e6, 1)} MB`, hash: `<code style="word-break:break-all">${esc(String(a.original.sha256 || ""))}</code>` })}` : ""}</p>` : ""}
           ${srcs.length || vintage ? `<p class="muted">${esc([srcs.join(", "), vintage].filter(Boolean).join(" · "))}</p>` : ""}`;
       });
       // Data files not loaded yet: load them, then redraw this page if it is still open.
@@ -190,7 +193,7 @@ export function initPedia(data) {
         <h4>${esc(t(s.title))}</h4>
         <p>${esc(t(s.description))}<br>
         <span class="muted">${esc(t(s.publisher))} · ${esc(t(s.license))}${s.vintage ? " · " + esc(t(s.vintage)) : ""} ·
-        <a href="${esc(s.homepage)}" target="_blank" rel="noopener">${esc(t("homepage"))}</a></span></p>
+        <a href="${esc(safeUrl(s.homepage))}" target="_blank" rel="noopener">${esc(t("homepage"))}</a></span></p>
         <table>${(s.files || []).map((f) => `<tr><td><code>${esc(f.url)}</code></td><td class="muted" style="white-space:nowrap">${esc(date((f.retrieved || "").slice(0, 10)))}<br>${esc(num((f.bytes || 0) / 1e6, 1))} MB</td></tr>`).join("")}</table>`).join("")}`,
   };
   // Page ids stay English (other modules open pages by id); the nav shows the translated title.
