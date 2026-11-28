@@ -316,7 +316,9 @@ projects, the planned Lubiatowo-Kopalino nuclear site, oil and gas sites, refine
 Offshore wind can use a water cell;
 other items use a Polish land cell. Mine types use unit `sites` and value 1 per mapped site. `output`, `output_unit`
 and `year` carry published output; missing output stays `null`.
-`summary.by_status` separates operating,
+Operating plant items carry `"map": false`: the map's Resources layer and its hex tooltip leave them out, because the
+Power plants layer (`energy.json`) draws every operating plant; a resource filter that names their types (the Energy
+advisor) still shows them. `summary.by_status` separates operating,
 under-construction and planned capacity. `renewables` keeps every published URE powiat row and every source field;
 missing capacity stays `null`.
 
@@ -885,6 +887,38 @@ OSM border lines), `pl_energy_plants` and `pl_energy_res`: the newest complete d
   without credentials or referrer, and keeps the quarters that have demand, wind, solar, 10+ production types and
   every border. Fewer than 4 such quarters or an error: it plays the stored day. No answer within `timeout_ms`: it
   plays the stored day and switches to today if the answer still comes (the request is cut after 20 s).
+
+### energy.json (lazy, motion layer and map layer)
+
+Built by `pipeline/build/energy.py` from `energy_gem` (Global Integrated Power Tracker, a hand-downloaded file in
+`data/raw/energy_gem/`), `energy_osm`, `energy_wri` and `energy_ember`. The module, its matching rules and its port
+checklist come from the energy module of the other country maps; the one country setting is `ENERGY_COUNTRY` in
+`pipeline/sources/energy_config.py`. Used by `web/js/ext/energy/`: the motion layer "Power plants by year" with the
+national card, and the map layer "Power plants" (operating plants with a known MW).
+
+```text
+version     1
+iso3        "POL"
+techs       ["solar","wind","hydro","coal","gas","oil","nuclear","biomass","other"]
+years       [first, last]   first plant start year .. newest year of any plant or Ember series
+srcs        plant sources used, in priority order (index for plants.rows[].src)
+sources     source ids for the Almanac (energy_gem_tz when any plant has tz)
+vintage     {ember, plants}
+coverage    "monthly" | "yearly" | "none"   (Ember)
+plants      {columns: [x, y, tech, mw, start, end, operating, src, name, cell, tz], rows: [[...], ...]}
+            x, y map km; tech index into techs; mw null when unknown; start, end years or null; operating 1/0;
+            src index into srcs; cell the land hex; tz 1 when a GEM unit has a TransitionZero ID (CC BY-NC 4.0).
+            Rows are sorted by MW, largest first.
+national    {years, capacity_gw: {tech: [...]}, share_pct: {tech: [...]}, gen_twh: {tech|total: [...]}} (Ember yearly)
+recent      {from, to, twh: {tech}, total_twh, share_pct: {tech}}   newest 12 months (Ember monthly) or null
+units       {voivodeship code: {mw, solar_wind_mw, by_tech: {tech: mw}}}   operating plants with a known MW
+rules       Almanac lines of the moving layer
+```
+
+* Missing values are `null`. The builder also adds the lenses `energy_capacity` and `energy_solar_wind` (group
+  `energy`) to `lenses.json`: the voivodeship sum of the operating plants, one value per hex, `null` off Poland.
+* The Resources layer leaves out the operating plants of `resources.json` (`items[].map == false`), so a plant is
+  drawn once: by "Power plants". Plants under construction or planned stay on the Resources layer.
 
 ### migration.json (lazy, motion layer)
 

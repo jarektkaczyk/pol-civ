@@ -133,6 +133,9 @@ def plant_items(locator: Locator, points: list[dict]) -> list[dict]:
             "id": point["id"], "type": type_id, "name": point["name"], "value": props.get("mw"),
             "status": props.get("status"), "operator": props.get("operator"), "detail": _detail(props),
             **_status_parts(props), "year": props.get("mw_year"), "ref": props.get("ref"), **at,
+            # An operating plant is drawn by the Power plants layer (energy.json, pipeline/build/energy.py), so the
+            # Resources layer leaves it out; plants under construction or planned stay on the Resources layer.
+            **({"map": False} if props.get("status") == "operating" else {}),
         })
     return out
 

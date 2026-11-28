@@ -11,9 +11,10 @@
 // over time (lenses that play on the motion clock).
 // permits/: the time-lapse of permits for new factories and warehouses (a motion layer).
 // trains/, flights/: a day of passenger trains and a year of air routes (motion layers).
+// energy/: power plants by year with the national mix card (a motion layer), the operating plants as map markers.
 // power/, migration/, money/: the grid every 15 minutes, moves between voivodeships, state money for local
 // governments (motion layers).
-const MODULES = ["./credit/index.js", "./motion/index.js", "./cityView/index.js", "./advisors/index.js", "./layers/index.js", "./history/index.js", "./commuting/index.js", "./timeline/index.js", "./timelapse/index.js", "./economy/index.js", "./permits/index.js", "./trains/index.js", "./flights/index.js", "./power/index.js", "./migration/index.js", "./money/index.js"];
+const MODULES = ["./credit/index.js", "./motion/index.js", "./energy/index.js", "./cityView/index.js", "./advisors/index.js", "./layers/index.js", "./history/index.js", "./commuting/index.js", "./timeline/index.js", "./timelapse/index.js", "./economy/index.js", "./permits/index.js", "./trains/index.js", "./flights/index.js", "./power/index.js", "./migration/index.js", "./money/index.js"];
 
 export async function installExtensions(app, list = MODULES) {
   const loads = list.map((spec) => import(spec).then((m) => ({ m }), (err) => ({ err })));

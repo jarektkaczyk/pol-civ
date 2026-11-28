@@ -64,6 +64,11 @@
 
 ## Źródła
 
+- [Ember](https://ember-energy.org/data/monthly-electricity-data/): Miesięczne i roczne dane o energii elektrycznej
+- [Global Energy Monitor](https://globalenergymonitor.org/projects/global-integrated-power-tracker/): Global Integrated Power Tracker
+- [TransitionZero](https://www.transitionzero.org/): Solar Asset Mapper
+- [Współtwórcy OpenStreetMap (przez Overpass API)](https://www.openstreetmap.org/): Elektrownie (OpenStreetMap)
+- [World Resources Institute](https://datasets.wri.org/dataset/globalpowerplantdatabase): Global Power Plant Database v1.3
 - [Główny Inspektorat Ochrony Środowiska (GIOŚ)](https://powietrze.gios.gov.pl/pjp/content/api): Jakość powietrza: godzinowe stężenia pyłu PM2,5 na wszystkich stacjach automatycznych, zima 2025/26
 - [Eurostat; OurAirports; Wikidata](https://ec.europa.eu/eurostat/databrowser/view/avia_par_pl/default/table): Trasy lotnicze z polskich lotnisk: pasażerowie w kolejnych miesiącach
 - [Główny Urząd Statystyczny (GUS)](https://bdl.stat.gov.pl/bdl/dane/podgrup/temat/31/640/4318): NSP 2021: wykształcenie według powiatów i gmin
@@ -104,7 +109,6 @@
 - [Wikidane (studia gier); strony firm, TOP500, Urzędu Patentowego RP i prasy (miejsca technologii)](https://www.wikidata.org/): Technologie i gry: studia gier i miejsca polskiej technologii
 - [Eurostat; współtwórcy OpenStreetMap; Wikidata; Rząd RP](https://ec.europa.eu/eurostat/web/transport/database): Lotniska w Polsce: ruch, położenie i planowany Port Polska
 - [Eurostat (dane Głównego Urzędu Statystycznego, GUS)](https://ec.europa.eu/eurostat/web/transport/database): Przewozy drogowe według regionów NUTS 3 i przewozy kolejowe między regionami (Eurostat)
-- [Współtwórcy OpenStreetMap (przez Overpass API)](https://www.openstreetmap.org/): Autostrady, drogi ekspresowe i główne linie kolejowe Polski (OpenStreetMap)
 - [Główny Urząd Statystyczny (GUS); Eurostat; zarządy portów i Gaz-System (pozycje z zestawienia własnego)](https://stat.gov.pl/obszary-tematyczne/transport-i-lacznosc/transport/gospodarka-morska-w-polsce-w-2025-r-,7,23.html): Porty morskie Polski: przeładunki i kontenery, terminale LNG
 
 ## Jak cytować

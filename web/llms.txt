@@ -64,6 +64,11 @@ Poland had 37,242,958 residents on 30 June 2026. Pages are in English; place nam
 
 ## Sources
 
+- [Ember](https://ember-energy.org/data/monthly-electricity-data/): Monthly and yearly electricity data
+- [Global Energy Monitor](https://globalenergymonitor.org/projects/global-integrated-power-tracker/): Global Integrated Power Tracker
+- [TransitionZero](https://www.transitionzero.org/): Solar Asset Mapper
+- [OpenStreetMap contributors (via the Overpass API)](https://www.openstreetmap.org/): Power plants (OpenStreetMap)
+- [World Resources Institute](https://datasets.wri.org/dataset/globalpowerplantdatabase): Global Power Plant Database v1.3
 - [Główny Inspektorat Ochrony Środowiska (GIOŚ)](https://powietrze.gios.gov.pl/pjp/content/api): Air quality: hourly PM2.5 at every automatic station, winter 2025/26
 - [Eurostat; OurAirports; Wikidata](https://ec.europa.eu/eurostat/databrowser/view/avia_par_pl/default/table): Air routes from Polish airports: passengers per month
 - [Statistics Poland (GUS)](https://bdl.stat.gov.pl/bdl/dane/podgrup/temat/31/640/4318): NSP 2021 education by powiat and gmina
@@ -104,7 +109,6 @@ Poland had 37,242,958 residents on 30 June 2026. Pages are in English; place nam
 - [Wikidata (game studios); company, TOP500, Polish Patent Office and press pages (landmarks)](https://www.wikidata.org/): Tech and games: game studios and tech landmarks
 - [Eurostat; OpenStreetMap contributors; Wikidata; Government of Poland](https://ec.europa.eu/eurostat/web/transport/database): Airports of Poland: traffic, positions and planned Port Polska
 - [Eurostat (data from Statistics Poland, GUS)](https://ec.europa.eu/eurostat/web/transport/database): Road freight by NUTS 3 region and rail freight between regions (Eurostat)
-- [OpenStreetMap contributors (via the Overpass API)](https://www.openstreetmap.org/): Motorways, expressways and main railway lines of Poland (OpenStreetMap)
 - [Statistics Poland (GUS); Eurostat; port authorities and Gaz-System (curated items)](https://stat.gov.pl/obszary-tematyczne/transport-i-lacznosc/transport/gospodarka-morska-w-polsce-w-2025-r-,7,23.html): Seaports of Poland: cargo tonnage and containers, LNG terminals
 
 ## How to cite

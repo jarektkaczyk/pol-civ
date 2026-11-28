@@ -436,10 +436,15 @@ function overviewItems(w, filter = null, sig = "") {
   return out;
 }
 
-/** A predicate for app.state.resourceFilter ({types?: Set<typeId>, minValue?: number}), or null for "all". */
+/** A predicate for app.state.resourceFilter ({types?: Set<typeId>, minValue?: number}). Without a type list, items
+ *  with `map: false` (operating power plants, drawn by the Power plants layer) are left out; a filter that names
+ *  their types (the Energy advisor) shows them. */
 export function resourcePredicate(f) {
-  if (!f || (!f.types && !(f.minValue > 0))) return null;
-  return (it) => (!f.types || f.types.has(it.type)) && (!(f.minValue > 0) || (Number.isFinite(it.value) && it.value >= f.minValue));
+  if (!f || !f.types) {
+    if (!(f?.minValue > 0)) return (it) => it.map !== false;
+    return (it) => it.map !== false && Number.isFinite(it.value) && it.value >= f.minValue;
+  }
+  return (it) => f.types.has(it.type) && (!(f.minValue > 0) || (Number.isFinite(it.value) && it.value >= f.minValue));
 }
 /** A string that changes whenever the filter's effect changes (for cache keys). */
 export function resourceFilterSig(f) {

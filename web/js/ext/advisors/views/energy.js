@@ -187,8 +187,8 @@ export function mount(ctx) {
 
   function apply() {
     const mapTypes = filter.min ? new Set([...filter.types].filter(isMW)) : filter.types;
-    const all = mapTypes.size === types.length && !filter.min;
-    ctx.setResourceFilter(all ? null : { types: new Set(mapTypes), minValue: filter.min || undefined });
+    // Always a type list: the advisor shows its mapped plants, which the plain Resources layer leaves to Power plants.
+    ctx.setResourceFilter({ types: new Set(mapTypes), minValue: filter.min || undefined });
     const shown = visible();
     siteTable.setRows(shown);
     const idx = filter.voivodeship ? voivodeshipIdx.get(filter.voivodeship) : null;

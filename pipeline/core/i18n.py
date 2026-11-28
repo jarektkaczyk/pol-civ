@@ -340,6 +340,7 @@ DATA_TEXT: dict[str, list[str]] = {
     "flights.json": ["rules[]", "attribution.processed", "attribution.disclaimer"],
     "permits_monthly.json": ["rules[]", "vintage"],
     "power.json": ["rules[]", "groups[].label", "attribution.processed"],
+    "energy.json": ["rules[]"],
     "migration.json": ["rules[]"],
     "money.json": ["rules[]", "fields[].label", "needs_parts[]", "state.name"],
     "sources.json": ["[].title", "[].description", "[].publisher", "[].license", "[].vintage", "[].used_for[]",

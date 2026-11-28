@@ -34,8 +34,9 @@ export function showCellTooltip(mx, my, w, i, lens, showResources = true) {
   } else if (o === FOREIGN) {
     lines.push(`<span class="muted">${esc(t("Beyond the borders (not mapped)"))}</span>`);
   }
-  const res = showResources && w.resources?.byCell.get(i);
-  if (res) {
+  // Operating power plants (map: false) belong to the Power plants layer, not to the Resources layer.
+  const res = showResources && w.resources?.byCell.get(i)?.filter((it) => it.map !== false);
+  if (res?.length) {
     for (const it of res.slice(0, 4)) {
       const ty = w.resources.typeById.get(it.type);
       const num = it.value == null ? "" : Math.abs(it.value) < 1e6 ? int(it.value) : compact(it.value);

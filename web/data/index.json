@@ -91,7 +91,7 @@
     },
     {
      "source": "pl_geo_hydrorivers",
-     "terms": "HydroSHEDS licence agreement: free for scientific, educational and commercial use with attribution. Lehner, B., Grill G. (2013), Global river hydrography and network routing, Hydrological Processes 27(15), doi:10.1002/hyp.9740"
+     "terms": "HydroSHEDS Version 1 License Agreement. Use of the river data of this map is subject to the terms of that License, reproduced in full in the file THIRD_PARTY_NOTICES of the map's public repository; they bind every user of the river data. Required attribution (Exhibit B): This product pol-civ incorporates data from the HydroSHEDS version 1 database which is © World Wildlife Fund, Inc. (2006-2022) and has been used herein under license. WWF has not evaluated the data as altered and incorporated within pol-civ, and therefore gives no warranty regarding its accuracy, completeness, currency or suitability for any particular purpose. Portions of the HydroSHEDS v1 database incorporate data which are the intellectual property rights of © USGS (2006-2008), NASA (2000-2005), ESRI (1992-1998), CIAT (2004-2006), UNEP-WCMC (1993), WWF (2004), Commonwealth of Australia (2007), and Her Royal Majesty and the British Crown and are used under license. The HydroSHEDS v1 database and more information are available at https://www.hydrosheds.org. Lehner, B., Grill G. (2013), Global river hydrography and network routing, Hydrological Processes 27(15), doi:10.1002/hyp.9740"
     }
    ]
   },
@@ -565,7 +565,7 @@
   {
    "path": "data/lenses.json",
    "url": "https://softonsofa.com/pol-civ/data/lenses.json",
-   "bytes": 2430411,
+   "bytes": 2506339,
    "description": "The map lenses: one value per hex for each metric, with legend domains and notes.",
    "fields": [
     "density (Density)",
@@ -624,11 +624,14 @@
     "smog_week (Smog week)",
     "forest (Forest)",
     "farmland (Farmland)",
-    "developed (Built-up)"
+    "developed (Built-up)",
+    "energy_capacity (Power capacity)",
+    "energy_solar_wind (Solar and wind capacity)"
    ],
-   "rows": 57,
+   "rows": 59,
    "vintage": "GUS population 2026-06-30; population 2025-12-31 for change since 2015, density, births, deaths and migration; demographic rates and life expectancy 2025; university students 2025-12-31; territorial division 2026-01-01; PKW: presidential election runoffs of 2015-05-24 and 2020-07-12; presidential election 2025 (rounds of 18 May and 2025-06-01); Sejm 2023 (2023-10-15)",
    "sources": [
+    "energy_gem",
     "pl_air_hourly",
     "pl_census_2021",
     "pl_econ_innovation",
@@ -653,6 +656,7 @@
     "pl_tourism_monthly"
    ],
    "publishers": [
+    "Global Energy Monitor",
     "Główny Inspektorat Ochrony Środowiska (GIOŚ)",
     "Statistics Poland (GUS)",
     "Statistics Poland (GUS), Dziedzinowe Bazy Wiedzy",
@@ -669,6 +673,10 @@
     "Ministry of Finance and Statistics Poland (GUS)"
    ],
    "licenses": [
+    {
+     "source": "energy_gem",
+     "terms": "CC BY 4.0"
+    },
     {
      "source": "pl_air_hourly",
      "terms": "Public sector information; reuse must name GIOŚ as the source (API terms)"
@@ -762,7 +770,7 @@
   {
    "path": "data/resources.json",
    "url": "https://softonsofa.com/pol-civ/data/resources.json",
-   "bytes": 99411,
+   "bytes": 100479,
    "description": "Power plants, mines, oil and gas sites, offshore wind and renewables by powiat.",
    "fields": [
     "types",
@@ -1455,7 +1463,7 @@
   {
    "path": "data/sources.json",
    "url": "https://softonsofa.com/pol-civ/data/sources.json",
-   "bytes": 279012,
+   "bytes": 286547,
    "description": "The bibliography: every source with publisher, licence, vintage and the exact files used.",
    "fields": [
     "id",
@@ -1464,7 +1472,7 @@
     "vintage",
     "files"
    ],
-   "rows": 53,
+   "rows": 58,
    "vintage": null,
    "sources": [],
    "publishers": [],
