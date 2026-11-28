@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/bialogard/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/bialogard/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W październiku 2026 r. stopa bezrobocia rejestrowanego w powiecie białogardzkim wyniosła 17,1%. To drugie miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/biala-podlaska/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/biala-podlaska/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Biała Podlaska had 53,266 residents on 30 June 2026. Between 2015 and 2025 it lost 6.9% of its residents.
 

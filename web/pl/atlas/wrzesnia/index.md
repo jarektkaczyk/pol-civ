@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/wrzesnia/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/wrzesnia/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Września liczy 31 509 mieszkańców (stan na 30 czerwca 2026 r.).
 

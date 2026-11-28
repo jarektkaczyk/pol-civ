@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/konin/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/konin/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Konin liczy 64 756 mieszkańców (stan na 30 czerwca 2026 r.). W latach 2015-2025 liczba ludności spadła o 14,0%.
 

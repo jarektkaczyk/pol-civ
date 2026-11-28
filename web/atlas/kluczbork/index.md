@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/kluczbork/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/kluczbork/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Turnout in the gmina of Kluczbork was 63.7% in the presidential runoff of 1 June 2025, the 5th lowest of the 203 Polish towns with 20,000 or more people.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/grodzisk-mazowiecki/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/grodzisk-mazowiecki/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 The gmina of Grodzisk Mazowiecki has the 6th youngest population of the 203 Polish towns with 20,000 or more people: a median age of 41.2 years.
 

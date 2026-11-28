@@ -65,14 +65,27 @@ def cmd_fetch(names, force=False):
         sys.exit(f"--offline: raw files missing for {', '.join(missing)} (run fetch without --offline)")
 
 
-def cmd_process(names):
+def cmd_process(names, keep_going=False):
+    """Process sources into data/interim. With keep_going, a source that fails keeps its previous interim
+    (nothing is written for it) and the others still run; the failed ids are returned."""
+    failed = []
     for sid in _pick(names, BY_ID, "source"):
         t = time.time()
         print(f"[process] {sid}")
-        data = BY_ID[sid].process()
-        # save_interim moves "_files" (raw files used) into the payload for the catalog.
-        save_interim(sid, data, vintage=data.pop("vintage", None))
+        try:
+            data = BY_ID[sid].process()
+            # save_interim moves "_files" (raw files used) into the payload for the catalog.
+            save_interim(sid, data, vintage=data.pop("vintage", None))
+        except (Exception, SystemExit) as exc:  # a source or builder that calls sys.exit() is a failure too
+            if not keep_going:
+                raise
+            print(f"    FAILED, previous interim kept: {type(exc).__name__}: {exc}")
+            failed.append(sid)
+            continue
         print(f"    done in {time.time() - t:.1f}s")
+    if keep_going:
+        print(f"[keep-going] process failed: {' '.join(failed) or 'none'}")
+    return failed
 
 
 # ---------------------------------------------------------------- build planning
@@ -131,8 +144,11 @@ def is_stale(mod: ModuleType) -> bool:
     return max((p.stat().st_mtime for p in inputs), default=0) >= min(p.stat().st_mtime for p in outs)
 
 
-def cmd_build(names, force=False, with_deps=False, builders=None):
+def cmd_build(names, force=False, with_deps=False, builders=None, keep_going=False):
+    """Build web/data. With keep_going, a builder that fails keeps its previous outputs and the others still
+    run; the failed names are returned."""
     builders = BUILDERS if builders is None else builders
+    failed = []
     for name in select_builders(names, builders, with_deps):
         mod = builders[name]
         if not (force or getattr(mod, "RUN_LAST", False) or is_stale(mod)):
@@ -140,8 +156,28 @@ def cmd_build(names, force=False, with_deps=False, builders=None):
             continue
         t = time.time()
         print(f"[build] {name}")
-        mod.build()
+        if not keep_going:
+            mod.build()
+        else:
+            # A builder that fails leaves its outputs as they were before it ran, so the files already
+            # published stay; downstream builders then read those.
+            outs = [output_path(o) for o in mod.PRODUCES]
+            before = {o: (o.read_bytes() if o.exists() else None) for o in outs}
+            try:
+                mod.build()
+            except (Exception, SystemExit) as exc:  # a source or builder that calls sys.exit() is a failure too
+                for o, data in before.items():
+                    if data is None:
+                        o.unlink(missing_ok=True)
+                    else:
+                        o.write_bytes(data)
+                print(f"    FAILED, previous outputs kept: {type(exc).__name__}: {exc}")
+                failed.append(name)
+                continue
         print(f"    done in {time.time() - t:.1f}s")
+    if keep_going:
+        print(f"[keep-going] build failed: {' '.join(failed) or 'none'}")
+    return failed
 
 
 def cmd_check() -> int:
@@ -173,15 +209,17 @@ def main(argv=None):
     p.add_argument("--force", action="store_true", help="fetch: re-download even if cached; build: rebuild even if up to date")
     p.add_argument("--deps", action="store_true", help="build: also run upstream builders of the named ones")
     p.add_argument("--offline", action="store_true", help="use cached downloads only; never touch the network")
+    p.add_argument("--keep-going", action="store_true",
+                   help="process, build: a failing source or builder keeps its previous output; the rest still run")
     p.add_argument("--port", type=int, default=8765)
     a = p.parse_args(argv)
     fetch.OFFLINE = a.offline
     if a.command == "fetch":
         cmd_fetch(a.names, a.force)
     elif a.command == "process":
-        cmd_process(a.names)
+        cmd_process(a.names, a.keep_going)
     elif a.command == "build":
-        cmd_build(a.names, a.force, a.deps)
+        cmd_build(a.names, a.force, a.deps, keep_going=a.keep_going)
     elif a.command == "check":
         sys.exit(cmd_check())
     elif a.command == "all":

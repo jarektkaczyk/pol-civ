@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/bydgoszcz/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/bydgoszcz/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Bydgoszcz zajmuje dziewiąte miejsce w Polsce pod względem liczby mieszkańców. Liczy 319 528 mieszkańców (stan na 30 czerwca 2026 r.).
 

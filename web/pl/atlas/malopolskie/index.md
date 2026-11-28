@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/malopolskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/malopolskie/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W 2025 r. w województwie małopolskim na mieszkańca przypadało średnio 8,8 noclegu udzielonego turystom. To najwyższy wynik wśród województw.
 
@@ -90,5 +90,5 @@ W województwie są 64 miasta. 12 z nich liczy co najmniej 20 tys. mieszkańców
 - [Centrum Światowego Dziedzictwa UNESCO (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl): Światowe dziedzictwo UNESCO w Polsce i Pomniki Historii (UNESCO whc001 (22 listopada 2026); NID Pomniki Historii 30 września 2026 + Dz.U. z 2026 r. poz. 1334)](https://data.unesco.org/explore/dataset/whc001/)
 - [Główny Urząd Statystyczny (GUS); Wikidata: Parki narodowe: powierzchnia i liczba odwiedzających (GUS, Ochrona środowiska 2025 (dane za 2024 r.); raport Tatrzańskiego Parku Narodowego za 2025 r.; punkty centralne z Wikidata)](https://stat.gov.pl/obszary-tematyczne/srodowisko-energia/srodowisko/ochrona-srodowiska-2025,1,26.html)
 - [Główny Urząd Statystyczny (GUS); Ministerstwo Nauki i Szkolnictwa Wyższego (RAD-on / POL-on); Wikidata: Uczelnie: studenci, kategorie naukowe, główny kampus (GUS, rok akademicki 2025/26 (31 grudnia 2025); ewaluacje RAD-on 2017-2021 i 2022-2025; lokalizacje z Wikidata)](https://radon.nauka.gov.pl/dane)
-- [Współtwórcy OpenStreetMap; operatorzy (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Elektrownie w Polsce (100 MW i więcej; fotowoltaika 50 MW i więcej), morskie farmy wiatrowe i elektrownia jądrowa (Dane z OpenStreetMap pobrane 26 listopada 2026, raport PGE 2025, pozostałe dane według stanu na listopad 2026)](https://www.openstreetmap.org/)
+- [Współtwórcy OpenStreetMap; operatorzy (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Elektrownie w Polsce (100 MW i więcej; fotowoltaika 50 MW i więcej), morskie farmy wiatrowe i elektrownia jądrowa (Dane z OpenStreetMap pobrane 27 listopada 2026, raport PGE 2025, pozostałe dane według stanu na listopad 2026)](https://www.openstreetmap.org/)
 - [Ministerstwo Przemysłu (sprawozdanie o górnictwie węgla kamiennego za 2025 r.), Wyższy Urząd Górniczy (WUG), KGHM, Sejm; lokalizacje z Wikidata i OpenStreetMap: Kopalnie w Polsce: węgiel kamienny, węgiel brunatny, miedź i srebro, sól, siarka (zestawienie własne) (Wydobycie 2025 (raporty WUG, raport o węglu kamiennym dla KE, KGHM); siarka 2024)](https://www.gov.pl/web/wug/kwk)

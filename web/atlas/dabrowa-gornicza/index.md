@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/dabrowa-gornicza/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/dabrowa-gornicza/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Dąbrowa Górnicza has 170 university students per 1,000 residents, the 6th highest share of the 84 towns of 20,000+ with a university.
 

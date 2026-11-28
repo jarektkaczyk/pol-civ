@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/tarnobrzeg/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/tarnobrzeg/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Tarnobrzeg had 42,488 residents on 30 June 2026. Between 2015 and 2025 it lost 10.6% of its residents.
 

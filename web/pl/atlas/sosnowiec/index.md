@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/sosnowiec/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/sosnowiec/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Sosnowiec zajmuje siedemnaste miejsce w Polsce pod względem liczby mieszkańców. Liczy 181 983 mieszkańców (stan na 30 czerwca 2026 r.).
 

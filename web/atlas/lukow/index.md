@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/lukow/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/lukow/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 The average gross wage around Łuków (powiat łukowski) was 7,205 zł a month in May 2026, the 5th lowest for any of the 203 Polish towns with 20,000 or more people.
 

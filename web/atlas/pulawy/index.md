@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/pulawy/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/pulawy/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Puławy has the 6th oldest population of the 203 Polish towns with 20,000 or more people: a median age of 49.3 years.
 

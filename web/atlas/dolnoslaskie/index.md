@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/dolnoslaskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/dolnoslaskie/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Dolnośląskie has the 2nd highest average gross wage of the 16 voivodeships: 9,208 zł a month in May 2026.
 
@@ -95,5 +95,5 @@ It has 93 towns; 16 of them have 20,000 or more residents.
 - [UNESCO World Heritage Centre (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl): UNESCO World Heritage in Poland and Pomniki Historii (UNESCO whc001 (22 November 2026); NID Pomniki Historii 30 September 2026 + Dz.U. 2026 poz. 1334)](https://data.unesco.org/explore/dataset/whc001/)
 - [Główny Urząd Statystyczny (GUS); Wikidata: National parks: area and visitors (GUS Ochrona srodowiska 2025 (data for 2024); Tatra National Park report for 2025; Wikidata centre points)](https://stat.gov.pl/obszary-tematyczne/srodowisko-energia/srodowisko/ochrona-srodowiska-2025,1,26.html)
 - [Główny Urząd Statystyczny (GUS); Ministry of Science (RAD-on / POL-on); Wikidata: Universities: students, research categories, main campus (GUS academic year 2025/26 (31 December 2025); RAD-on evaluations 2017-2021 and 2022-2025; Wikidata positions)](https://radon.nauka.gov.pl/dane)
-- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 26 November 2026, PGE report 2025, other curated figures as of November 2026)](https://www.openstreetmap.org/)
+- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 27 November 2026, PGE report 2025, other curated figures as of November 2026)](https://www.openstreetmap.org/)
 - [Ministry of Industry (report on hard coal mining 2025), State Mining Authority (WUG), KGHM, Sejm; positions from Wikidata and OpenStreetMap: Mines of Poland: coal, lignite, copper and silver, salt, sulphur (curated) (Mining output 2025 (WUG reports, EC hard coal report, KGHM); sulphur 2024)](https://www.gov.pl/web/wug/kwk)

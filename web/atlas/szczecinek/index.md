@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/szczecinek/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/szczecinek/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Szczecinek has the cleanest air of the 154 towns of 20,000+ with a measuring station within 25 km: PM2.5 averaged 9.7 µg/m³ in 2025 at the nearest station.
 

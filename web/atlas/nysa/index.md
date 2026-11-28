@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/nysa/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/nysa/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Nysa had 39,591 residents on 30 June 2026.
 

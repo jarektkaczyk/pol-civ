@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/radom/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/radom/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Radom zajmuje szesnaste miejsce w Polsce pod względem liczby mieszkańców. Liczy 190 909 mieszkańców (stan na 30 czerwca 2026 r.).
 

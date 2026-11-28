@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/tarnowskie-gory/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/tarnowskie-gory/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Tarnowskie Góry had 60,876 residents on 30 June 2026. Between 2015 and 2025 it lost 0.1% of its residents.
 

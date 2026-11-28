@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/katowice/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/katowice/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Katowice has 187 university students per 1,000 residents, the 4th highest share of the 84 towns of 20,000+ with a university.
 

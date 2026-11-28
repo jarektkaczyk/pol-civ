@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/dabrowa-gornicza/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/dabrowa-gornicza/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Na 1000 mieszkańców przypada tu 170 studentów. To szóste miejsce wśród 84 miast liczących co najmniej 20 tys. mieszkańców, w których działa uczelnia.
 

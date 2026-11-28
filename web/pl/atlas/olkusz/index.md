@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/olkusz/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/olkusz/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Olkusz liczy 31 316 mieszkańców (stan na 30 czerwca 2026 r.).
 

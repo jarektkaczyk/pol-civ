@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/bartoszyce/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/bartoszyce/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Registered unemployment around Bartoszyce (powiat bartoszycki) was 17.5% in October 2026, the highest for any of the 203 Polish towns with 20,000 or more people.
 

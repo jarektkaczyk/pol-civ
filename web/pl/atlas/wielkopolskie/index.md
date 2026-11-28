@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/wielkopolskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/wielkopolskie/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W październiku 2026 r. stopa bezrobocia rejestrowanego w województwie wielkopolskim wyniosła 3,8%. To najniższy wynik wśród województw.
 
@@ -88,6 +88,6 @@ W województwie jest 120 miast. 17 z nich liczy co najmniej 20 tys. mieszkańcó
 - [Europejska Agencja Kosmiczna (konsorcjum ESA WorldCover): ESA WorldCover 2021 (v200), pokrycie terenu 10 m (ESA WorldCover 2021 v200, podgląd 1:32 (1/375 stopnia))](https://esa-worldcover.org/)
 - [Główny Urząd Statystyczny (GUS); współtwórcy OpenStreetMap: Miasta Polski: ludność na 30 czerwca 2026 i położenie (GUS: ludność 30 czerwca 2026; miasta na 1 stycznia 2026, ludność 31 grudnia 2025; punkty place OSM z dnia pobrania)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
 - [Główny Urząd Statystyczny (GUS); Ministerstwo Nauki i Szkolnictwa Wyższego (RAD-on / POL-on); Wikidata: Uczelnie: studenci, kategorie naukowe, główny kampus (GUS, rok akademicki 2025/26 (31 grudnia 2025); ewaluacje RAD-on 2017-2021 i 2022-2025; lokalizacje z Wikidata)](https://radon.nauka.gov.pl/dane)
-- [Współtwórcy OpenStreetMap; operatorzy (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Elektrownie w Polsce (100 MW i więcej; fotowoltaika 50 MW i więcej), morskie farmy wiatrowe i elektrownia jądrowa (Dane z OpenStreetMap pobrane 26 listopada 2026, raport PGE 2025, pozostałe dane według stanu na listopad 2026)](https://www.openstreetmap.org/)
+- [Współtwórcy OpenStreetMap; operatorzy (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Elektrownie w Polsce (100 MW i więcej; fotowoltaika 50 MW i więcej), morskie farmy wiatrowe i elektrownia jądrowa (Dane z OpenStreetMap pobrane 27 listopada 2026, raport PGE 2025, pozostałe dane według stanu na listopad 2026)](https://www.openstreetmap.org/)
 - [Ministerstwo Przemysłu (sprawozdanie o górnictwie węgla kamiennego za 2025 r.), Wyższy Urząd Górniczy (WUG), KGHM, Sejm; lokalizacje z Wikidata i OpenStreetMap: Kopalnie w Polsce: węgiel kamienny, węgiel brunatny, miedź i srebro, sól, siarka (zestawienie własne) (Wydobycie 2025 (raporty WUG, raport o węglu kamiennym dla KE, KGHM); siarka 2024)](https://www.gov.pl/web/wug/kwk)
 - [ORLEN, Gaz-System (cytowane strony); lokalizacje z Wikidata i OpenStreetMap: Ropa i gaz w Polsce: Baltic Pipe, główne złoża, rafinerie (zestawienie własne) (Zestawienie własne według stanu na listopad 2026 (ORLEN, Gaz-System))](https://www.orlen.pl/en)

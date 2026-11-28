@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/szczytno/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/szczytno/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Registered unemployment around Szczytno (powiat szczycieński) was 11.5% in October 2026, the 10th highest for any of the 203 Polish towns with 20,000 or more people.
 

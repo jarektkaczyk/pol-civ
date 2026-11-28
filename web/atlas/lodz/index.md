@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/lodz/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/lodz/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Łódź is the 4th largest city in Poland, with 636,753 residents on 30 June 2026.
 

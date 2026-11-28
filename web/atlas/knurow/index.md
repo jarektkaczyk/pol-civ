@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/knurow/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/knurow/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Knurów had 34,791 residents on 30 June 2026. Between 2015 and 2025 it lost 9.9% of its residents.
 

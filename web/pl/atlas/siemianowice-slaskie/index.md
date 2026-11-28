@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/siemianowice-slaskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/siemianowice-slaskie/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Siemianowice Śląskie liczą 62 097 mieszkańców (stan na 30 czerwca 2026 r.). W latach 2015-2025 liczba ludności spadła o 8,7%.
 

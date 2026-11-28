@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/mazowieckie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/mazowieckie/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 30 czerwca 2026 r. województwo mazowieckie liczyło 5 502 043 mieszkańców. To najwyższy wynik wśród województw.
 
@@ -102,6 +102,6 @@ W województwie jest 114 miast. 26 z nich liczy co najmniej 20 tys. mieszkańcó
 - [Główny Urząd Statystyczny (GUS); Wikidata: Parki narodowe: powierzchnia i liczba odwiedzających (GUS, Ochrona środowiska 2025 (dane za 2024 r.); raport Tatrzańskiego Parku Narodowego za 2025 r.; punkty centralne z Wikidata)](https://stat.gov.pl/obszary-tematyczne/srodowisko-energia/srodowisko/ochrona-srodowiska-2025,1,26.html)
 - [Główny Urząd Statystyczny (GUS); Ministerstwo Nauki i Szkolnictwa Wyższego (RAD-on / POL-on); Wikidata: Uczelnie: studenci, kategorie naukowe, główny kampus (GUS, rok akademicki 2025/26 (31 grudnia 2025); ewaluacje RAD-on 2017-2021 i 2022-2025; lokalizacje z Wikidata)](https://radon.nauka.gov.pl/dane)
 - [Eurostat; współtwórcy OpenStreetMap; Wikidata; Rząd RP: Lotniska w Polsce: ruch, położenie i planowany Port Polska (Eurostat, ruch lotniczy 2025; stan planu Portu Polska na 30 czerwca 2026)](https://ec.europa.eu/eurostat/web/transport/database)
-- [Współtwórcy OpenStreetMap; operatorzy (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Elektrownie w Polsce (100 MW i więcej; fotowoltaika 50 MW i więcej), morskie farmy wiatrowe i elektrownia jądrowa (Dane z OpenStreetMap pobrane 26 listopada 2026, raport PGE 2025, pozostałe dane według stanu na listopad 2026)](https://www.openstreetmap.org/)
+- [Współtwórcy OpenStreetMap; operatorzy (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Elektrownie w Polsce (100 MW i więcej; fotowoltaika 50 MW i więcej), morskie farmy wiatrowe i elektrownia jądrowa (Dane z OpenStreetMap pobrane 27 listopada 2026, raport PGE 2025, pozostałe dane według stanu na listopad 2026)](https://www.openstreetmap.org/)
 - [ORLEN, Gaz-System (cytowane strony); lokalizacje z Wikidata i OpenStreetMap: Ropa i gaz w Polsce: Baltic Pipe, główne złoża, rafinerie (zestawienie własne) (Zestawienie własne według stanu na listopad 2026 (ORLEN, Gaz-System))](https://www.orlen.pl/en)
 - [Varso Tower: varso.com](https://varso.com/en/varso-tower/)

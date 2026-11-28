@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/lowicz/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/lowicz/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Łowicz had 25,141 residents on 30 June 2026. Between 2015 and 2025 it lost 12.5% of its residents.
 

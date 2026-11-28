@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/pruszcz-gdanski/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/pruszcz-gdanski/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W latach 2015-2025 liczba mieszkańców miasta wzrosła o 9,3%. Pod względem tempa wzrostu Pruszcz Gdański zajmuje ósme miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

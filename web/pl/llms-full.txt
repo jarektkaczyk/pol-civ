@@ -1,6 +1,6 @@
 # Polska w stylu Civ: pełny tekst
 
-Tekst atlasu https://softonsofa.com/pol-civ/pl/atlas/ w formacie Markdown. Stan na 2026-11-27. Przy danych podano daty i wydawców.
+Tekst atlasu https://softonsofa.com/pol-civ/pl/atlas/ w formacie Markdown. Stan na 2026-11-28. Przy danych podano daty i wydawców.
 
 ## Polska w liczbach
 

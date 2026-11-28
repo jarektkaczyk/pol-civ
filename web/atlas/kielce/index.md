@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/kielce/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/kielce/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Kielce is the 18th largest city in Poland, with 177,980 residents on 30 June 2026.
 

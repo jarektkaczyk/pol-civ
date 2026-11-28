@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/zakopane/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/zakopane/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Zakopane had 24,805 residents on 30 June 2026. Between 2015 and 2025 it lost 9.2% of its residents.
 

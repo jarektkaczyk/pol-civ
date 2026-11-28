@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/dzierzoniow/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/dzierzoniow/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Mediana wieku w mieście wynosi 48,9 roku. To dziewiąte miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/dzierzoniow/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/dzierzoniow/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Dzierżoniów has the 9th oldest population of the 203 Polish towns with 20,000 or more people: a median age of 48.9 years.
 

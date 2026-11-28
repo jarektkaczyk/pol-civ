@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/chelm/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/chelm/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Chełm had 55,319 residents on 30 June 2026. Between 2015 and 2025 it lost 13.4% of its residents.
 

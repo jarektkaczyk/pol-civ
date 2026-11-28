@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/swidnik/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/swidnik/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Świdnik had 36,028 residents on 30 June 2026. Between 2015 and 2025 it lost 9.6% of its residents.
 

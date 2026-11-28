@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/gdynia/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/gdynia/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Gdynia expects 5,917 zł per resident from its share of personal income tax in 2026, the 10th highest of the 203 Polish towns with 20,000 or more people.
 

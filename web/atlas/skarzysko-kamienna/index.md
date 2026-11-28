@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/skarzysko-kamienna/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/skarzysko-kamienna/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Skarżysko-Kamienna has the oldest population of the 203 Polish towns with 20,000 or more people: a median age of 50.1 years.
 

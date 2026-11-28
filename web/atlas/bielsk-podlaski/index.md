@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/bielsk-podlaski/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/bielsk-podlaski/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Bielsk Podlaski had 23,096 residents on 30 June 2026. Between 2015 and 2025 it lost 10.9% of its residents.
 

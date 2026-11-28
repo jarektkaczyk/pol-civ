@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/piaseczno/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/piaseczno/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W drugiej turze wyborów prezydenckich 1 czerwca 2025 r. frekwencja w gminie Piaseczno wyniosła 83,5%. To najwyższy wynik wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

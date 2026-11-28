@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/pomorskie/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/pomorskie/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W latach 2015-2025 liczba ludności województwa pomorskiego wzrosła o 2,2%. To drugie miejsce w rankingu zmiany liczby ludności województw.
 
@@ -86,5 +86,5 @@ W województwie są 43 miasta. 15 z nich liczy co najmniej 20 tys. mieszkańców
 - [Główny Urząd Statystyczny (GUS); współtwórcy OpenStreetMap: Miasta Polski: ludność na 30 czerwca 2026 i położenie (GUS: ludność 30 czerwca 2026; miasta na 1 stycznia 2026, ludność 31 grudnia 2025; punkty place OSM z dnia pobrania)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
 - [Centrum Światowego Dziedzictwa UNESCO (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl): Światowe dziedzictwo UNESCO w Polsce i Pomniki Historii (UNESCO whc001 (22 listopada 2026); NID Pomniki Historii 30 września 2026 + Dz.U. z 2026 r. poz. 1334)](https://data.unesco.org/explore/dataset/whc001/)
 - [Główny Urząd Statystyczny (GUS); Eurostat; zarządy portów i Gaz-System (pozycje z zestawienia własnego): Porty morskie Polski: przeładunki i kontenery, terminale LNG (GUS, gospodarka morska 2025 (dane wstępne); Eurostat, porty 2025; TEU 2025)](https://stat.gov.pl/obszary-tematyczne/transport-i-lacznosc/transport/gospodarka-morska-w-polsce-w-2025-r-,7,23.html)
-- [Współtwórcy OpenStreetMap; operatorzy (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Elektrownie w Polsce (100 MW i więcej; fotowoltaika 50 MW i więcej), morskie farmy wiatrowe i elektrownia jądrowa (Dane z OpenStreetMap pobrane 26 listopada 2026, raport PGE 2025, pozostałe dane według stanu na listopad 2026)](https://www.openstreetmap.org/)
+- [Współtwórcy OpenStreetMap; operatorzy (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Elektrownie w Polsce (100 MW i więcej; fotowoltaika 50 MW i więcej), morskie farmy wiatrowe i elektrownia jądrowa (Dane z OpenStreetMap pobrane 27 listopada 2026, raport PGE 2025, pozostałe dane według stanu na listopad 2026)](https://www.openstreetmap.org/)
 - [ORLEN, Gaz-System (cytowane strony); lokalizacje z Wikidata i OpenStreetMap: Ropa i gaz w Polsce: Baltic Pipe, główne złoża, rafinerie (zestawienie własne) (Zestawienie własne według stanu na listopad 2026 (ORLEN, Gaz-System))](https://www.orlen.pl/en)

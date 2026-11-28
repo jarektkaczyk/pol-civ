@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/radom/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/radom/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Radom is the 16th largest city in Poland, with 190,909 residents on 30 June 2026.
 

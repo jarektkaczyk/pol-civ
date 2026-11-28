@@ -2,7 +2,7 @@
  "version": 1,
  "name": "Polska data catalogue",
  "site": "https://softonsofa.com/pol-civ/",
- "generated": "2026-11-27",
+ "generated": "2026-11-28",
  "description": "Public data behind the Polska map of Poland. Each file is JSON; shapes are documented in docs/DATA_CONTRACTS.md of the source repository.",
  "contracts": "https://github.com/jarektkaczyk/pol-civ/blob/main/docs/DATA_CONTRACTS.md",
  "license": {
@@ -565,7 +565,7 @@
   {
    "path": "data/lenses.json",
    "url": "https://softonsofa.com/pol-civ/data/lenses.json",
-   "bytes": 2430413,
+   "bytes": 2430411,
    "description": "The map lenses: one value per hex for each metric, with legend domains and notes.",
    "fields": [
     "density (Density)",
@@ -772,7 +772,7 @@
    ],
    "rows": 142,
    "vintage": {
-    "plants": "OpenStreetMap extract 2026-11-26, PGE report 2025, other curated figures as of 2026-11",
+    "plants": "OpenStreetMap extract 2026-11-27, PGE report 2025, other curated figures as of 2026-11",
     "renewables": "URE Mapa OZE 2026-09-30",
     "oil_gas": "Curated as of 2026-11 (ORLEN, Gaz-System)",
     "mines": "Mining output 2025 (WUG reports, EC hard coal report, KGHM); sulphur 2024"
@@ -822,8 +822,8 @@
    ],
    "rows": null,
    "vintage": {
-    "roads": "OpenStreetMap extract 2026-11-26",
-    "rail": "OpenStreetMap extract 2026-11-26",
+    "roads": "OpenStreetMap extract 2026-11-27",
+    "rail": "OpenStreetMap extract 2026-11-27",
     "network": "Eurostat tran_r_net motorway_km 2024, navigable_canal_km 2024, navigable_river_km 2024, rail_double_track_km 2024, rail_electrified_km 2024, rail_line_km 2024",
     "ports": "GUS maritime economy 2025 (preliminary); Eurostat ports 2025; TEU 2025",
     "airports": "Eurostat airport traffic 2025; Port Polska plan status 2026-06-30"
@@ -901,7 +901,7 @@
     "parks": "GUS Ochrona srodowiska 2025 (data for 2024); Tatra National Park report for 2025; Wikidata centre points",
     "universities": "GUS academic year 2025/26 (2025-12-31); RAD-on evaluations 2017-2021 and 2022-2025; Wikidata positions",
     "transport": "GUS maritime economy 2025 (preliminary); Eurostat ports 2025; TEU 2025; Eurostat airport traffic 2025; Port Polska plan status 2026-06-30",
-    "energy": "OpenStreetMap extract 2026-11-26, PGE report 2025, other curated figures as of 2026-11"
+    "energy": "OpenStreetMap extract 2026-11-27, PGE report 2025, other curated figures as of 2026-11"
    },
    "sources": [
     "pl_soc_heritage",
@@ -1105,7 +1105,7 @@
    "licenses": [
     {
      "source": "pl_hist_borders",
-     "terms": "CC BY-NC-SA 4.0"
+     "terms": "CC BY-NC-SA 4.0: non-commercial use, which this free, ad-free site is; the derived borders are shared under the same licence"
     }
    ]
   },
@@ -1198,7 +1198,7 @@
   {
    "path": "data/permits_monthly.json",
    "url": "https://softonsofa.com/pol-civ/data/permits_monthly.json",
-   "bytes": 439145,
+   "bytes": 439219,
    "description": "Building permits for new factories and warehouses per gmina and month, from the GUNB permit register.",
    "fields": [
     "months",
@@ -1208,7 +1208,7 @@
     "rules"
    ],
    "rows": 2325,
-   "vintage": "GUNB permit register, file of 2026-11-25; decisions 2016-01 to 2026-10",
+   "vintage": "GUNB permit register, file of 2026-11-27; decisions 2016-01 to 2026-10",
    "sources": [
     "pl_econ_permits"
    ],
@@ -1280,7 +1280,7 @@
   {
    "path": "data/power.json",
    "url": "https://softonsofa.com/pol-civ/data/power.json",
-   "bytes": 62405,
+   "bytes": 62571,
    "description": "One day of the power system every 15 minutes: generation by fuel, wind, solar, demand and the flows on each border, with the border lines, the largest wind and solar sites and capacity by powiat.",
    "fields": [
     "t",
@@ -1297,7 +1297,7 @@
     "attribution"
    ],
    "rows": 96,
-   "vintage": "PSE 2026-11-26 (15-minute data); OpenStreetMap 2026-11-27",
+   "vintage": "PSE 2026-11-27 (15-minute data); OpenStreetMap 2026-11-27",
    "sources": [
     "pl_power_pse",
     "pl_energy_plants",
@@ -1455,7 +1455,7 @@
   {
    "path": "data/sources.json",
    "url": "https://softonsofa.com/pol-civ/data/sources.json",
-   "bytes": 278535,
+   "bytes": 279012,
    "description": "The bibliography: every source with publisher, licence, vintage and the exact files used.",
    "fields": [
     "id",

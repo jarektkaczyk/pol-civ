@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/szczecin/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/szczecin/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Szczecin is the 7th largest city in Poland, with 382,271 residents on 30 June 2026.
 

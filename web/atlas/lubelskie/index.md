@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/lubelskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/lubelskie/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Lubelskie has the lowest average gross wage of the 16 voivodeships: 7,982 zł a month in May 2026.
 
@@ -74,5 +74,5 @@ It has 58 towns; 9 of them have 20,000 or more residents.
 - [European Space Agency (ESA WorldCover consortium): ESA WorldCover 2021 (v200), 10 m land cover (ESA WorldCover 2021 v200, 1:32 overview (1/375 degree))](https://esa-worldcover.org/)
 - [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 30 June 2026 and position (GUS population 30 June 2026; towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
 - [UNESCO World Heritage Centre (data.unesco.org); Narodowy Instytut Dziedzictwa (dane.gov.pl): UNESCO World Heritage in Poland and Pomniki Historii (UNESCO whc001 (22 November 2026); NID Pomniki Historii 30 September 2026 + Dz.U. 2026 poz. 1334)](https://data.unesco.org/explore/dataset/whc001/)
-- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 26 November 2026, PGE report 2025, other curated figures as of November 2026)](https://www.openstreetmap.org/)
+- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 27 November 2026, PGE report 2025, other curated figures as of November 2026)](https://www.openstreetmap.org/)
 - [Ministry of Industry (report on hard coal mining 2025), State Mining Authority (WUG), KGHM, Sejm; positions from Wikidata and OpenStreetMap: Mines of Poland: coal, lignite, copper and silver, salt, sulphur (curated) (Mining output 2025 (WUG reports, EC hard coal report, KGHM); sulphur 2024)](https://www.gov.pl/web/wug/kwk)

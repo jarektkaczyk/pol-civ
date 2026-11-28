@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/krotoszyn/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/krotoszyn/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W maju 2026 r. przeciętne miesięczne wynagrodzenie brutto w powiecie krotoszyńskim wyniosło 6828 zł. To najniższy wynik wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

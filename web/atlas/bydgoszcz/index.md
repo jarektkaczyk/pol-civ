@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/bydgoszcz/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/bydgoszcz/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Bydgoszcz is the 9th largest city in Poland, with 319,528 residents on 30 June 2026.
 

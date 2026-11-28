@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/gliwice/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/gliwice/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W maju 2026 r. przeciętne miesięczne wynagrodzenie brutto w mieście wyniosło 10 345 zł. To ósme miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

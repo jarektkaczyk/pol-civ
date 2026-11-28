@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/wagrowiec/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/wagrowiec/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Wągrowiec had 25,137 residents on 30 June 2026. Between 2015 and 2025 it lost 0.3% of its residents.
 

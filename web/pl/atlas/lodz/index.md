@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/lodz/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/lodz/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Łódź zajmuje czwarte miejsce w Polsce pod względem liczby mieszkańców. Liczy 636 753 mieszkańców (stan na 30 czerwca 2026 r.).
 

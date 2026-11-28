@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/zabrze/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/zabrze/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W drugiej turze wyborów prezydenckich 1 czerwca 2025 r. frekwencja w mieście wyniosła 62,5%. To drugie miejsce od końca wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

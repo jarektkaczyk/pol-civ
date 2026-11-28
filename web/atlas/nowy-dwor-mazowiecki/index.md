@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/nowy-dwor-mazowiecki/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/nowy-dwor-mazowiecki/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Nowy Dwór Mazowiecki had 28,344 residents on 30 June 2026. Between 2015 and 2025 it grew by 0.2%.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/mazowieckie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/mazowieckie/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Mazowieckie is the most populous voivodeship, with 5,502,043 residents on 30 June 2026.
 
@@ -102,6 +102,6 @@ It has 114 towns; 26 of them have 20,000 or more residents.
 - [Główny Urząd Statystyczny (GUS); Wikidata: National parks: area and visitors (GUS Ochrona srodowiska 2025 (data for 2024); Tatra National Park report for 2025; Wikidata centre points)](https://stat.gov.pl/obszary-tematyczne/srodowisko-energia/srodowisko/ochrona-srodowiska-2025,1,26.html)
 - [Główny Urząd Statystyczny (GUS); Ministry of Science (RAD-on / POL-on); Wikidata: Universities: students, research categories, main campus (GUS academic year 2025/26 (31 December 2025); RAD-on evaluations 2017-2021 and 2022-2025; Wikidata positions)](https://radon.nauka.gov.pl/dane)
 - [Eurostat; OpenStreetMap contributors; Wikidata; Government of Poland: Airports of Poland: traffic, positions and planned Port Polska (Eurostat airport traffic 2025; Port Polska plan status 30 June 2026)](https://ec.europa.eu/eurostat/web/transport/database)
-- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 26 November 2026, PGE report 2025, other curated figures as of November 2026)](https://www.openstreetmap.org/)
+- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 27 November 2026, PGE report 2025, other curated figures as of November 2026)](https://www.openstreetmap.org/)
 - [ORLEN, Gaz-System (via the cited pages); positions from Wikidata and OpenStreetMap: Oil and gas in Poland: Baltic Pipe, main fields, refineries (curated) (Curated as of November 2026 (ORLEN, Gaz-System))](https://www.orlen.pl/en)
 - [Varso Tower: varso.com](https://varso.com/en/varso-tower/)

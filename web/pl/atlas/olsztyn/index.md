@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/olsztyn/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/olsztyn/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Olsztyn zajmuje dwudzieste miejsce w Polsce pod względem liczby mieszkańców. Liczy 164 999 mieszkańców (stan na 30 czerwca 2026 r.).
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/piastow/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/piastow/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Turnout in Piastów was 81.3% in the presidential runoff of 1 June 2025, the 4th highest of the 203 Polish towns with 20,000 or more people.
 

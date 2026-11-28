@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/jarocin/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/jarocin/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Jarocin liczy 26 198 mieszkańców (stan na 30 czerwca 2026 r.).
 

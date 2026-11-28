@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/kedzierzyn-kozle/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/kedzierzyn-kozle/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W latach 2015-2025 liczba mieszkańców miasta spadła o 14,8%. Pod względem tempa spadku Kędzierzyn-Koźle zajmuje piąte miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

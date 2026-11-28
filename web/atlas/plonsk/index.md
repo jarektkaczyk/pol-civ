@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/plonsk/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/plonsk/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Płońsk had 21,220 residents on 30 June 2026. Between 2015 and 2025 it lost 4.6% of its residents.
 

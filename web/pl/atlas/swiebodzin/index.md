@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/swiebodzin/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/swiebodzin/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Świebodzin liczy 20 404 mieszkańców (stan na 30 czerwca 2026 r.).
 

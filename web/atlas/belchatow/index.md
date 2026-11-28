@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/belchatow/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/belchatow/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Bełchatów has the 5th most polluted air of the 154 towns of 20,000+ with a measuring station within 25 km: PM2.5 averaged 21.6 µg/m³ in 2025 at the nearest station.
 
@@ -63,4 +63,4 @@ The median of the 154 towns of 20,000+ with a station within 25 km was 16.4 µg/
 - [Statistics Poland (GUS): GUS labour publication tables (GUS, October 2026, May 2026, and December 2025)](https://stat.gov.pl/obszary-tematyczne/rynek-pracy/)
 - [Ministry of Finance and Statistics Poland (GUS): Polish local income, housing, and tourism statistics (Ministry of Finance 2026; GUS annual 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
 - [Państwowa Komisja Wyborcza (PKW): Election results by gmina (presidential 2015, 2020 and 2025, Sejm 2023) (PKW: presidential election runoffs of 24 May 2015 and 12 July 2020; presidential election 2025 (rounds of 18 May and 1 June 2025); Sejm 2023 (15 October 2023))](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach)
-- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 26 November 2026, PGE report 2025, other curated figures as of November 2026)](https://www.openstreetmap.org/)
+- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 27 November 2026, PGE report 2025, other curated figures as of November 2026)](https://www.openstreetmap.org/)

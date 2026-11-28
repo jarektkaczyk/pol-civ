@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/lebork/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/lebork/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Lębork had 33,538 residents on 30 June 2026. Between 2015 and 2025 it lost 5.0% of its residents.
 

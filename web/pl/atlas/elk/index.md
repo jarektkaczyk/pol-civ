@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/elk/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/elk/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W drugiej turze wyborów prezydenckich 1 czerwca 2025 r. frekwencja w mieście wyniosła 61,9%. To najniższy wynik wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

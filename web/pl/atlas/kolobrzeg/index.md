@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/kolobrzeg/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/kolobrzeg/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Mediana wieku w mieście wynosi 49,3 roku. To szóste miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

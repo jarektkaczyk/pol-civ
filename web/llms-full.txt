@@ -1,6 +1,6 @@
 # Polska: Poland, the Civ way: full text
 
-Every atlas page of https://softonsofa.com/pol-civ/ as compact markdown. Generated 2026-11-27. Each figure gives its date and publisher.
+Every atlas page of https://softonsofa.com/pol-civ/ as compact markdown. Generated 2026-11-28. Each figure gives its date and publisher.
 
 ## Poland in numbers
 

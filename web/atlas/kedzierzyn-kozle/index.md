@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/kedzierzyn-kozle/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/kedzierzyn-kozle/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Kędzierzyn-Koźle lost 14.8% of its residents between 2015 and 2025, the 5th steepest fall of the 203 Polish towns with 20,000 or more people.
 

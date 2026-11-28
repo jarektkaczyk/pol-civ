@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/marki/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/marki/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W latach 2015-2025 liczba mieszkańców miasta wzrosła o 53,5%. Pod względem tempa wzrostu Marki zajmują pierwsze miejsce wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

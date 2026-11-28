@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/gorzow-wielkopolski/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/gorzow-wielkopolski/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Gorzów Wielkopolski had 113,032 residents on 30 June 2026. Between 2015 and 2025 it lost 8.2% of its residents.
 

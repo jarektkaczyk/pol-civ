@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/police/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/police/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Police had 28,739 residents on 30 June 2026.
 

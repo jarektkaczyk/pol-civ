@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/turek/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/turek/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W maju 2026 r. przeciętne miesięczne wynagrodzenie brutto w powiecie tureckim wyniosło 7068 zł. To trzecie miejsce od końca wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

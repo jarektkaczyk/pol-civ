@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/raciborz/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/raciborz/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W drugiej turze wyborów prezydenckich 1 czerwca 2025 r. frekwencja w mieście wyniosła 64,1%. To szóste miejsce od końca wśród 203 miast liczących co najmniej 20 tys. mieszkańców.
 

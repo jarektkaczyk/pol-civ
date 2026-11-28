@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/belchatow/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/belchatow/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W 2025 r. średnie roczne stężenie pyłu PM2,5 na najbliższej stacji wyniosło 21,6 µg/m³. To piąte miejsce wśród 154 miast liczących co najmniej 20 tys. mieszkańców ze stacją pomiarową w promieniu 25 km.
 
@@ -63,4 +63,4 @@ Wśród 154 miast liczących co najmniej 20 tys. mieszkańców ze stacją w prom
 - [Główny Urząd Statystyczny (GUS): Tablice GUS o rynku pracy (GUS, październik 2026, maj 2026 i grudzień 2025)](https://stat.gov.pl/obszary-tematyczne/rynek-pracy/)
 - [Ministerstwo Finansów i Główny Urząd Statystyczny (GUS): Polskie statystyki lokalne: dochody, mieszkania i turystyka (Ministerstwo Finansów 2026; dane roczne GUS 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
 - [Państwowa Komisja Wyborcza (PKW): Wyniki wyborów prezydenckich w latach 2015, 2020 i 2025 oraz wyborów do Sejmu w 2023 r. według gmin (PKW: drugie tury wyborów prezydenckich z 24 maja 2015 i 12 lipca 2020; wybory prezydenckie 2025 (tury z 18 maja i 1 czerwca 2025 r.); Sejm 2023 (15 października 2023))](https://wybory.gov.pl/prezydent2025/pl/dane_w_arkuszach)
-- [Współtwórcy OpenStreetMap; operatorzy (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Elektrownie w Polsce (100 MW i więcej; fotowoltaika 50 MW i więcej), morskie farmy wiatrowe i elektrownia jądrowa (Dane z OpenStreetMap pobrane 26 listopada 2026, raport PGE 2025, pozostałe dane według stanu na listopad 2026)](https://www.openstreetmap.org/)
+- [Współtwórcy OpenStreetMap; operatorzy (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Elektrownie w Polsce (100 MW i więcej; fotowoltaika 50 MW i więcej), morskie farmy wiatrowe i elektrownia jądrowa (Dane z OpenStreetMap pobrane 27 listopada 2026, raport PGE 2025, pozostałe dane według stanu na listopad 2026)](https://www.openstreetmap.org/)

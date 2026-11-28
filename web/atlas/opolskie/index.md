@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/opolskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/opolskie/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Opolskie is the least populous voivodeship, with 919,766 residents on 30 June 2026.
 
@@ -64,4 +64,4 @@ It has 38 towns; 5 of them have 20,000 or more residents.
 - [Ministry of Finance and Statistics Poland (GUS): Polish local income, housing, and tourism statistics (Ministry of Finance 2026; GUS annual 2025)](https://www.gov.pl/web/finanse/kwoty-dochodow-jednostek-samorzadu-terytorialnego-na-rok-2026-potrzeby-finansowe-podlegajace-sfinansowaniu-oraz-szczegolowe-dane-wykorzystane-do-ich-obliczenia)
 - [European Space Agency (ESA WorldCover consortium): ESA WorldCover 2021 (v200), 10 m land cover (ESA WorldCover 2021 v200, 1:32 overview (1/375 degree))](https://esa-worldcover.org/)
 - [Główny Urząd Statystyczny (GUS); OpenStreetMap contributors: Towns of Poland: population on 30 June 2026 and position (GUS population 30 June 2026; towns on 1 January 2026, population 31 December 2025; OSM place nodes as fetched)](https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/powierzchnia-i-ludnosc-w-przekroju-terytorialnym-w-2026-r-,7,23.html)
-- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 26 November 2026, PGE report 2025, other curated figures as of November 2026)](https://www.openstreetmap.org/)
+- [OpenStreetMap contributors; operators (PGE, Enea, Tauron, Orlen, Energa, Polenergia, PEJ), PSE: Power plants of Poland (100 MW or more; solar 50 MW or more), offshore wind and nuclear (OpenStreetMap extract 27 November 2026, PGE report 2025, other curated figures as of November 2026)](https://www.openstreetmap.org/)

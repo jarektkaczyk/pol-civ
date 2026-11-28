@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/sroda-wielkopolska/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/sroda-wielkopolska/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Środa Wielkopolska had 24,280 residents on 30 June 2026.
 

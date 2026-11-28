@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/zagan/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/zagan/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Żagań had 22,648 residents on 30 June 2026. Between 2015 and 2025 it lost 13.1% of its residents.
 

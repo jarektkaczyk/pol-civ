@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/ruda-slaska/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/ruda-slaska/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Ruda Śląska had 126,922 residents on 30 June 2026. Between 2015 and 2025 it lost 8.8% of its residents.
 

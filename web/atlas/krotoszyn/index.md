@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/krotoszyn/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/krotoszyn/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 The average gross wage around Krotoszyn (powiat krotoszyński) was 6,828 zł a month in May 2026, the lowest for any of the 203 Polish towns with 20,000 or more people.
 

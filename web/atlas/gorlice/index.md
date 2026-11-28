@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/gorlice/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/gorlice/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Gorlice had 24,670 residents on 30 June 2026. Between 2015 and 2025 it lost 11.5% of its residents.
 

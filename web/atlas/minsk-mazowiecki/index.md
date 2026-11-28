@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/minsk-mazowiecki/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/minsk-mazowiecki/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Mińsk Mazowiecki had 39,352 residents on 30 June 2026. Between 2015 and 2025 it lost 2.1% of its residents.
 

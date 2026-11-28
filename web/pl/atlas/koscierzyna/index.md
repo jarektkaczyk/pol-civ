@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/koscierzyna/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/koscierzyna/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W 2025 r. średnie roczne stężenie pyłu PM2,5 na najbliższej stacji wyniosło 10,8 µg/m³. To trzecie miejsce od końca wśród 154 miast liczących co najmniej 20 tys. mieszkańców ze stacją pomiarową w promieniu 25 km.
 

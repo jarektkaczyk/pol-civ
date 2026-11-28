@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/starachowice/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/starachowice/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Starachowice has the 4th oldest population of the 203 Polish towns with 20,000 or more people: a median age of 49.6 years.
 

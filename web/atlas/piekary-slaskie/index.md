@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/piekary-slaskie/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/piekary-slaskie/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Piekary Śląskie had 50,913 residents on 30 June 2026. Between 2015 and 2025 it lost 9.5% of its residents.
 

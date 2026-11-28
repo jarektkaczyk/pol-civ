@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/chojnice/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/chojnice/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Chojnice had 37,906 residents on 30 June 2026. Between 2015 and 2025 it lost 4.8% of its residents.
 

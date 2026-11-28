@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/kutno/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/kutno/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 W 2025 r. średnie roczne stężenie pyłu PM2,5 na najbliższej stacji wyniosło 20,9 µg/m³. To ósme miejsce wśród 154 miast liczących co najmniej 20 tys. mieszkańców ze stacją pomiarową w promieniu 25 km.
 

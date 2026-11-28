@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/augustow/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/augustow/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Augustów had 28,425 residents on 30 June 2026. Between 2015 and 2025 it lost 6.2% of its residents.
 

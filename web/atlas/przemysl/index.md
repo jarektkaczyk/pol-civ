@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/przemysl/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/przemysl/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Przemyśl had 53,941 residents on 30 June 2026. Between 2015 and 2025 it lost 13.3% of its residents.
 

@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/myslowice/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/myslowice/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Mysłowice had 69,864 residents on 30 June 2026. Between 2015 and 2025 it lost 6.3% of its residents.
 

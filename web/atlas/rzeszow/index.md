@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/rzeszow/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/rzeszow/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Rzeszów has 177 university students per 1,000 residents, the 5th highest share of the 84 towns of 20,000+ with a university.
 

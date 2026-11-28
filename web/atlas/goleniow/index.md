@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/goleniow/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/goleniow/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Goleniów has the 7th cleanest air of the 154 towns of 20,000+ with a measuring station within 25 km: PM2.5 averaged 11.6 µg/m³ in 2025 at the nearest station.
 

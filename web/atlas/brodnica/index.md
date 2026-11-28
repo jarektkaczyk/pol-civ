@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/brodnica/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/brodnica/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 The average gross wage around Brodnica (powiat brodnicki) was 7,274 zł a month in May 2026, the 6th lowest for any of the 203 Polish towns with 20,000 or more people.
 

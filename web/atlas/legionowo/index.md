@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/legionowo/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/legionowo/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Legionowo had 51,732 residents on 30 June 2026. Between 2015 and 2025 it lost 4.2% of its residents.
 

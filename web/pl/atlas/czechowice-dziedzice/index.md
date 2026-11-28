@@ -2,7 +2,7 @@
 
 Adres strony: https://softonsofa.com/pol-civ/pl/atlas/czechowice-dziedzice/
 Wersja angielska: https://softonsofa.com/pol-civ/atlas/czechowice-dziedzice/
-Ostatnia aktualizacja: 2026-11-27
+Ostatnia aktualizacja: 2026-11-28
 
 Czechowice-Dziedzice liczą 34 510 mieszkańców (stan na 30 czerwca 2026 r.).
 

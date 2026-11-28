@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/ostroda/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/ostroda/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Ostróda had 30,612 residents on 30 June 2026. Between 2015 and 2025 it lost 8.2% of its residents.
 

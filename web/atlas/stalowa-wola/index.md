@@ -2,7 +2,7 @@
 
 Source page: https://softonsofa.com/pol-civ/atlas/stalowa-wola/
 Polish version: https://softonsofa.com/pol-civ/pl/atlas/stalowa-wola/
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
 Stalowa Wola lost 14.9% of its residents between 2015 and 2025, the 4th steepest fall of the 203 Polish towns with 20,000 or more people.
 
